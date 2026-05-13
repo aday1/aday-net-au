@@ -494,6 +494,19 @@
     }
   };
 
+  const animateHeaders = () => {
+    if (!window.anime) return;
+    const headers = [...document.querySelectorAll("h1, h2, h3")];
+    window.anime({
+      targets: headers,
+      translateY: [14, 0],
+      opacity: [0, 1],
+      duration: 900,
+      delay: window.anime.stagger(70, { start: 120 }),
+      easing: "easeOutExpo"
+    });
+  };
+
   const moshImage = (img) => {
     if (img.dataset.moshReady === "1") return;
     const wrap = document.createElement("div");
@@ -581,6 +594,7 @@
   setInterval(cycleMenu, 2200);
   if (crtMedia) setInterval(cycleCrtMedia, 4200);
   animateTextFx();
+  animateHeaders();
   hydrateRepoGrid();
 
   document.querySelectorAll("img.mosh-image").forEach((img) => {
