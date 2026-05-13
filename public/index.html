@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>aday.net.au // @aday_net_au</title>
   <meta name="description" content="aday.net.au creative portal">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body class="scanlines-on boot-seq">
@@ -12,8 +13,8 @@
   <main class="shell">
     <header class="masthead">
       <p class="sysline">aday.net.au // @aday_net_au</p>
-      <h1 class="logo glitch" data-text="aday">aday</h1>
-      <p class="tagline">open source / modded / bendy / chip / h4xed enthusiasm</p>
+      <h1 class="logo glitch decrypt" data-text="aday">aday</h1>
+      <p class="tagline decrypt-line">open source / modded / bendy / chip / h4xed enthusiasm</p>
     </header>
 
     <section class="crt-rig scanlines" aria-label="crt-hero">
@@ -50,7 +51,7 @@
     </nav>
 
     <section class="panel">
-      <h2>System Feed</h2>
+      <h2 class="decrypt">System Feed</h2>
       <p>This portal is now a curated front page for your public output: music, gigs, art, VJ tools, creative coding experiments, web projects, and engineering repos.</p>
       <ul class="feed">
         <li><span>now</span> rebuilt CRT/glitch style with scanline toggle and archive-driven link map</li>
@@ -60,7 +61,45 @@
     </section>
 
     <section class="panel">
-      <h2>Music</h2>
+      <h2 class="decrypt">Primary Projects</h2>
+      <div class="grid two">
+        <article class="card project-primary">
+          <h3>Macroverse</h3>
+          <p>Primary browser visual platform for shaders and live visual workflows.</p>
+          <a href="https://macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">live preview</a>
+          <a href="https://github.com/aday1/macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">github repo</a>
+          <img class="repo-shot mosh-image" src="https://opengraph.githubassets.com/aday-mv/aday1/macroverse.aday.net.au" alt="Macroverse repository preview">
+        </article>
+        <article class="card project-primary">
+          <h3>ArtBastard</h3>
+          <p>Primary OSC/MIDI/DMX/Art-Net control and performance control-plane app.</p>
+          <a href="https://artbastard.aday.net.au" target="_blank" rel="noopener noreferrer">live preview</a>
+          <a href="https://github.com/aday1/artbastard.aday.net.au" target="_blank" rel="noopener noreferrer">github repo</a>
+          <img class="repo-shot mosh-image" src="https://opengraph.githubassets.com/aday-ab/aday1/artbastard.aday.net.au" alt="ArtBastard repository preview">
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="decrypt">Asset Vault</h2>
+      <div class="grid three assets-grid">
+        <article class="card">
+          <h3>Avatar</h3>
+          <img class="asset-image mosh-image" src="https://avatars.githubusercontent.com/u/1834001?v=4" alt="Aday avatar">
+        </article>
+        <article class="card">
+          <h3>Error Diffusion</h3>
+          <img class="asset-image mosh-image" src="https://raw.githubusercontent.com/aday1/error-diffusion/main/public/assets/max-patch-1.png" alt="Error Diffusion artwork">
+        </article>
+        <article class="card">
+          <h3>Acid Banger Visual</h3>
+          <img class="asset-image mosh-image" src="https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png" alt="Acid Banger preview image">
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="decrypt">Music</h2>
       <div class="grid two">
         <article class="card">
           <h3>Soundcloud</h3>
@@ -70,7 +109,8 @@
         <article class="card">
           <h3>Selected Music Code Projects</h3>
           <ul>
-            <li><a href="https://github.com/aday1/acid-banger" target="_blank" rel="noopener noreferrer">acid-banger</a></li>
+            <li><a href="https://github.com/aday1/acid-banger" target="_blank" rel="noopener noreferrer">acid-banger repo</a></li>
+            <li><a href="https://aday1.github.io/acid-banger/" target="_blank" rel="noopener noreferrer">acid-banger live page</a></li>
             <li><a href="https://github.com/aday1/Dreamurium-Weeklybeats2020W1" target="_blank" rel="noopener noreferrer">Dreamurium-Weeklybeats2020W1</a></li>
             <li><a href="https://github.com/aday1/Aisjam-V-Aday-Chiptune_Australian-BBQ-Bash-" target="_blank" rel="noopener noreferrer">Aisjam V Aday chiptune collab</a></li>
           </ul>
@@ -79,7 +119,7 @@
     </section>
 
     <section class="panel">
-      <h2>Gigs, Demos, and Scene Work</h2>
+      <h2 class="decrypt">Gigs, Demos, and Scene Work</h2>
       <div class="grid two">
         <article class="card">
           <h3>Demozoo Profile</h3>
@@ -99,7 +139,7 @@
     </section>
 
     <section class="panel">
-      <h2>Art, VJ Software, and Creative Coding</h2>
+      <h2 class="decrypt">Art, VJ Software, and Creative Coding</h2>
       <div class="grid three">
         <article class="card">
           <h3>Macroverse</h3>
@@ -122,7 +162,7 @@
     </section>
 
     <section class="panel">
-      <h2>Code, Web Design, and Projects</h2>
+      <h2 class="decrypt">Code, Web Design, and Projects</h2>
       <div class="grid three">
         <article class="card">
           <h3>Core Web Nodes</h3>
@@ -152,7 +192,13 @@
     </section>
 
     <section class="panel">
-      <h2>Blog</h2>
+      <h2 class="decrypt">Repository Radar</h2>
+      <p>Auto-indexed from public GitHub repos with previews and live-page links where available.</p>
+      <div id="repoGrid" class="grid three repo-grid"></div>
+    </section>
+
+    <section class="panel">
+      <h2 class="decrypt">Blog</h2>
       <div class="grid two">
         <article class="card">
           <h3>Writing and updates</h3>

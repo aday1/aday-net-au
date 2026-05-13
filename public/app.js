@@ -5,6 +5,7 @@
   const canvas = document.getElementById("crtCanvas");
   const cursor = document.getElementById("retroCursor");
   const menuItems = [...document.querySelectorAll(".osd-menu li")];
+  const repoGrid = document.getElementById("repoGrid");
   let activeIndex = 0;
 
   const saved = localStorage.getItem(key);
@@ -30,9 +31,8 @@
     });
   }
 
-  if (!canvas) return;
-
   const fit = () => {
+    if (!canvas) return;
     const ratio = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width = Math.max(1, Math.floor(rect.width * ratio));
@@ -40,6 +40,7 @@
   };
 
   const initShader = () => {
+    if (!canvas) return null;
     const gl = canvas.getContext("webgl", { antialias: false, alpha: false });
     if (!gl) return null;
 
@@ -126,7 +127,7 @@
   };
 
   const shader = initShader();
-  const ctx2d = shader ? null : canvas.getContext("2d");
+  const ctx2d = shader || !canvas ? null : canvas.getContext("2d");
 
   const drawFallback = (ctx, t) => {
     const w = canvas.clientWidth;
@@ -164,6 +165,7 @@
   };
 
   const render = (t) => {
+    if (!canvas) return;
     fit();
     if (shader) {
       const { gl, program, aPos, uRes, uTime, buffer } = shader;
@@ -191,8 +193,138 @@
     menuItems[activeIndex]?.classList.add("active");
   };
 
+  const scrambleText = (el, target) => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let frame = 0;
+    const max = target.length + 14;
+    const run = () => {
+      let out = "";
+      for (let i = 0; i < target.length; i++) {
+        if (i < frame - 6) out += target[i];
+        else out += chars[Math.floor(Math.random() * chars.length)];
+      }
+      el.textContent = out;
+      frame += 1;
+      if (frame <= max) requestAnimationFrame(run);
+      else el.textContent = target;
+    };
+    run();
+  };
+
+  const animateTextFx = () => {
+    const nodes = [...document.querySelectorAll(".decrypt")];
+    nodes.forEach((node, idx) => {
+      const text = node.dataset.text || node.textContent || "";
+      setTimeout(() => scrambleText(node, text), 180 + idx * 120);
+    });
+
+    const line = document.querySelector(".decrypt-line");
+    if (line && window.anime) {
+      const txt = line.textContent || "";
+      line.textContent = "";
+      let i = 0;
+      const timer = setInterval(() => {
+        line.textContent += txt[i] || "";
+        i += 1;
+        if (i >= txt.length) clearInterval(timer);
+      }, 18);
+      window.anime({
+        targets: ".decrypt-line",
+        opacity: [0.3, 1],
+        duration: 1400,
+        easing: "easeOutQuad"
+      });
+    }
+  };
+
+  const moshImage = (img) => {
+    if (img.dataset.moshReady === "1") return;
+    const wrap = document.createElement("div");
+    wrap.className = "mosh-wrap";
+    img.parentNode?.insertBefore(wrap, img);
+    wrap.appendChild(img);
+
+    const layer = document.createElement("canvas");
+    layer.className = "mosh-layer";
+    wrap.appendChild(layer);
+    const lctx = layer.getContext("2d");
+    if (!lctx) return;
+
+    const size = () => {
+      layer.width = img.clientWidth;
+      layer.height = img.clientHeight;
+    };
+
+    const draw = () => {
+      size();
+      lctx.clearRect(0, 0, layer.width, layer.height);
+      for (let i = 0; i < 7; i++) {
+        const sy = Math.random() * layer.height;
+        const sh = 4 + Math.random() * 20;
+        const dx = (Math.random() - 0.5) * 14;
+        lctx.globalAlpha = 0.14 + Math.random() * 0.3;
+        lctx.drawImage(img, 0, sy, layer.width, sh, dx, sy, layer.width, sh);
+      }
+      lctx.globalAlpha = 0.18;
+      lctx.fillStyle = `rgba(${Math.floor(Math.random() * 90)}, ${200 + Math.floor(Math.random() * 50)}, 255, 0.28)`;
+      lctx.fillRect(0, Math.random() * layer.height, layer.width, 1 + Math.random() * 2);
+    };
+
+    setInterval(draw, 240);
+    window.addEventListener("resize", size);
+    img.dataset.moshReady = "1";
+  };
+
+  const hydrateRepoGrid = async () => {
+    if (!repoGrid) return;
+    try {
+      const response = await fetch("https://api.github.com/users/aday1/repos?per_page=100&sort=updated");
+      if (!response.ok) return;
+      const repos = await response.json();
+      const picks = repos
+        .filter((repo) => !repo.fork)
+        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+        .slice(0, 24);
+
+      repoGrid.innerHTML = "";
+      for (let i = 0; i < picks.length; i++) {
+        const repo = picks[i];
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const shot = `https://opengraph.githubassets.com/aday-radar-${i}/${repo.owner.login}/${repo.name}`;
+        const liveGuess = repo.homepage && repo.homepage.trim() !== ""
+          ? repo.homepage
+          : (repo.name.includes(".aday.net.au") ? `https://${repo.name}` : `https://aday1.github.io/${repo.name}/`);
+
+        card.innerHTML = `
+          <h3>${repo.name}</h3>
+          <p class="repo-meta">${(repo.description || "No description yet").slice(0, 120)}</p>
+          <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">repo</a>
+          <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">live/page</a>
+          <img class="repo-shot mosh-image" src="${shot}" alt="${repo.name} preview">
+        `;
+        repoGrid.appendChild(card);
+      }
+
+      document.querySelectorAll("img.mosh-image").forEach((img) => {
+        if (img.complete) moshImage(img);
+        else img.addEventListener("load", () => moshImage(img), { once: true });
+      });
+    } catch {
+      // silent degrade
+    }
+  };
+
   window.addEventListener("resize", fit);
   fit();
-  requestAnimationFrame(render);
+  if (canvas) requestAnimationFrame(render);
   setInterval(cycleMenu, 2200);
+  animateTextFx();
+  hydrateRepoGrid();
+
+  document.querySelectorAll("img.mosh-image").forEach((img) => {
+    if (img.complete) moshImage(img);
+    else img.addEventListener("load", () => moshImage(img), { once: true });
+  });
 })();
