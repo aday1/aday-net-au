@@ -152,6 +152,7 @@ body.scanlines-off::before {
   border: 1px solid var(--line);
   background: rgba(5, 12, 24, 0.9);
   padding: 16px;
+  margin-top: 14px;
 }
 
 .panel h2 {
@@ -163,6 +164,51 @@ body.scanlines-off::before {
 .panel p {
   margin: 0 0 12px;
   color: #d5dded;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+.grid.two {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid.three {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.card {
+  border: 1px solid #2a3a58;
+  background: rgba(8, 17, 34, 0.85);
+  padding: 12px;
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 0.98rem;
+  color: #c0f6ff;
+}
+
+.card p {
+  margin: 0 0 8px;
+}
+
+.card a {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 6px;
+  color: #9fd4ff;
+}
+
+.card ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.card li {
+  margin: 0 0 6px;
 }
 
 .feed {
