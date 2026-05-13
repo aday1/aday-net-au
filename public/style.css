@@ -31,6 +31,19 @@ body::before {
 
 body.scanlines-off::before { opacity: 0; }
 
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.22;
+  background:
+    linear-gradient(115deg, transparent 0%, transparent 43%, rgba(131, 191, 255, 0.08) 44%, transparent 45%, transparent 100%),
+    linear-gradient(64deg, transparent 0%, transparent 64%, rgba(163, 255, 142, 0.06) 65%, transparent 66%, transparent 100%);
+  animation: wiredPulse 7.8s ease-in-out infinite;
+}
+
 .noise {
   position: fixed;
   inset: 0;
@@ -49,7 +62,7 @@ body.scanlines-off::before { opacity: 0; }
   margin: 34px auto 46px;
   padding: 22px;
   border: 1px solid #4c70a6;
-  background: rgba(7, 14, 26, 0.76);
+  background: rgba(6, 11, 22, 0.82);
   box-shadow: 0 0 0 1px rgba(173, 206, 255, 0.22), 0 22px 90px rgba(0, 0, 0, 0.56), inset 0 0 50px rgba(0, 50, 110, 0.2);
   transform-origin: center;
 }
@@ -72,6 +85,7 @@ body.boot-seq .shell {
 .glitch::before { transform: translateX(2px); color: rgba(255, 100, 180, 0.55); clip-path: polygon(0 0, 100% 0, 100% 48%, 0 48%); animation: jumpA 2.3s infinite; }
 .glitch::after { transform: translateX(-2px); color: rgba(85, 245, 255, 0.6); clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%); animation: jumpB 1.9s infinite; }
 .tagline { margin: 8px 0 0; color: var(--muted); }
+.tagline { letter-spacing: 0.03em; }
 
 .crt-rig {
   margin: 18px 0 18px;
@@ -221,7 +235,7 @@ body.boot-seq .shell {
 
 .panel {
   border: 1px solid var(--line);
-  background: rgba(8, 15, 28, 0.9);
+  background: rgba(6, 12, 24, 0.92);
   padding: 16px;
   margin-top: 12px;
 }
@@ -275,6 +289,17 @@ body.boot-seq .shell {
 .decrypt-char {
   display: inline-block;
   min-width: 0.45ch;
+}
+
+.wired-panel {
+  border-color: #59749c;
+  background:
+    radial-gradient(circle at 16% 8%, rgba(145, 255, 151, 0.12), transparent 40%),
+    linear-gradient(180deg, rgba(8, 20, 34, 0.95), rgba(6, 12, 24, 0.95));
+}
+
+.wired-panel p {
+  color: #bfe8ff;
 }
 
 .feed { list-style: none; margin: 0; padding: 0; }
@@ -378,6 +403,11 @@ a { cursor: none; }
 @keyframes pulse {
   0%, 100% { filter: contrast(1) brightness(1); }
   45% { filter: contrast(1.2) brightness(1.08); }
+}
+
+@keyframes wiredPulse {
+  0%, 100% { opacity: 0.16; }
+  45% { opacity: 0.27; }
 }
 
 @keyframes tvOn {
