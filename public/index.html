@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body class="scanlines-on boot-seq">
+  <canvas id="bgShader" class="bg-shader" aria-hidden="true"></canvas>
   <div class="noise" aria-hidden="true"></div>
   <main class="shell">
     <header class="masthead">
@@ -228,6 +229,14 @@
       <h2 class="decrypt">Repository Radar</h2>
       <p>Auto-indexed from public GitHub repos with previews and live-page links where available.</p>
       <div id="repoGrid" class="grid three repo-grid"></div>
+    </section>
+
+    <section class="panel node-map-panel">
+      <h2 class="decrypt">Wired Node Map</h2>
+      <p>Entries in the network are visualized as linked nodes. Primary app nodes route through Macroverse, ArtBastard, and live experiment branches.</p>
+      <div class="node-stage">
+        <canvas id="nodeMapCanvas" width="1080" height="460" aria-hidden="true"></canvas>
+      </div>
     </section>
 
     <section class="panel">

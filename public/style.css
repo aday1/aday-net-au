@@ -18,6 +18,16 @@ body {
   cursor: none;
 }
 
+.bg-shader {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -279,6 +289,18 @@ body.boot-seq .shell {
 
 .repo-grid .card {
   min-height: 240px;
+  position: relative;
+  overflow: hidden;
+}
+
+.repo-grid .card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent 0%, transparent 49%, rgba(141, 255, 123, 0.08) 50%, transparent 51%, transparent 100%),
+    linear-gradient(45deg, transparent 0%, transparent 44%, rgba(138, 199, 255, 0.07) 45%, transparent 46%, transparent 100%);
 }
 
 .repo-meta {
@@ -300,6 +322,28 @@ body.boot-seq .shell {
 
 .wired-panel p {
   color: #bfe8ff;
+}
+
+.node-map-panel {
+  border-color: #5d80b9;
+  background:
+    radial-gradient(circle at 80% 18%, rgba(135, 255, 155, 0.11), transparent 38%),
+    linear-gradient(180deg, rgba(9, 18, 34, 0.95), rgba(5, 12, 24, 0.95));
+}
+
+.node-stage {
+  margin-top: 10px;
+  border: 1px solid #395379;
+  background: rgba(4, 8, 18, 0.85);
+  min-height: 300px;
+  position: relative;
+}
+
+#nodeMapCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  min-height: 300px;
 }
 
 .feed { list-style: none; margin: 0; padding: 0; }
