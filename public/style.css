@@ -1,10 +1,10 @@
 :root {
-  --bg: #1b2838;
-  --panel: #0e1726;
-  --line: #384b69;
-  --ink: #d6e4ff;
-  --muted: #95a8c7;
-  --green: #8dff8a;
+  --bg: #0b1730;
+  --panel: #081225;
+  --line: #365784;
+  --ink: #d8ecff;
+  --muted: #9ab2d8;
+  --green: #8eff79;
 }
 
 * { box-sizing: border-box; }
@@ -12,9 +12,10 @@ html, body { margin: 0; padding: 0; min-height: 100%; }
 
 body {
   font-family: "Consolas", "Lucida Console", "Courier New", monospace;
-  background: radial-gradient(circle at 50% -10%, #294061 0%, #1b2838 45%, #101820 100%);
+  background: radial-gradient(circle at 50% -10%, #2a4572 0%, #13233f 35%, #091426 70%, #060d18 100%);
   color: var(--ink);
   overflow-x: hidden;
+  cursor: none;
 }
 
 body::before {
@@ -23,9 +24,9 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.2) 50%);
-  background-size: 100% 3px;
-  opacity: 0.45;
+  background: linear-gradient(to bottom, rgba(140, 210, 255, 0.04) 0, transparent 1px, transparent 2px, rgba(0, 0, 0, 0.34) 3px);
+  background-size: 100% 4px;
+  opacity: 0.68;
 }
 
 body.scanlines-off::before { opacity: 0; }
@@ -35,10 +36,10 @@ body.scanlines-off::before { opacity: 0; }
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  opacity: 0.07;
+  opacity: 0.11;
   background-image: repeating-radial-gradient(circle at 50% 50%, #fff 0 1px, transparent 1px 2px);
-  background-size: 3px 3px;
-  animation: drift 0.18s infinite;
+  background-size: 2px 2px;
+  animation: drift 0.11s infinite;
 }
 
 .shell {
@@ -47,9 +48,14 @@ body.scanlines-off::before { opacity: 0; }
   width: min(1080px, 95vw);
   margin: 34px auto 46px;
   padding: 22px;
-  border: 1px solid #4a658f;
-  background: rgba(11, 18, 31, 0.72);
-  box-shadow: 0 0 0 1px rgba(173, 206, 255, 0.14), 0 22px 80px rgba(0, 0, 0, 0.52);
+  border: 1px solid #4c70a6;
+  background: rgba(7, 14, 26, 0.76);
+  box-shadow: 0 0 0 1px rgba(173, 206, 255, 0.22), 0 22px 90px rgba(0, 0, 0, 0.56), inset 0 0 50px rgba(0, 50, 110, 0.2);
+  transform-origin: center;
+}
+
+body.boot-seq .shell {
+  animation: tvOn 720ms cubic-bezier(0.2, 0.7, 0.1, 1), bootFlicker 1200ms steps(1, end);
 }
 
 .masthead { padding-bottom: 14px; border-bottom: 1px dashed #405577; }
@@ -58,7 +64,7 @@ body.scanlines-off::before { opacity: 0; }
   margin: 0;
   font-size: clamp(2.8rem, 12vw, 7.6rem);
   line-height: 0.9;
-  color: #dff3ff;
+  color: #d4ecff;
   text-shadow: -2px 0 rgba(255, 38, 110, 0.45), 2px 0 rgba(0, 217, 255, 0.42), 0 0 18px rgba(116, 225, 255, 0.35);
 }
 .glitch { position: relative; display: inline-block; animation: pulse 2.8s infinite; }
@@ -69,8 +75,8 @@ body.scanlines-off::before { opacity: 0; }
 
 .crt-rig {
   margin: 18px 0 18px;
-  border: 1px solid #506689;
-  background: linear-gradient(180deg, #25364d 0%, #172537 100%);
+  border: 1px solid #648ac4;
+  background: linear-gradient(180deg, #1f3352 0%, #101f34 100%);
   padding: 14px;
 }
 
@@ -78,7 +84,7 @@ body.scanlines-off::before { opacity: 0; }
   position: relative;
   overflow: hidden;
   border: 2px solid #98b7e6;
-  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.65), 0 0 24px rgba(72, 160, 255, 0.22);
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.7), 0 0 30px rgba(72, 160, 255, 0.32);
   border-radius: 10px;
   aspect-ratio: 16 / 9;
   background: #0a111d;
@@ -88,15 +94,29 @@ body.scanlines-off::before { opacity: 0; }
   width: 100%;
   height: 100%;
   display: block;
-  filter: contrast(1.16) saturate(1.25) brightness(1.05);
+  filter: contrast(1.22) saturate(1.34) brightness(1.08);
+}
+
+.screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(to bottom, rgba(166, 226, 255, 0.08), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.28)),
+              linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.38) 50%);
+  background-size: 100% 100%, 100% 4px;
+  mix-blend-mode: screen;
+  opacity: 0.85;
 }
 
 .screen::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent 42%, rgba(0, 0, 0, 0.45) 100%);
+  background: radial-gradient(circle at center, transparent 38%, rgba(0, 0, 0, 0.72) 100%);
   pointer-events: none;
+  z-index: 2;
 }
 
 .overlay {
@@ -110,24 +130,24 @@ body.scanlines-off::before { opacity: 0; }
 }
 
 .channel {
-  color: var(--green);
+  color: #9cff8e;
   font-size: 1rem;
-  text-shadow: 0 0 8px rgba(141, 255, 138, 0.8);
+  text-shadow: 0 0 10px rgba(141, 255, 138, 0.92), 0 0 22px rgba(80, 255, 125, 0.5);
 }
 
 .osd-menu {
   pointer-events: auto;
   width: min(260px, 42vw);
   border: 1px solid #79a6e0;
-  background: rgba(7, 15, 28, 0.72);
-  color: #e4eeff;
+  background: rgba(5, 12, 22, 0.82);
+  color: #8eff79;
   backdrop-filter: blur(2px);
 }
 
 .osd-menu header {
   padding: 8px 10px;
   border-bottom: 1px solid #6e8fbe;
-  color: #b9fff4;
+  color: #a1ff95;
   font-weight: bold;
 }
 
@@ -142,9 +162,9 @@ body.scanlines-off::before { opacity: 0; }
   padding: 4px 6px;
 }
 
-.osd-menu li.active { background: rgba(146, 255, 142, 0.18); border-left: 3px solid #8dff8a; }
+.osd-menu li.active { background: rgba(146, 255, 142, 0.22); border-left: 3px solid #8dff8a; }
 
-.osd-menu a { color: #d3f5ff; text-decoration: none; }
+.osd-menu a { color: #92ff84; text-decoration: none; }
 .osd-menu a:hover { text-decoration: underline; }
 
 .osd-menu footer {
@@ -167,7 +187,7 @@ body.scanlines-off::before { opacity: 0; }
 
 .quicklinks a {
   text-decoration: none;
-  color: #deebff;
+  color: #9eff89;
   border: 1px solid #46618a;
   padding: 10px 11px;
   background: rgba(10, 18, 32, 0.86);
@@ -181,23 +201,23 @@ body.scanlines-off::before { opacity: 0; }
   margin-top: 12px;
 }
 .panel h2 { margin: 0 0 10px; color: #baf2ff; font-size: 1.08rem; }
-.panel p { margin: 0 0 10px; color: #d5dded; }
+.panel p { margin: 0 0 10px; color: #cae3ff; }
 
 .grid { display: grid; gap: 12px; }
 .grid.two { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
 .grid.three { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
 
 .card { border: 1px solid #2e4362; background: rgba(9, 18, 33, 0.9); padding: 11px; }
-.card h3 { margin: 0 0 8px; color: #bdf8ff; font-size: 0.96rem; }
+.card h3 { margin: 0 0 8px; color: #9dff8e; font-size: 0.96rem; }
 .card p { margin: 0 0 8px; }
-.card a { display: inline-block; margin-right: 10px; margin-bottom: 6px; color: #9fd4ff; }
+.card a { display: inline-block; margin-right: 10px; margin-bottom: 6px; color: #9eff89; }
 .card ul { margin: 0; padding-left: 16px; }
 .card li { margin: 0 0 6px; }
 
 .feed { list-style: none; margin: 0; padding: 0; }
 .feed li { padding: 7px 0; border-top: 1px dotted #2e4564; color: #c0d2ed; }
 .feed li:first-child { border-top: 0; }
-.feed span { color: #98fcff; display: inline-block; min-width: 58px; }
+.feed span { color: #9dff8e; display: inline-block; min-width: 58px; }
 
 .footer {
   margin-top: 16px;
@@ -211,13 +231,41 @@ button {
   appearance: none;
   border: 1px solid #4c6590;
   background: #0d1a2f;
-  color: #d7e7ff;
+  color: #9eff89;
   padding: 8px 11px;
-  cursor: pointer;
+  cursor: none;
   font: inherit;
 }
 button:hover { border-color: #79d2ff; }
-.footer a { color: #9ecbff; }
+.footer a { color: #9eff89; cursor: none; }
+a { cursor: none; }
+
+.retro-cursor {
+  position: fixed;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #8fff79;
+  box-shadow: 0 0 10px rgba(143, 255, 121, 0.8), inset 0 0 6px rgba(143, 255, 121, 0.45);
+  background: rgba(12, 30, 12, 0.12);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+.retro-cursor::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 4px;
+  height: 4px;
+  background: #8fff79;
+}
+
+@media (hover: none), (pointer: coarse) {
+  body, a, button { cursor: auto; }
+  .retro-cursor { display: none; }
+}
 
 @keyframes drift {
   0% { transform: translate(0, 0); }
@@ -241,4 +289,16 @@ button:hover { border-color: #79d2ff; }
 @keyframes pulse {
   0%, 100% { filter: contrast(1) brightness(1); }
   45% { filter: contrast(1.2) brightness(1.08); }
+}
+
+@keyframes tvOn {
+  0% { transform: scale(1, 0.01); filter: brightness(3.2) contrast(2.4); opacity: 0.1; }
+  45% { transform: scale(1, 0.02); filter: brightness(4) contrast(2.9); opacity: 1; }
+  60% { transform: scale(1, 0.9); filter: brightness(2.2) contrast(1.7); }
+  100% { transform: scale(1, 1); filter: brightness(1) contrast(1); opacity: 1; }
+}
+
+@keyframes bootFlicker {
+  0%, 13%, 32%, 57%, 100% { opacity: 1; }
+  11%, 18%, 46%, 63% { opacity: 0.84; }
 }
