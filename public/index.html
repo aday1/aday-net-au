@@ -3,30 +3,43 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>aday.net.au</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; margin: 0; padding: 0; background: #0b0b10; color: #e8e8ee; }
-    main { max-width: 720px; margin: 80px auto; padding: 0 24px; line-height: 1.6; }
-    h1 { font-size: 2rem; margin-bottom: 0.25rem; letter-spacing: -0.01em; }
-    code { background: #1a1a22; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
-    .muted { color: #8a8a9a; font-size: 0.9rem; margin-top: 2rem; }
-    a { color: #7aa7ff; }
-    ul.links { list-style: none; padding: 0; }
-    ul.links li { margin: 0.25rem 0; }
-  </style>
+  <title>aday.net.au // @aday_net_au</title>
+  <meta name="description" content="aday.net.au creative portal">
+  <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-  <main>
-    <h1>aday.net.au</h1>
-    <p>Personal site for aday.net.au.</p>
-    <p>Domain: <code>aday.net.au</code></p>
-    <div class="muted">
-      <ul class="links">
-        <li>Live (Cloudflare): <a href="https://aday.net.au">https://aday.net.au</a></li>
-        <li>Backup mirror (GitHub Pages): <a href="https://aday1.github.io/aday-net-au/">https://aday1.github.io/aday-net-au/</a></li>
-        <li>Source: <a href="https://github.com/aday1/aday-net-au">github.com/aday1/aday-net-au</a></li>
+<body class="scanlines-on">
+  <div class="noise" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="masthead">
+      <p class="sysline">aday.net.au // @aday_net_au</p>
+      <h1 class="logo glitch" data-text="aday">aday</h1>
+      <p class="tagline">open source / modded / bendy / chip / h4xed enthusiasm</p>
+    </header>
+
+    <nav aria-label="primary" class="menu">
+      <a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <a href="https://www.twitch.tv/aday_net_au" target="_blank" rel="noopener noreferrer">Twitch</a>
+      <a href="https://blog.aday.net.au">Blog</a>
+      <a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">Soundcloud</a>
+      <a href="https://keys.aday.net.au">Keys</a>
+      <a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+
+    <section class="panel">
+      <h2>System Feed</h2>
+      <p>This site is rebuilt with a CRT/glitch style inspired by your reference pens, while preserving the original outward links and portal structure from the archived layout.</p>
+      <ul class="feed">
+        <li><span>now</span> domain online on Cloudflare and mirrored on GitHub Pages</li>
+        <li><span>next</span> blog entries publish from commits to blog.aday.net.au</li>
+        <li><span>note</span> toggle scanlines for readability if needed</li>
       </ul>
-    </div>
+    </section>
+
+    <footer class="footer">
+      <button id="scanlineToggle" type="button">Toggle scanlines</button>
+      <a href="https://web.archive.org/web/20260316231632/http://aday.net.au/" target="_blank" rel="noopener noreferrer">Wayback snapshot reference</a>
+    </footer>
   </main>
+  <script src="./app.js"></script>
 </body>
 </html>
