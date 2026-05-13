@@ -3,10 +3,40 @@
   const button = document.getElementById("scanlineToggle");
   const key = "aday.scanlines";
   const canvas = document.getElementById("crtCanvas");
+  const crtMedia = document.getElementById("crtMedia");
+  const crtCaption = document.getElementById("crtCaption");
   const cursor = document.getElementById("retroCursor");
   const menuItems = [...document.querySelectorAll(".osd-menu li")];
   const repoGrid = document.getElementById("repoGrid");
   let activeIndex = 0;
+  let mediaIndex = 0;
+
+  const mediaFeed = [
+    {
+      src: "https://raw.githubusercontent.com/aday1/error-diffusion/main/public/assets/max-patch-1.png",
+      title: "error-diffusion / visual patch output"
+    },
+    {
+      src: "https://avatars.githubusercontent.com/u/1834001?v=4",
+      title: "aday avatar"
+    },
+    {
+      src: "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png",
+      title: "acid-banger project visual"
+    },
+    {
+      src: "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif",
+      title: "acid-banger animated preview"
+    },
+    {
+      src: "https://opengraph.githubassets.com/aday-mv/aday1/macroverse.aday.net.au",
+      title: "macroverse project card"
+    },
+    {
+      src: "https://opengraph.githubassets.com/aday-ab/aday1/artbastard.aday.net.au",
+      title: "artbastard project card"
+    }
+  ];
 
   const saved = localStorage.getItem(key);
   if (saved === "off") {
@@ -188,9 +218,44 @@
 
   const cycleMenu = () => {
     if (!menuItems.length) return;
-    menuItems[activeIndex]?.classList.remove("active");
+    const prev = menuItems[activeIndex];
+    prev?.classList.remove("active");
     activeIndex = (activeIndex + 1) % menuItems.length;
-    menuItems[activeIndex]?.classList.add("active");
+    const next = menuItems[activeIndex];
+    next?.classList.add("active");
+
+    if (window.anime && next) {
+      window.anime({
+        targets: next,
+        translateX: [-8, 0],
+        opacity: [0.45, 1],
+        duration: 420,
+        easing: "easeOutExpo"
+      });
+    }
+  };
+
+  const cycleCrtMedia = () => {
+    if (!crtMedia) return;
+    mediaIndex = (mediaIndex + 1) % mediaFeed.length;
+    const item = mediaFeed[mediaIndex];
+    crtMedia.src = item.src;
+    crtCaption.textContent = item.title;
+    if (window.anime) {
+      window.anime({
+        targets: crtMedia,
+        opacity: [0.2, 0.82],
+        duration: 650,
+        easing: "easeOutCubic"
+      });
+      window.anime({
+        targets: crtCaption,
+        translateY: [8, 0],
+        opacity: [0.3, 1],
+        duration: 420,
+        easing: "easeOutExpo"
+      });
+    }
   };
 
   const scrambleText = (el, target) => {
@@ -320,6 +385,7 @@
   fit();
   if (canvas) requestAnimationFrame(render);
   setInterval(cycleMenu, 2200);
+  if (crtMedia) setInterval(cycleCrtMedia, 4200);
   animateTextFx();
   hydrateRepoGrid();
 
