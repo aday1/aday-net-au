@@ -35,6 +35,14 @@
     {
       src: "https://opengraph.githubassets.com/aday-ab/aday1/artbastard.aday.net.au",
       title: "artbastard project card"
+    },
+    {
+      src: "https://content.pouet.net/logos/neuroxfra.gif",
+      title: "pouet scene archive visual"
+    },
+    {
+      src: "https://opengraph.githubassets.com/aday-acid/aday1/acid-banger",
+      title: "acid-banger repository card"
     }
   ];
 
