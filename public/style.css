@@ -1476,7 +1476,7 @@ body.boot-seq .shell {
 
 .footer-wave {
   width: 100%;
-  height: 54px;
+  height: 64px;
   position: relative;
   border: 1px solid #3f5f86;
   border-radius: 8px;
@@ -1497,7 +1497,7 @@ body.boot-seq .shell {
     repeating-linear-gradient(90deg, rgba(130, 190, 255, 0.2) 0 8px, transparent 8px 18px),
     linear-gradient(90deg, rgba(108, 210, 255, 0), rgba(108, 210, 255, 0.6), rgba(163, 255, 177, 0.72), rgba(232, 146, 255, 0.58), rgba(108, 210, 255, 0));
   mix-blend-mode: screen;
-  animation: footerWaveShift 4.2s linear infinite;
+  animation: footerWaveShift 3.8s ease-in-out infinite alternate;
 }
 
 .footer-wave::after {
@@ -1514,7 +1514,7 @@ body.boot-seq .shell {
     radial-gradient(circle at 78% 48%, rgba(222, 131, 255, 0.56), rgba(0, 0, 0, 0) 30%);
   opacity: 0.82;
   filter: blur(2px);
-  animation: footerWavePulse 3.6s ease-in-out infinite;
+  animation: footerWavePulse 3.2s ease-in-out infinite alternate;
 }
 
 button {
@@ -1566,7 +1566,7 @@ body.retro-cursor-on,
 body.retro-cursor-on a,
 body.retro-cursor-on button,
 body.retro-cursor-on [role="button"] {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='28' viewBox='0 0 20 28'%3E%3Cpath d='M1 1V24L6 19L9 27L12 25L9 18H19V1Z' fill='%23f4f8ff' stroke='%23061220' stroke-width='1.1'/%3E%3Cpath d='M3 3V18L6 15L8.8 22L9.8 21.4L7.3 14.6H16V3Z' fill='%2368dbff' opacity='0.26'/%3E%3C/svg%3E") 1 1, auto !important;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='30' viewBox='0 0 22 30'%3E%3Cpath d='M2 2V27L8 21L11 29L14 27L11 19H20V2Z' fill='%23ffffff' stroke='%23000000' stroke-width='1.2'/%3E%3Cpath d='M4 4V22L8 18L10.4 25L11.7 24.2L9.6 17H17V4Z' fill='%23cfd6db'/%3E%3Cpath d='M6 24L8 22L11 29L14 27L11 19H13' fill='none' stroke='%23000000' stroke-width='1' opacity='0.58'/%3E%3C/svg%3E") 2 2, auto !important;
 }
 
 body.hide-crt-static .crt-static-overlay {
@@ -1952,13 +1952,13 @@ body.animations-off *::after {
 }
 
 @keyframes footerWaveShift {
-  0% { background-position: 0 0, -220px 0; }
-  100% { background-position: 88px 0, 220px 0; }
+  0% { background-position: 0 0, -170px 0; }
+  100% { background-position: 72px 0, 170px 0; }
 }
 
 @keyframes footerWavePulse {
-  0%, 100% { transform: translateX(-1.5%) scaleY(0.9); opacity: 0.64; }
-  50% { transform: translateX(1.5%) scaleY(1.14); opacity: 0.9; }
+  0% { transform: translateX(-1.2%) scaleY(0.9); opacity: 0.64; }
+  100% { transform: translateX(1.2%) scaleY(1.14); opacity: 0.9; }
 }
 
 @keyframes crtBurst {
