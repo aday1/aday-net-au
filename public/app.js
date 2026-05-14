@@ -768,6 +768,21 @@
 
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
+  const CUTON_BOOT_MS = 2400;
+  const CUTON_HIDE_MS = 2950;
+  let cutOnScheduled = false;
+  const runCutOnSequence = (forceImmediate = false) => {
+    if (forceImmediate) {
+      bootDone();
+      hideTransition();
+      cutOnScheduled = true;
+      return;
+    }
+    if (cutOnScheduled) return;
+    cutOnScheduled = true;
+    setTimeout(bootDone, CUTON_BOOT_MS);
+    setTimeout(hideTransition, CUTON_HIDE_MS);
+  };
   const loadUiPrefs = () => {
     const defaults = {
       retroCursor: canUseRetroCursor,
@@ -873,17 +888,14 @@
     window.addEventListener("resize", closeMenu);
   };
   document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(hideTransition, 1500);
+    runCutOnSequence();
   });
   window.addEventListener("load", () => {
-    setTimeout(bootDone, 800);
-    setTimeout(hideTransition, 900);
+    runCutOnSequence();
   });
-  window.addEventListener("pageshow", () => {
-    setTimeout(hideTransition, 120);
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) runCutOnSequence(true);
   });
-  setTimeout(bootDone, 3600);
-  setTimeout(hideTransition, 3800);
   applyUiPrefs();
   initUiToggleMenu();
 
