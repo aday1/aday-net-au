@@ -161,6 +161,134 @@
     return Math.abs(hash);
   };
 
+  const escapeXml = (value) => String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&apos;");
+
+  const wrapWords = (text, maxChars = 30, maxLines = 2) => {
+    const words = String(text || "").trim().split(/\s+/).filter(Boolean);
+    const lines = [];
+    let current = "";
+    for (let i = 0; i < words.length; i++) {
+      const next = current ? `${current} ${words[i]}` : words[i];
+      if (next.length > maxChars) {
+        if (current) lines.push(current);
+        current = words[i];
+      } else {
+        current = next;
+      }
+      if (lines.length >= maxLines) break;
+    }
+    if (lines.length < maxLines && current) lines.push(current);
+    return lines.slice(0, maxLines);
+  };
+
+  const buildRepoPoster = (repo, seed) => {
+    const palettes = [
+      { bgA: "#041108", bgB: "#0a2618", line: "#7dffb1", ink: "#d2ffe6", accent: "#46c77b", glow: "#89ffba" },
+      { bgA: "#080a17", bgB: "#11253d", line: "#8fd8ff", ink: "#d5edff", accent: "#4a8fd9", glow: "#9adfff" },
+      { bgA: "#120510", bgB: "#2a1130", line: "#ff9ceb", ink: "#ffe1fa", accent: "#d86ad6", glow: "#ffabf1" },
+      { bgA: "#1a1204", bgB: "#3b2608", line: "#ffd57e", ink: "#fff0ca", accent: "#d2a24f", glow: "#ffe198" },
+      { bgA: "#071313", bgB: "#0f2b2b", line: "#89ffe6", ink: "#d8fff6", accent: "#48c7ad", glow: "#9cfff0" },
+      { bgA: "#0c0f05", bgB: "#22330d", line: "#c8ff85", ink: "#efffd4", accent: "#92d84a", glow: "#d9ff9b" }
+    ];
+    const palette = palettes[seed % palettes.length];
+    let state = (seed % 2147483647) || 1;
+    const rnd = () => {
+      state = (state * 48271) % 2147483647;
+      return state / 2147483647;
+    };
+    const rawDesc = projectBlurbOverrides[repo.name] || repo.description || "Creative software signal relay.";
+    const haystack = `${repo.name} ${rawDesc} ${(repo.language || "")}`.toLowerCase();
+    const theme = haystack.includes("audio") || haystack.includes("music") || haystack.includes("midi")
+      ? "audio"
+      : haystack.includes("shader") || haystack.includes("visual") || haystack.includes("video")
+        ? "visual"
+        : haystack.includes("forum") || haystack.includes("blog") || haystack.includes("archive")
+          ? "archive"
+          : haystack.includes("key") || haystack.includes("security") || haystack.includes("auth")
+            ? "security"
+            : "code";
+    const repoName = escapeXml(repo.name || "repo");
+    const ownerName = escapeXml(repo.owner?.login || "aday1");
+    const descLines = wrapWords(rawDesc, 36, 2).map((line, idx) => (
+      `<text x="56" y="${470 + idx * 34}" fill="${palette.ink}" opacity="0.9" font-family="Consolas, monospace" font-size="25">${escapeXml(line)}</text>`
+    )).join("");
+    const language = escapeXml(repo.language || "mixed");
+    const tagLine = escapeXml([language, `updated:${new Date(repo.updated_at).toLocaleDateString("en-AU")}`, `theme:${theme}`].join("  /  "));
+
+    const stars = Array.from({ length: 16 }, () => {
+      const x = 70 + rnd() * 1060;
+      const y = 74 + rnd() * 262;
+      const r = 0.8 + rnd() * 2.6;
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${palette.glow}" opacity="${(0.18 + rnd() * 0.6).toFixed(3)}" />`;
+    }).join("");
+    const wave = Array.from({ length: 28 }, (_, i) => {
+      const x = 36 + i * 42;
+      const y = 286 + Math.sin(i * 0.55 + rnd() * 3) * (18 + rnd() * 20);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(" ");
+    const bars = Array.from({ length: 26 }, (_, i) => {
+      const h = 8 + rnd() * 96;
+      const x = 44 + i * 42;
+      const y = 340 - h;
+      return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="24" height="${h.toFixed(1)}" fill="${palette.accent}" opacity="${(0.24 + rnd() * 0.5).toFixed(3)}" />`;
+    }).join("");
+    const circuit = Array.from({ length: 10 }, (_, i) => {
+      const y = 98 + i * 26;
+      const x2 = 840 + (i % 4) * 84;
+      return `<path d="M30 ${y} H${x2} v${(i % 2 ? 16 : -16)} H1150" stroke="${palette.accent}" stroke-width="2" fill="none" opacity="0.52" />`;
+    }).join("");
+    const archiveGrid = Array.from({ length: 36 }, (_, i) => {
+      const x = 36 + (i % 12) * 94;
+      const y = 84 + Math.floor(i / 12) * 72;
+      const w = 34 + (i % 3) * 10;
+      return `<rect x="${x}" y="${y}" width="${w}" height="18" fill="${palette.glow}" opacity="${(0.1 + (i % 6) * 0.07).toFixed(2)}" />`;
+    }).join("");
+    const lockShape = `<path d="M985 218 h122 v112 h-122 z M1018 218 v-40 a28 28 0 0 1 56 0 v40" fill="none" stroke="${palette.line}" stroke-width="4" opacity="0.72" />`;
+
+    const motif = theme === "audio"
+      ? `${bars}<polyline points="${wave}" fill="none" stroke="${palette.line}" stroke-width="3" opacity="0.78" />`
+      : theme === "visual"
+        ? `${stars}<polyline points="${wave}" fill="none" stroke="${palette.glow}" stroke-width="2" opacity="0.72" />`
+        : theme === "archive"
+          ? archiveGrid
+          : theme === "security"
+            ? `${circuit}${lockShape}`
+            : `${circuit}${stars}`;
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+      <defs>
+        <linearGradient id="bg-${seed}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${palette.bgA}" />
+          <stop offset="100%" stop-color="${palette.bgB}" />
+        </linearGradient>
+        <pattern id="scan-${seed}" width="4" height="4" patternUnits="userSpaceOnUse">
+          <rect width="4" height="2" fill="rgba(255,255,255,0.03)" />
+          <rect y="2" width="4" height="2" fill="rgba(0,0,0,0.07)" />
+        </pattern>
+      </defs>
+      <rect width="1200" height="700" fill="url(#bg-${seed})" />
+      <rect x="20" y="20" width="1160" height="660" fill="none" stroke="${palette.line}" stroke-width="3" />
+      <rect x="32" y="32" width="1136" height="636" fill="none" stroke="${palette.accent}" stroke-width="1.5" opacity="0.7" />
+      ${motif}
+      <rect x="38" y="38" width="1124" height="624" fill="url(#scan-${seed})" opacity="0.34" />
+      <text x="56" y="126" fill="${palette.glow}" font-family="Consolas, monospace" font-size="30" opacity="0.92">${ownerName}</text>
+      <text x="56" y="188" fill="${palette.ink}" font-family="Consolas, monospace" font-size="62" font-weight="700">${repoName}</text>
+      <text x="56" y="244" fill="${palette.line}" font-family="Consolas, monospace" font-size="22">${tagLine}</text>
+      <text x="56" y="414" fill="${palette.accent}" font-family="Consolas, monospace" font-size="20" opacity="0.84">imagine-signal: generated per-repo poster frame</text>
+      ${descLines}
+      <circle cx="1088" cy="96" r="34" fill="none" stroke="${palette.line}" stroke-width="2.5" opacity="0.78" />
+      <circle cx="1088" cy="96" r="18" fill="${palette.glow}" opacity="0.24" />
+      <line x1="1050" y1="96" x2="1126" y2="96" stroke="${palette.line}" stroke-width="2" opacity="0.8" />
+      <line x1="1088" y1="58" x2="1088" y2="134" stroke="${palette.line}" stroke-width="2" opacity="0.8" />
+    </svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  };
+
 
   const randomImageSources = [
     "https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png",
@@ -255,7 +383,68 @@
   };
 
   const repoImageOverrides = {
-    MoveMusicSaveEditor: "https://raw.githubusercontent.com/aday1/MoveMusicSaveEditor/main/test.gif"
+    MoveMusicSaveEditor: "/assets/repo-cards/card-daw-timeline.jpg",
+    "macroverse.aday.net.au": "/assets/repo-cards/card-radar-core.jpg",
+    "artbastard.aday.net.au": "/assets/repo-cards/card-dmx-console.jpg",
+    "error-diffusion": "/assets/repo-cards/card-security-lock.jpg",
+    "acid-banger": "/assets/repo-cards/card-daw-timeline.jpg",
+    "blog.aday.net.au": "/assets/repo-cards/card-forum-map.jpg",
+    "aday-net-au": "/assets/repo-cards/card-synth-rack.jpg",
+    "keys-aday-net-au": "/assets/repo-cards/card-circuit-blue.jpg",
+    "breakcore-forums-placeholder": "/assets/repo-cards/card-system-tree.jpg",
+    "breakcore-com-au": "/assets/repo-cards/card-social-map-crt.jpg",
+    OpenSoundLab: "/assets/repo-cards/card-audio-rack.jpg",
+    "bitwig-mcp-server": "/assets/repo-cards/card-daw-timeline.jpg",
+    ZealPalace: "/assets/repo-cards/card-neon-code.jpg"
+  };
+
+  const repoClipOverrides = {
+    "macroverse.aday.net.au": "/assets/repo-clips/clip-radar-core-pp.mp4",
+    "artbastard.aday.net.au": "/assets/repo-clips/clip-dmx-faders-pp.mp4",
+    "error-diffusion": "/assets/repo-clips/clip-security-lock-pp.mp4",
+    "acid-banger": "/assets/repo-clips/clip-daw-panel-pp.mp4",
+    OpenSoundLab: "/assets/repo-clips/clip-daw-panel-pp.mp4",
+    "bitwig-mcp-server": "/assets/repo-clips/clip-daw-panel-pp.mp4",
+    "keys-aday-net-au": "/assets/repo-clips/clip-circuit-blue-pp.mp4",
+    "breakcore-forums-placeholder": "/assets/repo-clips/clip-node-graph-pp.mp4"
+  };
+
+  const localRepoCardPool = [
+    "/assets/repo-cards/card-audio-rack.jpg",
+    "/assets/repo-cards/card-circuit-blue.jpg",
+    "/assets/repo-cards/card-daw-timeline.jpg",
+    "/assets/repo-cards/card-dmx-console.jpg",
+    "/assets/repo-cards/card-forum-map.jpg",
+    "/assets/repo-cards/card-radar-core.jpg",
+    "/assets/repo-cards/card-security-lock.jpg",
+    "/assets/repo-cards/card-social-map-crt.jpg",
+    "/assets/repo-cards/card-synth-rack.jpg",
+    "/assets/repo-cards/card-system-tree.jpg"
+  ];
+
+  const pickLocalRepoCard = (repoName, seed) => {
+    const lower = (repoName || "").toLowerCase();
+    if (lower.includes("key") || lower.includes("auth") || lower.includes("secure")) return "/assets/repo-cards/card-security-lock.jpg";
+    if (lower.includes("macroverse")) return "/assets/repo-cards/card-radar-core.jpg";
+    if (lower.includes("art") || lower.includes("dmx") || lower.includes("light")) return "/assets/repo-cards/card-dmx-console.jpg";
+    if (lower.includes("sound") || lower.includes("audio") || lower.includes("music") || lower.includes("daw")) return "/assets/repo-cards/card-audio-rack.jpg";
+    if (lower.includes("blog") || lower.includes("forum")) return "/assets/repo-cards/card-forum-map.jpg";
+    if (lower.includes("breakcore")) return "/assets/repo-cards/card-social-map-crt.jpg";
+    if (lower.includes("acid")) return "/assets/repo-cards/card-daw-timeline.jpg";
+    if (!localRepoCardPool.length) return "";
+    return localRepoCardPool[seed % localRepoCardPool.length];
+  };
+
+  const pickLocalRepoClip = (repoName) => {
+    const lower = (repoName || "").toLowerCase();
+    if (lower.includes("macroverse")) return "/assets/repo-clips/clip-radar-core-pp.mp4";
+    if (lower.includes("art") || lower.includes("dmx") || lower.includes("light")) return "/assets/repo-clips/clip-dmx-faders-pp.mp4";
+    if (lower.includes("sound") || lower.includes("audio") || lower.includes("music") || lower.includes("daw")) return "/assets/repo-clips/clip-daw-panel-pp.mp4";
+    if (lower.includes("key") || lower.includes("auth") || lower.includes("secure")) return "/assets/repo-clips/clip-security-lock-pp.mp4";
+    if (lower.includes("blog") || lower.includes("forum")) return "/assets/repo-clips/clip-node-graph-pp.mp4";
+    if (lower.includes("breakcore")) return "/assets/repo-clips/clip-circuit-blue-pp.mp4";
+    if (lower.includes("acid")) return "/assets/repo-clips/clip-daw-panel-pp.mp4";
+    return "";
   };
 
   const projectBlurbOverrides = {
@@ -459,6 +648,10 @@
   let lastCrtFrameTime = 0;
   const render = (t) => {
     if (!canvas) return;
+    if (document.hidden) {
+      requestAnimationFrame(render);
+      return;
+    }
     if (t - lastCrtFrameTime < crtFrameBudgetMs) {
       requestAnimationFrame(render);
       return;
@@ -510,6 +703,15 @@
       seed: i * 0.71 + 1,
       speed: 0.11 + Math.random() * 0.24
     }));
+    let isVisible = true;
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+        });
+      }, { threshold: 0.05 });
+      observer.observe(nodeMapCanvas);
+    }
     let lastFrameTime = 0;
 
     const pickNode = (mx, my) => {
@@ -556,6 +758,10 @@
     });
 
     const renderGraph = (time) => {
+      if (document.hidden || !isVisible) {
+        requestAnimationFrame(renderGraph);
+        return;
+      }
       if (time - lastFrameTime < nodeMapFrameBudgetMs) {
         requestAnimationFrame(renderGraph);
         return;
@@ -695,9 +901,22 @@
     sceneAsset.onerror = () => {
       sceneAsset.src = "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png";
     };
+    let isVisible = true;
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+        });
+      }, { threshold: 0.05 });
+      observer.observe(acid303Canvas);
+    }
 
     let lastAcidFrameTime = 0;
     const draw = (time) => {
+      if (document.hidden || !isVisible) {
+        requestAnimationFrame(draw);
+        return;
+      }
       if (time - lastAcidFrameTime < acidFrameBudgetMs) {
         requestAnimationFrame(draw);
         return;
@@ -1043,7 +1262,8 @@
     const nodes = [...headers, ...subHeaders];
     if (!nodes.length) return;
 
-    nodes.forEach((node, idx) => {
+    const activeNodes = nodes.slice(0, performanceMode ? 6 : 10);
+    activeNodes.forEach((node, idx) => {
       const baseText = (node.dataset.text || node.textContent || "").trim();
       if (!baseText) return;
       node.dataset.baseText = baseText;
@@ -1063,21 +1283,21 @@
             easing: "linear"
           });
         }
-        const next = 5200 + Math.floor(Math.random() * 2600);
+        const next = 8800 + Math.floor(Math.random() * 5200);
         setTimeout(run, next);
       };
       setTimeout(run, 320 + idx * 120);
     });
 
-    if (window.anime) {
+    if (window.anime && !performanceMode) {
       window.anime({
-        targets: "h1, h2, h3, .decrypt-line",
+        targets: activeNodes,
         textShadow: [
           "0 0 4px rgba(132,255,160,0.2)",
           "0 0 9px rgba(132,255,160,0.55)",
           "0 0 4px rgba(132,255,160,0.2)"
         ],
-        duration: 2200,
+        duration: 3200,
         easing: "linear",
         loop: true
       });
@@ -1085,7 +1305,7 @@
   };
 
   let activeMoshCount = 0;
-  const MAX_MOSH_IMAGES = performanceMode ? 0 : 2;
+  const MAX_MOSH_IMAGES = 0;
   const moshImage = (img) => {
     if (img.id === "crtMedia") return;
     if (img.dataset.moshReady === "1") return;
@@ -1145,6 +1365,8 @@
         .slice(0, 8);
 
       repoGrid.innerHTML = "";
+      let videoCardsUsed = 0;
+      const MAX_VIDEO_CARDS = performanceMode ? 1 : 3;
       for (let i = 0; i < picks.length; i++) {
         const repo = picks[i];
         const seed = hashString(repo.name);
@@ -1156,7 +1378,23 @@
         card.className = `card repo-tv repo-tv-variant-${variant}`;
         card.style.setProperty("--tv-hue", String(hue));
 
-        const shot = repoImageOverrides[repo.name] || `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
+        const localShot = repoImageOverrides[repo.name] || pickLocalRepoCard(repo.name, seed);
+        const localClip = repoClipOverrides[repo.name] || pickLocalRepoClip(repo.name);
+        const repoOgShot = `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
+        const shot = localShot || buildRepoPoster(repo, seed);
+        const shotFallbacks = [
+          localShot,
+          repoOgShot,
+          `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/main/preview.png`,
+          `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/master/preview.png`,
+          `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/main/screenshot.png`,
+          `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/main/docs/preview.png`
+        ].filter((url, idx, all) => url && all.indexOf(url) === idx);
+        const useVideo = !!localClip && videoCardsUsed < MAX_VIDEO_CARDS;
+        const mediaMarkup = useVideo
+          ? `<video class="repo-shot repo-shot-video" src="${localClip}" poster="${shot}" muted autoplay loop playsinline preload="metadata"></video>`
+          : `<img class="repo-shot" src="${shot}" alt="${repo.name} preview" data-fallbacks="${shotFallbacks.join("|")}">`;
+        if (useVideo) videoCardsUsed += 1;
         const override = livePageOverrides[repo.name];
         const homepage = (repo.homepage || "").trim();
         const hasHomepage = homepage.startsWith("http://") || homepage.startsWith("https://");
@@ -1188,7 +1426,7 @@
             <span class="repo-tv-channel">${channelMode}-${String(i + 1).padStart(2, "0")}</span>
           </div>
           <div class="repo-tv-screen">
-            <img class="repo-shot mosh-image" src="${shot}" alt="${repo.name} preview">
+            ${mediaMarkup}
           </div>
           <p class="repo-meta">${blurb}</p>
           <p class="repo-meta repo-activity repo-activity-${activity}">activity: ${activity} / updated ${days}d ago</p>
@@ -1201,7 +1439,27 @@
         `;
         repoGrid.appendChild(card);
         const image = card.querySelector("img.repo-shot");
-        armRepoImageFallback(image, repo.owner.login, repo.name, repo.name);
+        if (image) armGenericImageFallback(image);
+      }
+
+      const repoVideos = [...repoGrid.querySelectorAll("video.repo-shot-video")];
+      if (repoVideos.length) {
+        if ("IntersectionObserver" in window) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              const video = entry.target;
+              if (!(video instanceof HTMLVideoElement)) return;
+              if (entry.isIntersecting && !document.hidden) {
+                video.play().catch(() => {});
+              } else {
+                video.pause();
+              }
+            });
+          }, { threshold: 0.15 });
+          repoVideos.forEach((video) => observer.observe(video));
+        } else {
+          repoVideos.forEach((video) => video.play().catch(() => {}));
+        }
       }
 
       document.querySelectorAll("img.mosh-image").forEach((img) => {
@@ -1241,4 +1499,12 @@
     else img.addEventListener("load", () => moshImage(img), { once: true });
   });
   document.querySelectorAll("img:not(.mosh-image)").forEach((img) => armGenericImageFallback(img));
+  document.addEventListener("visibilitychange", () => {
+    const repoVideos = document.querySelectorAll("video.repo-shot-video");
+    repoVideos.forEach((video) => {
+      if (!(video instanceof HTMLVideoElement)) return;
+      if (document.hidden) video.pause();
+      else video.play().catch(() => {});
+    });
+  });
 })();

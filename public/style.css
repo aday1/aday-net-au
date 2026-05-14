@@ -786,6 +786,7 @@ body.boot-seq .shell {
   position: relative;
   overflow: hidden;
   transition: transform 220ms ease, box-shadow 220ms ease;
+  animation: none !important;
 }
 
 .repo-grid .card:hover {
@@ -820,6 +821,10 @@ body.boot-seq .shell {
 
 .repo-tv::before {
   opacity: 0.65;
+}
+
+.repo-grid .repo-tv::before {
+  animation: none !important;
 }
 
 .repo-tv-head {
@@ -861,6 +866,11 @@ body.boot-seq .shell {
   background-size: 100% 4px;
   z-index: 2;
   animation: crtStaticRoll 2.6s steps(3, end) infinite;
+}
+
+.repo-grid .repo-tv-screen::before {
+  animation: none !important;
+  opacity: 0.42;
 }
 
 .repo-tv-screen::after {
@@ -907,6 +917,12 @@ body.boot-seq .shell {
   border: 0;
   min-height: 145px;
   aspect-ratio: 16 / 9;
+}
+
+.repo-tv .repo-shot-video {
+  background: #050b16;
+  object-fit: cover;
+  image-rendering: auto;
 }
 
 .repo-tv-links {
