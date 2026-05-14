@@ -25,7 +25,9 @@
   const djCrossfader = document.getElementById("djCrossfader");
   const deckALevel = document.getElementById("deckALevel");
   const deckBLevel = document.getElementById("deckBLevel");
-  const acid303Canvas = document.getElementById("acid303Canvas");
+  const acidVisualWrap = document.getElementById("acidVisualWrap");
+  const acidRelayGif = document.getElementById("acidRelayGif");
+  const acidRelayLoop = document.getElementById("acidRelayLoop");
   const wbTrackSelector = document.getElementById("wbTrackSelector");
   const wbOpenTrack = document.getElementById("wbOpenTrack");
   const galleryFilters = [...document.querySelectorAll(".gallery-filter")];
@@ -37,7 +39,6 @@
   const ultraLiteMode = prefersReducedMotion || window.innerWidth <= 640;
   const crtFrameBudgetMs = ultraLiteMode ? 50 : (performanceMode ? 34 : 16);
   const nodeMapFrameBudgetMs = ultraLiteMode ? 70 : (performanceMode ? 52 : 32);
-  const acidFrameBudgetMs = ultraLiteMode ? 64 : (performanceMode ? 42 : 16);
   let activeIndex = 0;
   let mediaIndex = 0;
   const sessionEdgeSeed = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
@@ -867,127 +868,44 @@
     requestAnimationFrame(renderGraph);
   };
 
-  const runAcid303Visual = () => {
-    if (!acid303Canvas) return;
-    const ctx = acid303Canvas.getContext("2d");
-    if (!ctx) return;
-
-    const resize = () => {
-      const ratio = window.devicePixelRatio || 1;
-      const rect = acid303Canvas.getBoundingClientRect();
-      acid303Canvas.width = Math.max(1, Math.floor(rect.width * ratio));
-      acid303Canvas.height = Math.max(1, Math.floor(rect.height * ratio));
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    };
-
-    const drawKnob = (x, y, r, angle, color) => {
-      ctx.fillStyle = "rgba(16, 0, 8, 0.9)";
-      ctx.strokeStyle = "rgba(255, 126, 146, 0.7)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + Math.cos(angle) * (r - 6), y + Math.sin(angle) * (r - 6));
-      ctx.stroke();
-    };
-    const sceneAsset = new Image();
-    sceneAsset.crossOrigin = "anonymous";
-    sceneAsset.src = "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif";
-    sceneAsset.onerror = () => {
-      sceneAsset.src = "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png";
-    };
+  const initAcidVisualCrossfade = () => {
+    if (!acidVisualWrap || !acidRelayGif || !acidRelayLoop) return;
     let isVisible = true;
+    let showingVideo = false;
+    const crossfadeMs = performanceMode ? 14000 : 10000;
+
+    const applyState = () => {
+      acidRelayGif.classList.toggle("is-active", !showingVideo);
+      acidRelayLoop.classList.toggle("is-active", showingVideo);
+      if (!showingVideo || document.hidden || !isVisible) {
+        acidRelayLoop.pause();
+        return;
+      }
+      acidRelayLoop.play().catch(() => {});
+    };
+
     if ("IntersectionObserver" in window) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           isVisible = entry.isIntersecting;
+          if (!isVisible) acidRelayLoop.pause();
+          else applyState();
         });
       }, { threshold: 0.05 });
-      observer.observe(acid303Canvas);
+      observer.observe(acidVisualWrap);
     }
 
-    let lastAcidFrameTime = 0;
-    const draw = (time) => {
-      if (document.hidden || !isVisible) {
-        requestAnimationFrame(draw);
-        return;
-      }
-      if (time - lastAcidFrameTime < acidFrameBudgetMs) {
-        requestAnimationFrame(draw);
-        return;
-      }
-      lastAcidFrameTime = time;
-      const t = time * 0.001;
-      const w = acid303Canvas.clientWidth;
-      const h = acid303Canvas.clientHeight;
-      ctx.clearRect(0, 0, w, h);
+    acidRelayLoop.addEventListener("error", () => {
+      showingVideo = false;
+      applyState();
+    });
+    applyState();
 
-      const bg = ctx.createLinearGradient(0, 0, w, h);
-      bg.addColorStop(0, "#19030b");
-      bg.addColorStop(0.5, "#110108");
-      bg.addColorStop(1, "#080104");
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, w, h);
-
-      for (let i = 0; i < 8; i += 1) {
-        const laneY = h * (0.2 + i * 0.08);
-        const lanePulse = 0.2 + 0.25 * Math.sin(t * 2.2 + i * 0.7);
-        ctx.fillStyle = `rgba(255, 92, 128, ${Math.max(0.08, lanePulse).toFixed(3)})`;
-        ctx.fillRect(0, laneY, w, 2);
-      }
-
-      ctx.strokeStyle = "rgba(128, 255, 166, 0.82)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      for (let x = 0; x <= w; x += 6) {
-        const xn = x / w;
-        const seq = Math.sin((xn * 18 + t * 2.8) * Math.PI);
-        const accent = Math.sin((xn * 58 - t * 5.2) * Math.PI) * 0.24;
-        const y = h * 0.55 + (seq * 0.18 + accent) * h * 0.35;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      if (sceneAsset.complete && sceneAsset.naturalWidth > 0) {
-        const assetW = Math.min(w * 0.36, 280);
-        const assetH = assetW * 0.7;
-        ctx.save();
-        ctx.translate(w * 0.84, h * 0.24);
-        ctx.rotate(Math.sin(t * 0.9) * 0.08);
-        ctx.globalAlpha = 0.72;
-        ctx.drawImage(sceneAsset, -assetW / 2, -assetH / 2, assetW, assetH);
-        ctx.restore();
-      }
-
-      const ledCount = 16;
-      const ledW = Math.max(8, (w - 40) / ledCount - 6);
-      for (let i = 0; i < ledCount; i += 1) {
-        const ledX = 20 + i * (ledW + 6);
-        const strength = Math.sin(t * 4 + i * 0.9) * 0.5 + 0.5;
-        const active = strength > 0.45;
-        ctx.fillStyle = active ? "rgba(132, 255, 160, 0.9)" : "rgba(70, 34, 44, 0.8)";
-        ctx.fillRect(ledX, h - 44, ledW, 14);
-      }
-
-      const knobY = h - 90;
-      const spacing = w / 5;
-      drawKnob(spacing * 1, knobY, 26, -1.6 + Math.sin(t * 0.9) * 1.4, "rgba(255, 156, 176, 0.95)");
-      drawKnob(spacing * 2, knobY, 26, -1.2 + Math.sin(t * 1.2 + 1) * 1.3, "rgba(255, 156, 176, 0.95)");
-      drawKnob(spacing * 3, knobY, 26, -1.8 + Math.sin(t * 1.4 + 2) * 1.5, "rgba(132, 255, 160, 0.95)");
-      drawKnob(spacing * 4, knobY, 26, -1.4 + Math.sin(t * 1.1 + 3) * 1.2, "rgba(132, 255, 160, 0.95)");
-
-      requestAnimationFrame(draw);
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-    requestAnimationFrame(draw);
+    setInterval(() => {
+      if (document.hidden || !isVisible) return;
+      showingVideo = !showingVideo;
+      applyState();
+    }, crossfadeMs);
   };
 
   const cycleMenu = () => {
@@ -1476,7 +1394,7 @@
   fit();
   if (canvas) requestAnimationFrame(render);
   runNodeMap();
-  runAcid303Visual();
+  initAcidVisualCrossfade();
   setInterval(cycleMenu, performanceMode ? 4200 : 3000);
   if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 6800 : 5200);
   setInterval(pulseCrtBurst, performanceMode ? 9800 : 7800);
@@ -1506,5 +1424,9 @@
       if (document.hidden) video.pause();
       else video.play().catch(() => {});
     });
+    if (acidRelayLoop) {
+      if (document.hidden) acidRelayLoop.pause();
+      else if (acidRelayLoop.classList.contains("is-active")) acidRelayLoop.play().catch(() => {});
+    }
   });
 })();

@@ -282,9 +282,10 @@
 
     <section class="panel acid-visual-panel">
       <h2 class="decrypt">Acid 303 Visual Relay</h2>
-      <p>Native 303 animation layer only. Audio engine and full UI are not embedded here.</p>
-      <div class="acid-visual-wrap">
-        <canvas id="acid303Canvas" class="acid-visual-canvas" width="1280" height="540" aria-label="Acid 303 animation canvas"></canvas>
+      <p>Acid-banger visual relay using a lightweight GIF and Grok loop crossfade. Audio engine and full UI are not embedded here.</p>
+      <div id="acidVisualWrap" class="acid-visual-wrap">
+        <img id="acidRelayGif" class="acid-relay-media" src="https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif" alt="Acid banger visual relay gif" data-fallbacks="https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png">
+        <video id="acidRelayLoop" class="acid-relay-media" src="/assets/repo-clips/clip-neon-code-pp.mp4" muted loop playsinline preload="metadata" aria-label="Grok visual loop relay"></video>
       </div>
       <p class="repo-meta">For the full instrument and transport controls, open the standalone acid-banger page.</p>
       <a href="https://aday1.github.io/acid-banger/" target="_blank" rel="noopener noreferrer">open acid-banger full page</a>
