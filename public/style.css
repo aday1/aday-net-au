@@ -440,6 +440,30 @@ body.boot-seq .shell {
 .card ul { margin: 0; padding-left: 16px; }
 .card li { margin: 0 0 6px; }
 
+.year-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 10px 0 12px;
+}
+
+.year-chip {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid #4a6e97;
+  color: #bce8ff;
+  text-decoration: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  background: rgba(8, 15, 28, 0.86);
+}
+
+.year-chip:hover {
+  border-color: #8fd7ff;
+  color: #9eff89;
+  box-shadow: 0 0 10px rgba(132, 207, 255, 0.25);
+}
+
 .experimental-lab {
   border-color: #4f79a8;
   background:
@@ -1092,6 +1116,11 @@ a { cursor: none; }
   .post-list .date {
     display: block;
     font-size: 0.78rem;
+  }
+
+  .year-chip {
+    font-size: 0.72rem;
+    padding: 4px 7px;
   }
 }
 
