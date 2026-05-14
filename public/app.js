@@ -96,7 +96,8 @@
 
   const livePageOverrides = {
     ZealPalace: "https://aday1.github.io/ZealPalace/",
-    "acid-banger": "https://aday1.github.io/acid-banger/"
+    "acid-banger": "https://aday1.github.io/acid-banger/",
+    "error-diffusion": "https://errordiffusion.net"
   };
 
   const projectBlurbOverrides = {
