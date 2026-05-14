@@ -99,6 +99,16 @@
     "acid-banger": "https://aday1.github.io/acid-banger/"
   };
 
+  const projectBlurbOverrides = {
+    ZealPalace: "A 90s RPG/MUD-inspired AI social terrarium on Raspberry Pi with autonomous IRC personas and world simulation.",
+    "acid-banger": "Browser acid 303 groovebox and sequencer playground with performance-oriented controls.",
+    "macroverse.aday.net.au": "Live browser visual platform for shader-driven visuals and performance routing.",
+    "artbastard.aday.net.au": "OSC/MIDI/DMX/Art-Net control plane for live show and lighting workflows.",
+    "error-diffusion": "Experimental glitch diffusion and visual processing studies for VJ performance.",
+    OpenSoundLab: "Open music and audio coding experiments, tooling, and rough prototypes.",
+    "bitwig-mcp-server": "MCP bridge for scripting and automating Bitwig workflows."
+  };
+
   const saved = localStorage.getItem(key);
   if (saved === "off") {
     body.classList.remove("scanlines-on");
@@ -729,9 +739,10 @@
         const days = Math.floor(updatedMs / (1000 * 60 * 60 * 24));
         const activity = days < 14 ? "hot" : days < 60 ? "warm" : "cold";
 
+        const blurb = projectBlurbOverrides[repo.name] || (repo.description || "No description yet").slice(0, 120);
         card.innerHTML = `
           <h3>${repo.name}</h3>
-          <p class="repo-meta">${(repo.description || "No description yet").slice(0, 120)}</p>
+          <p class="repo-meta">${blurb}</p>
           <p class="repo-meta repo-activity repo-activity-${activity}">activity: ${activity} / updated ${days}d ago</p>
           <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">open project page</a>
           <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">source</a>
