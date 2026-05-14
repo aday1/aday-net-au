@@ -1,6 +1,7 @@
 (() => {
   const body = document.body;
   const canvas = document.getElementById("crtCanvas");
+  const atzCanvas = document.getElementById("atzCanvas");
   const crtMedia = document.getElementById("crtMedia");
   const crtCaption = document.getElementById("crtCaption");
   const screen = document.querySelector(".screen");
@@ -454,17 +455,6 @@
     ZealPalace: "/assets/repo-cards/card-neon-code.jpg"
   };
 
-  const repoClipOverrides = {
-    "macroverse.aday.net.au": "/assets/repo-clips/clip-radar-core-pp.mp4",
-    "artbastard.aday.net.au": "/assets/repo-clips/clip-dmx-faders-pp.mp4",
-    "error-diffusion": "/assets/repo-clips/clip-security-lock-pp.mp4",
-    "acid-banger": "/assets/repo-clips/clip-daw-panel-pp.mp4",
-    OpenSoundLab: "/assets/repo-clips/clip-daw-panel-pp.mp4",
-    "bitwig-mcp-server": "/assets/repo-clips/clip-daw-panel-pp.mp4",
-    "keys-aday-net-au": "/assets/repo-clips/clip-circuit-blue-pp.mp4",
-    "breakcore-forums-placeholder": "/assets/repo-clips/clip-node-graph-pp.mp4"
-  };
-
   const localRepoCardPool = [
     "/assets/repo-cards/card-audio-rack.jpg",
     "/assets/repo-cards/card-circuit-blue.jpg",
@@ -491,16 +481,19 @@
     return localRepoCardPool[seed % localRepoCardPool.length];
   };
 
-  const pickLocalRepoClip = (repoName) => {
-    const lower = (repoName || "").toLowerCase();
-    if (lower.includes("macroverse")) return "/assets/repo-clips/clip-radar-core-pp.mp4";
-    if (lower.includes("art") || lower.includes("dmx") || lower.includes("light")) return "/assets/repo-clips/clip-dmx-faders-pp.mp4";
-    if (lower.includes("sound") || lower.includes("audio") || lower.includes("music") || lower.includes("daw")) return "/assets/repo-clips/clip-daw-panel-pp.mp4";
-    if (lower.includes("key") || lower.includes("auth") || lower.includes("secure")) return "/assets/repo-clips/clip-security-lock-pp.mp4";
-    if (lower.includes("blog") || lower.includes("forum")) return "/assets/repo-clips/clip-node-graph-pp.mp4";
-    if (lower.includes("breakcore")) return "/assets/repo-clips/clip-circuit-blue-pp.mp4";
-    if (lower.includes("acid")) return "/assets/repo-clips/clip-daw-panel-pp.mp4";
-    return "";
+  const wrapMediaWithCrtEffect = (root = document) => {
+    const mediaNodes = root.querySelectorAll("img.repo-shot, img.asset-image, img.project-loop, video");
+    mediaNodes.forEach((node) => {
+      const parent = node.parentElement;
+      if (!parent || parent.classList.contains("crt-media-wrap")) return;
+      const wrap = document.createElement("span");
+      const inlineMedia = node.classList.contains("service-icon")
+        || node.classList.contains("headliner-badge")
+        || node.classList.contains("masthead-avatar");
+      wrap.className = inlineMedia ? "crt-media-wrap crt-media-wrap-inline" : "crt-media-wrap";
+      parent.insertBefore(wrap, node);
+      wrap.appendChild(node);
+    });
   };
 
   const projectBlurbOverrides = {
@@ -1297,6 +1290,221 @@
     renderTrackOptions();
   };
 
+  const initAtzedentBackdrop = () => {
+    if (!atzCanvas || performanceMode || ultraLiteMode) return;
+    const gl = atzCanvas.getContext("webgl2", {
+      alpha: true,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false
+    });
+    if (!gl) return;
+
+    const vertexSource = `#version 300 es
+in vec2 position;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+}`;
+
+    const fragmentSource = `#version 300 es
+precision highp float;
+out vec4 O;
+uniform float time;
+uniform vec2 resolution;
+uniform vec2 move;
+uniform vec2 wheel;
+#define FC gl_FragCoord.xy
+#define R resolution
+#define T (25.0 + time)
+#define S smoothstep
+#define N normalize
+#define MN min(R.x, R.y)
+#define rnd(p) fract(sin(dot(p, vec2(12.9898, 78.233))) * 345678.0)
+#define rot(a) mat2(cos((a) - vec4(0.0, 11.0, 33.0, 0.0)))
+
+float box(vec3 p, vec3 s, float r) {
+  p = abs(p) - s + r;
+  return length(max(p, 0.0)) + min(0.0, max(max(p.x, p.y), p.z)) - r;
+}
+
+float map(vec3 p) {
+  float s = sign(p.y);
+  p.y = abs(p.y) - 2.5;
+  vec2 id = floor(p.xz - s);
+  if (mod(id.y, 2.0) == 0.0) {
+    p.x -= T * 0.5;
+    id.x = floor(p.x - s);
+  }
+  float f = 1.0 - dot(abs(fract(p * 42.0) - 0.5) - 0.25, vec3(1.0)) * 0.5;
+  p.xz = fract(p.xz - s) - 0.5;
+  return box(p, vec3(0.1 + 0.3 * rnd(id), 2.0 - 0.6 * rnd(id), 0.2), f * f * 0.0125) - 0.001 * f;
+}
+
+vec3 norm(vec3 p) {
+  float h = 0.001;
+  vec2 k = vec2(-1.0, 1.0);
+  return N(
+    k.xyy * map(p + k.xyy * h) +
+    k.yxy * map(p + k.yxy * h) +
+    k.yyx * map(p + k.yyx * h) +
+    k.xxx * map(p + k.xxx * h)
+  );
+}
+
+bool march(inout vec3 p, vec3 rd, out float dd) {
+  dd = 0.0;
+  for (int i = 0; i < 260; i++) {
+    float d = map(p);
+    if (abs(d) < 0.001) return true;
+    if (dd > 15.0) return false;
+    p += rd * d * 0.5;
+    dd += d * 0.5;
+  }
+  return false;
+}
+
+float occ(vec3 p, vec3 n, float d) {
+  return clamp(map(p + n * d) / d, 0.0, 1.0);
+}
+
+vec3 dir(vec2 uv, vec3 p, vec3 t, float z) {
+  vec3 up = vec3(0.0, 1.0, 0.0);
+  vec3 f = N(t - p);
+  vec3 r = N(cross(up, f));
+  vec3 u = N(cross(f, r));
+  return mat3(r, u, f) * N(vec3(uv, z));
+}
+
+void cam(inout vec3 p) {
+  p.xz *= rot(0.2 - move.x / MN + 0.2 * T * 0.01);
+}
+
+vec3 render(vec2 uv) {
+  vec3 col = vec3(0.0);
+  vec3 p = vec3(0.0, -0.3, -23.5 - wheel.y / MN - 100.0 * sin(T * 0.005));
+  cam(p);
+  vec3 rd = dir(uv, p, vec3(0.0, 5.5, 0.0), 1.2);
+  vec3 lp = p;
+  lp.z += 0.5;
+  float dd = 0.0;
+  if (march(p, rd, dd)) {
+    vec3 n = norm(p);
+    vec3 l = N(lp - p);
+    float dif = clamp(dot(l, n), 0.0, 1.0);
+    float spe = pow(clamp(dot(N(lp - rd), n), 0.0, 1.0), 21.0);
+    float ao = occ(p, n, 0.5) * 0.8 * occ(p, n, 1.0);
+    float ld = distance(lp, p);
+    float atten = 1.0 / (1.0 + ld * 0.25 + ld * ld * 0.125);
+    vec3 mat = vec3(4.0, 1.6, 0.6);
+    col += 0.08 + dif * mat * ao * atten;
+    col += spe * atten;
+  }
+  col = mix(vec3(0.0), col, exp(-0.0125 * dd * dd * dd));
+  col = tanh(col * col);
+  col = sqrt(col);
+  col = mix(vec3(0.0), col, min(time * 0.3, 1.0));
+  vec2 c = FC / R;
+  c *= 1.0 - c.yx;
+  float vig = c.x * c.y * 25.0;
+  vig = pow(vig, 0.5);
+  col *= vig;
+  return col;
+}
+
+void main() {
+  vec2 uv = (FC - 0.5 * R) / MN;
+  vec3 col = render(uv);
+  O = vec4(col, 1.0);
+}`;
+
+    const compileShader = (type, source) => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return null;
+      return shader;
+    };
+
+    const vs = compileShader(gl.VERTEX_SHADER, vertexSource);
+    const fs = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
+    if (!vs || !fs) return;
+    const program = gl.createProgram();
+    if (!program) return;
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+    gl.useProgram(program);
+
+    const quad = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW
+    );
+    const position = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+    const timeLoc = gl.getUniformLocation(program, "time");
+    const resLoc = gl.getUniformLocation(program, "resolution");
+    const moveLoc = gl.getUniformLocation(program, "move");
+    const wheelLoc = gl.getUniformLocation(program, "wheel");
+
+    let moveX = 0;
+    let wheelY = 0;
+    let raf = 0;
+    let last = 0;
+    const fpsStep = 1000 / 20;
+
+    const onMove = (event) => {
+      moveX = event.clientX || 0;
+    };
+    const onWheel = (event) => {
+      wheelY += event.deltaY * 0.08;
+      wheelY = Math.max(-420, Math.min(420, wheelY));
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("wheel", onWheel, { passive: true });
+
+    const resizeBackdrop = () => {
+      const scale = Math.min(window.devicePixelRatio || 1, 1.2);
+      const width = Math.max(1, Math.floor(window.innerWidth * scale));
+      const height = Math.max(1, Math.floor(window.innerHeight * scale));
+      atzCanvas.width = width;
+      atzCanvas.height = height;
+      atzCanvas.style.width = `${window.innerWidth}px`;
+      atzCanvas.style.height = `${window.innerHeight}px`;
+      gl.viewport(0, 0, width, height);
+    };
+    resizeBackdrop();
+    window.addEventListener("resize", resizeBackdrop);
+
+    body.classList.add("atz-on");
+
+    const draw = (now) => {
+      raf = requestAnimationFrame(draw);
+      if (document.hidden) return;
+      if (now - last < fpsStep) return;
+      last = now;
+      gl.useProgram(program);
+      gl.uniform1f(timeLoc, now * 0.001);
+      gl.uniform2f(resLoc, atzCanvas.width, atzCanvas.height);
+      gl.uniform2f(moveLoc, moveX, 0);
+      gl.uniform2f(wheelLoc, 0, wheelY);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    };
+    raf = requestAnimationFrame(draw);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && !raf) raf = requestAnimationFrame(draw);
+    });
+  };
+
   const initDjCrossfader = () => {
     if (!deckASelect || !deckBSelect || !deckALoad || !deckBLoad || !djCrossfader) return;
     const applyTypeFilterOptions = (filterEl) => {
@@ -1479,11 +1687,9 @@
       const picks = repos
         .filter((repo) => !repo.fork)
         .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-        .slice(0, 8);
+        .slice(0, performanceMode ? 6 : 8);
 
       repoGrid.innerHTML = "";
-      let videoCardsUsed = 0;
-      const MAX_VIDEO_CARDS = performanceMode ? 1 : 3;
       for (let i = 0; i < picks.length; i++) {
         const repo = picks[i];
         const seed = hashString(repo.name);
@@ -1496,7 +1702,6 @@
         card.style.setProperty("--tv-hue", String(hue));
 
         const localShot = repoImageOverrides[repo.name] || pickLocalRepoCard(repo.name, seed);
-        const localClip = repoClipOverrides[repo.name] || pickLocalRepoClip(repo.name);
         const repoOgShot = `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
         const shot = localShot || buildRepoPoster(repo, seed);
         const shotFallbacks = [
@@ -1507,11 +1712,7 @@
           `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/main/screenshot.png`,
           `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/main/docs/preview.png`
         ].filter((url, idx, all) => url && all.indexOf(url) === idx);
-        const useVideo = !!localClip && videoCardsUsed < MAX_VIDEO_CARDS;
-        const mediaMarkup = useVideo
-          ? `<video class="repo-shot repo-shot-video" src="${localClip}" poster="${shot}" muted autoplay loop playsinline preload="metadata"></video>`
-          : `<img class="repo-shot" src="${shot}" alt="${repo.name} preview" data-fallbacks="${shotFallbacks.join("|")}">`;
-        if (useVideo) videoCardsUsed += 1;
+        const mediaMarkup = `<img class="repo-shot" src="${shot}" alt="${repo.name} preview" data-fallbacks="${shotFallbacks.join("|")}">`;
         const override = livePageOverrides[repo.name];
         const homepage = (repo.homepage || "").trim();
         const hasHomepage = homepage.startsWith("http://") || homepage.startsWith("https://");
@@ -1556,26 +1757,9 @@
         `;
         repoGrid.appendChild(card);
         const image = card.querySelector("img.repo-shot");
-        if (image) armGenericImageFallback(image);
-      }
-
-      const repoVideos = [...repoGrid.querySelectorAll("video.repo-shot-video")];
-      if (repoVideos.length) {
-        if ("IntersectionObserver" in window) {
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-              const video = entry.target;
-              if (!(video instanceof HTMLVideoElement)) return;
-              if (entry.isIntersecting && !document.hidden) {
-                video.play().catch(() => {});
-              } else {
-                video.pause();
-              }
-            });
-          }, { threshold: 0.15 });
-          repoVideos.forEach((video) => observer.observe(video));
-        } else {
-          repoVideos.forEach((video) => video.play().catch(() => {}));
+        if (image) {
+          armGenericImageFallback(image);
+          wrapMediaWithCrtEffect(card);
         }
       }
 
@@ -1591,6 +1775,7 @@
 
   window.addEventListener("resize", fit);
   fit();
+  initAtzedentBackdrop();
   if (canvas) requestAnimationFrame(render);
   runNodeMap();
   initAcidVisualCrossfade();
@@ -1616,6 +1801,7 @@
     else img.addEventListener("load", () => moshImage(img), { once: true });
   });
   document.querySelectorAll("img:not(.mosh-image)").forEach((img) => armGenericImageFallback(img));
+  wrapMediaWithCrtEffect();
   document.addEventListener("visibilitychange", () => {
     const repoVideos = document.querySelectorAll("video.repo-shot-video");
     repoVideos.forEach((video) => {

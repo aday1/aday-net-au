@@ -111,6 +111,22 @@ body {
   display: none;
 }
 
+.atz-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.42;
+  mix-blend-mode: screen;
+  filter: saturate(1.08) contrast(1.02);
+}
+
+body:not(.atz-on) .atz-canvas {
+  display: none;
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -852,6 +868,46 @@ body.boot-seq .shell {
   object-fit: cover;
 }
 
+.crt-media-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+
+.crt-media-wrap > img,
+.crt-media-wrap > video {
+  margin-top: 0;
+}
+
+.crt-media-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.34) 50%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 3px);
+  background-size: 100% 3px, 100% 7px;
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  animation: crtMediaScanTwitch 1.65s steps(3, end) infinite;
+}
+
+.crt-media-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(170, 255, 192, 0.12), transparent 48%),
+    radial-gradient(circle at 75% 75%, rgba(122, 190, 255, 0.1), transparent 52%);
+  opacity: 0.45;
+  animation: crtMediaStaticFlicker 0.95s steps(2, end) infinite;
+}
+
 .mosh-wrap {
   position: relative;
 }
@@ -1578,6 +1634,18 @@ a { cursor: none; }
   0%, 100% { transform: translate(0, 0); filter: saturate(1.02) contrast(1.03); }
   33% { transform: translate(0.3px, -0.2px); filter: saturate(1.08) contrast(1.07); }
   34% { transform: translate(-0.3px, 0.2px); filter: saturate(0.98) contrast(1.05); }
+}
+
+@keyframes crtMediaScanTwitch {
+  0%, 100% { background-position: 0 0, 0 0; opacity: 0.6; }
+  32% { background-position: 0 2px, 0 1px; opacity: 0.66; }
+  66% { background-position: 0 -3px, 0 -1px; opacity: 0.54; }
+}
+
+@keyframes crtMediaStaticFlicker {
+  0%, 100% { transform: translate(0, 0); opacity: 0.42; }
+  30% { transform: translate(-1px, 0); opacity: 0.5; }
+  60% { transform: translate(1px, 1px); opacity: 0.36; }
 }
 
 @keyframes cutOnNoise {
