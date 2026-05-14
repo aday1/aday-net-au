@@ -1471,19 +1471,50 @@ body.boot-seq .shell {
 
 .signal-footer {
   border-top: 1px solid #3d5d85;
-  padding-top: 10px;
+  padding-top: 14px;
 }
 
 .footer-wave {
   width: 100%;
-  height: 16px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(116, 183, 255, 0.14) 0 6px,
-    rgba(161, 255, 151, 0.4) 6px 9px,
-    rgba(255, 128, 215, 0.22) 9px 12px
-  );
-  animation: footerWaveShift 2.7s linear infinite;
+  height: 54px;
+  position: relative;
+  border: 1px solid #3f5f86;
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 14% 35%, rgba(118, 170, 255, 0.4), rgba(0, 0, 0, 0) 28%),
+    radial-gradient(circle at 82% 70%, rgba(196, 118, 255, 0.34), rgba(0, 0, 0, 0) 30%),
+    radial-gradient(circle at 50% 50%, rgba(96, 255, 196, 0.2), rgba(0, 0, 0, 0) 48%),
+    linear-gradient(180deg, rgba(8, 18, 35, 0.92), rgba(6, 10, 24, 0.95));
+  box-shadow: inset 0 0 26px rgba(88, 140, 255, 0.22), 0 0 22px rgba(46, 118, 255, 0.14);
+}
+
+.footer-wave::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(130, 190, 255, 0.2) 0 8px, transparent 8px 18px),
+    linear-gradient(90deg, rgba(108, 210, 255, 0), rgba(108, 210, 255, 0.6), rgba(163, 255, 177, 0.72), rgba(232, 146, 255, 0.58), rgba(108, 210, 255, 0));
+  mix-blend-mode: screen;
+  animation: footerWaveShift 4.2s linear infinite;
+}
+
+.footer-wave::after {
+  content: "";
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  top: 42%;
+  height: 18px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(105, 200, 255, 0.66), rgba(0, 0, 0, 0) 28%),
+    radial-gradient(circle at 52% 52%, rgba(158, 255, 189, 0.58), rgba(0, 0, 0, 0) 26%),
+    radial-gradient(circle at 78% 48%, rgba(222, 131, 255, 0.56), rgba(0, 0, 0, 0) 30%);
+  opacity: 0.82;
+  filter: blur(2px);
+  animation: footerWavePulse 3.6s ease-in-out infinite;
 }
 
 button {
@@ -1535,7 +1566,7 @@ body.retro-cursor-on,
 body.retro-cursor-on a,
 body.retro-cursor-on button,
 body.retro-cursor-on [role="button"] {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='34' viewBox='0 0 24 34'%3E%3Cpath d='M1 1V31L8 24L12 33L16 31L12 22H23V1Z' fill='%23ff2b3d' stroke='%23220008' stroke-width='1.2'/%3E%3Cpath d='M3 4V25L8 21L12 29L13 28L9 20H19V4Z' fill='%23ffd4d8' opacity='0.74'/%3E%3C/svg%3E") 1 1, auto !important;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='28' viewBox='0 0 20 28'%3E%3Cpath d='M1 1V24L6 19L9 27L12 25L9 18H19V1Z' fill='%23f4f8ff' stroke='%23061220' stroke-width='1.1'/%3E%3Cpath d='M3 3V18L6 15L8.8 22L9.8 21.4L7.3 14.6H16V3Z' fill='%2368dbff' opacity='0.26'/%3E%3C/svg%3E") 1 1, auto !important;
 }
 
 body.hide-crt-static .crt-static-overlay {
@@ -1921,8 +1952,13 @@ body.animations-off *::after {
 }
 
 @keyframes footerWaveShift {
-  0% { background-position: 0 0; }
-  100% { background-position: 74px 0; }
+  0% { background-position: 0 0, -220px 0; }
+  100% { background-position: 88px 0, 220px 0; }
+}
+
+@keyframes footerWavePulse {
+  0%, 100% { transform: translateX(-1.5%) scaleY(0.9); opacity: 0.64; }
+  50% { transform: translateX(1.5%) scaleY(1.14); opacity: 0.9; }
 }
 
 @keyframes crtBurst {
@@ -2052,11 +2088,11 @@ body.boot-seq .shell {
 body:not(.boot-seq) .shell {
   opacity: 1;
   visibility: visible;
-  animation: crtShellReveal 940ms cubic-bezier(0.16, 0.82, 0.16, 1) both;
+  animation: crtShellReveal 700ms cubic-bezier(0.16, 0.82, 0.16, 1) both;
 }
 
 .page-transition {
-  transition: opacity 760ms ease;
+  transition: opacity 320ms ease;
   background: radial-gradient(circle at 50% 48%, rgba(15, 10, 24, 0.98), rgba(1, 1, 5, 1));
   animation: none;
 }
@@ -2077,7 +2113,7 @@ body:not(.boot-seq) .shell {
   box-shadow:
     inset 0 0 80px rgba(160, 230, 255, 0.24),
     0 0 120px rgba(105, 160, 255, 0.22);
-  animation: cutOnCrtBloom 3.05s cubic-bezier(0.14, 0.74, 0.18, 1) forwards;
+  animation: cutOnCrtBloom 1.65s cubic-bezier(0.14, 0.74, 0.18, 1) forwards;
 }
 
 .page-transition-inner {
@@ -2097,7 +2133,7 @@ body:not(.boot-seq) .shell {
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(180, 230, 255, 0), rgba(190, 235, 255, 1), rgba(180, 230, 255, 0));
   box-shadow: 0 0 26px rgba(180, 240, 255, 0.9), 0 0 56px rgba(110, 172, 255, 0.72);
-  animation: cutOnScanlineSlow 2.2s cubic-bezier(0.2, 0.82, 0.14, 1) forwards;
+  animation: cutOnScanlineSlow 1.25s cubic-bezier(0.2, 0.82, 0.14, 1) forwards;
 }
 
 .page-transition-inner::after {
@@ -2111,7 +2147,7 @@ body:not(.boot-seq) .shell {
   border-radius: 50% 50% 48% 48% / 58% 58% 42% 42%;
   border: 1px solid rgba(164, 222, 255, 0.35);
   opacity: 0;
-  animation: cutOnRoundHalo 2.9s ease-out forwards;
+  animation: cutOnRoundHalo 1.4s ease-out forwards;
 }
 
 @keyframes cutOnScanlineSlow {

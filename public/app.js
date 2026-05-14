@@ -574,13 +574,20 @@
     "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/sets&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
   ];
 
-  const djDeckSources = [
+  let djDeckSources = [
     {
       id: "aday-yt-uploads",
       label: "Aday YouTube uploads",
       type: "music",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed/GFBpXcUfIqM?enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "aday-yt-legacy",
+      label: "Aday YouTube legacy user uploads",
+      type: "music",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=Aday&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aday-yt-live",
@@ -590,11 +597,18 @@
       embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aday+live+visual+set&enablejsapi=1&playsinline=1&rel=0"
     },
     {
+      id: "aday-yt-weeklybeats",
+      label: "Aday YouTube WeeklyBeats search",
+      type: "weeklybeats",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aday+weeklybeats&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
       id: "aisjam-yt",
-      label: "Aisjam YouTube feature",
+      label: "Aisjam YouTube channel search",
       type: "music",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/GFBpXcUfIqM?enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aisjam+chiptune&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "clan-yt",
@@ -602,6 +616,20 @@
       type: "live",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed?listType=search&list=clan+analogue+live+electronic+music&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "hungee-funk-yt",
+      label: "Hungee Funk YouTube search",
+      type: "friends",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=hungee+funk+chiptune&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "friend-breakcore-yt",
+      label: "Friends breakcore channel search",
+      type: "friends",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=melbourne+breakcore+live&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "vimeo-onlinedoof",
@@ -651,12 +679,68 @@
       type: "drone",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed?listType=search&list=drone+flight+cinematic+fpv&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "weeklybeats-profile",
+      label: "WeeklyBeats / aday profile",
+      type: "weeklybeats",
+      kind: "web",
+      embed: "https://weeklybeats.com/aday"
+    },
+    {
+      id: "weeklybeats-library",
+      label: "WeeklyBeats / aday track library",
+      type: "weeklybeats",
+      kind: "web",
+      embed: "https://weeklybeats.com/music/aday"
     }
   ];
+
+  const sanitizeDjSourceId = (value) => String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  const appendDjSources = (extraSources = []) => {
+    if (!Array.isArray(extraSources) || !extraSources.length) return;
+    const existingIds = new Set(djDeckSources.map((source) => source.id));
+    extraSources.forEach((source) => {
+      if (!source?.id || existingIds.has(source.id)) return;
+      existingIds.add(source.id);
+      djDeckSources.push(source);
+    });
+  };
+
+  const enrichDjDeckSourcesWithWeeklyBeats = async () => {
+    try {
+      const response = await fetch("./data/weeklybeats_tracks.json", { cache: "no-store" });
+      if (!response.ok) return;
+      const payload = await response.json();
+      const tracks = Array.isArray(payload?.tracks) ? payload.tracks : [];
+      const extraSources = tracks.slice(0, 40).map((track, index) => {
+        const year = Number.isFinite(track?.year) ? track.year : "----";
+        const week = Number.isFinite(track?.week) ? `W${track.week}` : "W?";
+        const title = String(track?.title || `track-${index + 1}`).trim();
+        const slug = sanitizeDjSourceId(track?.slug || `${year}-${week}-${title}`);
+        return {
+          id: `wb-track-${slug || index + 1}`,
+          label: `WeeklyBeats / ${year} ${week} / ${title}`,
+          type: "weeklybeats",
+          kind: "web",
+          embed: String(track?.url || "https://weeklybeats.com/music/aday")
+        };
+      });
+      appendDjSources(extraSources);
+    } catch {
+      // ignore weeklybeats fetch failures for deck source loading
+    }
+  };
 
   const inferDjSourceType = (source) => {
     if (source.type) return source.type;
     const haystack = `${source.label || ""} ${source.id || ""} ${source.embed || ""}`.toLowerCase();
+    if (haystack.includes("weeklybeats")) return "weeklybeats";
+    if (haystack.includes("friend")) return "friends";
     if (haystack.includes("drone") || haystack.includes("fpv") || haystack.includes("flight")) return "drone";
     if (haystack.includes("live coding") || haystack.includes("shader") || haystack.includes("coding")) return "coding";
     if (haystack.includes("archive") || haystack.includes("vimeo")) return "archive";
@@ -768,8 +852,8 @@
 
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
-  const CUTON_BOOT_MS = 2400;
-  const CUTON_HIDE_MS = 2950;
+  const CUTON_BOOT_MS = 1450;
+  const CUTON_HIDE_MS = 1850;
   let cutOnScheduled = false;
   const runCutOnSequence = (forceImmediate = false) => {
     if (forceImmediate) {
@@ -1859,8 +1943,9 @@ void main() {
     });
   };
 
-  const initDjCrossfader = () => {
+  const initDjCrossfader = async () => {
     if (!deckASelect || !deckBSelect || !deckALoad || !deckBLoad || !djCrossfader) return;
+    await enrichDjDeckSourcesWithWeeklyBeats();
     const applyTypeFilterOptions = (filterEl) => {
       if (!filterEl) return;
       const typeOptions = getDjTypes()
@@ -2147,7 +2232,7 @@ void main() {
   initSoundcloudDeck();
   initWeeklyBeatsNode();
   initGalleryFilters();
-  initDjCrossfader();
+  void initDjCrossfader();
   if ("requestIdleCallback" in window) {
     window.requestIdleCallback(() => hydrateRepoGrid(), { timeout: 3000 });
   } else {
