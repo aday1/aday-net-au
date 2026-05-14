@@ -513,6 +513,122 @@ body.boot-seq .shell {
   font-family: inherit;
 }
 
+.gallery-panel {
+  border-color: #6a8ac0;
+  background:
+    radial-gradient(circle at 14% 10%, rgba(124, 191, 255, 0.14), transparent 46%),
+    linear-gradient(180deg, rgba(8, 16, 31, 0.95), rgba(6, 12, 24, 0.95));
+}
+
+.gallery-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.gallery-filter {
+  text-transform: lowercase;
+  letter-spacing: 0.03em;
+}
+
+.gallery-filter.active {
+  border-color: #8fd7ff;
+  box-shadow: 0 0 14px rgba(129, 210, 255, 0.26);
+}
+
+.gallery-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.gallery-card {
+  border: 1px solid #2f4669;
+  background: rgba(9, 18, 33, 0.92);
+  padding: 8px;
+  transition: opacity 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.gallery-card:hover {
+  box-shadow: 0 0 16px rgba(108, 182, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+.gallery-card h3 {
+  margin: 8px 0 4px;
+  color: #9dff8e;
+  font-size: 0.9rem;
+}
+
+.gallery-hidden {
+  display: none;
+}
+
+.dj-panel {
+  border-color: #6f92ca;
+  background:
+    radial-gradient(circle at 86% 8%, rgba(160, 119, 255, 0.14), transparent 42%),
+    linear-gradient(180deg, rgba(9, 17, 34, 0.95), rgba(6, 12, 24, 0.95));
+}
+
+.dj-decks {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.dj-deck select {
+  width: 100%;
+  background: #0a1324;
+  color: #b8ffd6;
+  border: 1px solid #3e5f84;
+  padding: 6px;
+  margin: 6px 0 8px;
+  font-family: inherit;
+}
+
+.dj-frame-wrap {
+  border: 2px solid #6588bf;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #050d19;
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.7), 0 0 18px rgba(118, 178, 255, 0.16);
+  margin-top: 8px;
+}
+
+.dj-frame {
+  width: 100%;
+  min-height: 260px;
+  border: 0;
+  display: block;
+}
+
+.dj-crossfader {
+  margin-top: 12px;
+  border: 1px solid #3f5f8a;
+  background: rgba(8, 16, 30, 0.88);
+  padding: 10px;
+}
+
+.dj-crossfader label {
+  display: block;
+  margin-bottom: 8px;
+  color: #9eff89;
+}
+
+#djCrossfader {
+  width: 100%;
+}
+
+.dj-meter {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  color: #b8d8ff;
+  font-size: 0.82rem;
+}
+
 .youtube-deck {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr);

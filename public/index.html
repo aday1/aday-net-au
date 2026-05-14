@@ -6,6 +6,7 @@
   <title>aday.net.au // @aday_net_au</title>
   <meta name="description" content="aday.net.au creative portal">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <script defer src="https://w.soundcloud.com/player/api.js"></script>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body class="scanlines-on boot-seq">
@@ -183,6 +184,68 @@
       </div>
     </section>
 
+    <section class="panel dj-panel">
+      <h2 class="decrypt">DJ Crossfader Console</h2>
+      <p>Two-deck mix rig for YouTube and SoundCloud sources. Load separate material into Deck A and Deck B, then blend with the crossfader.</p>
+      <div class="dj-decks">
+        <article class="card dj-deck">
+          <h3>Deck A</h3>
+          <label for="deckASelect">Source select</label>
+          <select id="deckASelect"></select>
+          <button id="deckALoad" type="button">Load Deck A</button>
+          <div class="dj-frame-wrap">
+            <iframe id="deckAFrame" class="dj-frame" title="DJ Deck A player" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" src=""></iframe>
+          </div>
+          <p id="deckAState" class="repo-meta">deck a: waiting for source</p>
+        </article>
+        <article class="card dj-deck">
+          <h3>Deck B</h3>
+          <label for="deckBSelect">Source select</label>
+          <select id="deckBSelect"></select>
+          <button id="deckBLoad" type="button">Load Deck B</button>
+          <div class="dj-frame-wrap">
+            <iframe id="deckBFrame" class="dj-frame" title="DJ Deck B player" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" src=""></iframe>
+          </div>
+          <p id="deckBState" class="repo-meta">deck b: waiting for source</p>
+        </article>
+      </div>
+      <div class="dj-crossfader">
+        <label for="djCrossfader">Crossfader</label>
+        <input id="djCrossfader" type="range" min="0" max="100" step="1" value="50">
+        <div class="dj-meter">
+          <span id="deckALevel">A 50%</span>
+          <span id="deckBLevel">B 50%</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="decrypt">Video Index</h2>
+      <div class="grid two">
+        <article class="card">
+          <h3>Onlinedoof archive clip</h3>
+          <p class="repo-meta">date index: 2012-01-01 (archive)</p>
+          <a href="https://vimeo.com/35409288" target="_blank" rel="noopener noreferrer">vimeo.com/35409288</a>
+        </article>
+        <article class="card">
+          <h3>Binaural Percolator</h3>
+          <p class="repo-meta">date index: 2014-01-01 (archive)</p>
+          <a href="https://vimeo.com/84038041" target="_blank" rel="noopener noreferrer">vimeo.com/84038041</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="decrypt">Project Index by Date</h2>
+      <ul class="post-list">
+        <li><span class="date">2025-10-07</span> MacroVerse live collaboration phase // <a href="https://macroverse.aday.net.au">open</a></li>
+        <li><span class="date">2026-05-13</span> macroverse.aday.net.au production repo // <a href="https://github.com/aday1/macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">open</a></li>
+        <li><span class="date">2026-05-13</span> artbastard.aday.net.au production repo // <a href="https://github.com/aday1/artbastard.aday.net.au" target="_blank" rel="noopener noreferrer">open</a></li>
+        <li><span class="date">2026-04-02</span> MoveMusicSaveEditor workflow tooling // <a href="https://github.com/aday1/MoveMusicSaveEditor" target="_blank" rel="noopener noreferrer">open</a></li>
+        <li><span class="date">2026-03-12</span> ZealPalace simulator branch // <a href="https://aday1.github.io/ZealPalace/" target="_blank" rel="noopener noreferrer">open</a></li>
+      </ul>
+    </section>
+
     <section class="panel">
       <h2 class="decrypt">Creator Channels</h2>
       <div class="grid three">
@@ -201,6 +264,39 @@
           <p>Music collection and streaming nodes connected into this portal’s playback deck.</p>
           <a href="https://bandcamp.com/aday_net_au" target="_blank" rel="noopener noreferrer">Bandcamp profile</a>
           <a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">SoundCloud profile</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel gallery-panel">
+      <h2 class="decrypt">Gallery Archive</h2>
+      <p>Album-style visual stack for gigs, random captures, and various experiments. Add more cards later by setting `data-album` on each gallery item.</p>
+      <div class="gallery-controls" role="group" aria-label="Gallery album filters">
+        <button type="button" class="gallery-filter active" data-gallery-filter="all">all</button>
+        <button type="button" class="gallery-filter" data-gallery-filter="gigs">gigs</button>
+        <button type="button" class="gallery-filter" data-gallery-filter="random">random</button>
+        <button type="button" class="gallery-filter" data-gallery-filter="various">various</button>
+      </div>
+      <div id="galleryGrid" class="gallery-grid">
+        <article class="gallery-card" data-album="gigs">
+          <img class="asset-image mosh-image" src="https://opengraph.githubassets.com/1/aday1/macroverse.aday.net.au" alt="Macroverse gig scene frame">
+          <h3>MacroVerse stage frame</h3>
+          <p class="repo-meta">album: gigs</p>
+        </article>
+        <article class="gallery-card" data-album="various">
+          <img class="asset-image mosh-image" src="https://raw.githubusercontent.com/aday1/error-diffusion/main/public/assets/max-patch-1.png" alt="Error Diffusion visual still">
+          <h3>Error Diffusion still</h3>
+          <p class="repo-meta">album: various</p>
+        </article>
+        <article class="gallery-card" data-album="random">
+          <img class="asset-image mosh-image" src="https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png" alt="Acid Banger random visual">
+          <h3>Acid Banger snapshot</h3>
+          <p class="repo-meta">album: random</p>
+        </article>
+        <article class="gallery-card" data-album="various">
+          <img class="asset-image mosh-image" src="https://avatars.githubusercontent.com/u/1834001?v=4" alt="Aday profile visual card">
+          <h3>Profile visual node</h3>
+          <p class="repo-meta">album: various</p>
         </article>
       </div>
     </section>

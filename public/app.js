@@ -20,6 +20,19 @@
   const scFrame = document.getElementById("scEmbedFrame");
   const scSelector = document.getElementById("scSelector");
   const scRandom = document.getElementById("scRandom");
+  const deckASelect = document.getElementById("deckASelect");
+  const deckALoad = document.getElementById("deckALoad");
+  const deckAFrame = document.getElementById("deckAFrame");
+  const deckAState = document.getElementById("deckAState");
+  const deckBSelect = document.getElementById("deckBSelect");
+  const deckBLoad = document.getElementById("deckBLoad");
+  const deckBFrame = document.getElementById("deckBFrame");
+  const deckBState = document.getElementById("deckBState");
+  const djCrossfader = document.getElementById("djCrossfader");
+  const deckALevel = document.getElementById("deckALevel");
+  const deckBLevel = document.getElementById("deckBLevel");
+  const galleryFilters = [...document.querySelectorAll(".gallery-filter")];
+  const galleryCards = [...document.querySelectorAll(".gallery-card")];
   let activeIndex = 0;
   let mediaIndex = 0;
 
@@ -103,6 +116,56 @@
     "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/tracks&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true",
     "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/sets&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
   ];
+
+  const djDeckSources = [
+    {
+      id: "aday-yt-uploads",
+      label: "Aday YouTube uploads",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=aday1&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "aday-yt-live",
+      label: "Aday YouTube live visual search",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aday+chiptune+live+visual&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "aisjam-yt",
+      label: "Aisjam YouTube feature",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed/GFBpXcUfIqM?enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "clan-yt",
+      label: "Clan Analogue YouTube channel",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=clan+analogue+live+electronic+music&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "aday-sc-profile",
+      label: "Aday SoundCloud profile",
+      kind: "soundcloud",
+      embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+    },
+    {
+      id: "aday-sc-tracks",
+      label: "Aday SoundCloud tracks",
+      kind: "soundcloud",
+      embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/tracks&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+    },
+    {
+      id: "clan-sc",
+      label: "Clan Analogue SoundCloud",
+      kind: "soundcloud",
+      embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/clan-analogue&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+    }
+  ];
+
+  const djDeckState = {
+    a: { frame: deckAFrame, status: deckAState, kind: "", widget: null, sourceId: "" },
+    b: { frame: deckBFrame, status: deckBState, kind: "", widget: null, sourceId: "" }
+  };
 
   const livePageOverrides = {
     ZealPalace: "https://aday1.github.io/ZealPalace/",
@@ -684,6 +747,109 @@
     });
   };
 
+  const initGalleryFilters = () => {
+    if (!galleryFilters.length || !galleryCards.length) return;
+    const applyFilter = (tag) => {
+      galleryCards.forEach((card) => {
+        const album = (card.dataset.album || "").toLowerCase();
+        const show = tag === "all" || album === tag;
+        card.classList.toggle("gallery-hidden", !show);
+      });
+    };
+    galleryFilters.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tag = (btn.dataset.galleryFilter || "all").toLowerCase();
+        galleryFilters.forEach((node) => node.classList.toggle("active", node === btn));
+        applyFilter(tag);
+        if (window.anime) {
+          window.anime({
+            targets: ".gallery-card:not(.gallery-hidden)",
+            opacity: [0.45, 1],
+            translateY: [4, 0],
+            duration: 320,
+            easing: "easeOutQuad"
+          });
+        }
+      });
+    });
+  };
+
+  const sendYoutubeCommand = (frame, func, args = []) => {
+    if (!frame?.contentWindow) return;
+    frame.contentWindow.postMessage(JSON.stringify({
+      event: "command",
+      func,
+      args
+    }), "*");
+  };
+
+  const setDeckVolume = (deck, volume) => {
+    const vol = Math.max(0, Math.min(100, Math.round(volume)));
+    if (!deck?.frame || !deck.kind) return;
+    if (deck.kind === "youtube") {
+      sendYoutubeCommand(deck.frame, "setVolume", [vol]);
+      if (vol === 0) sendYoutubeCommand(deck.frame, "mute");
+      else sendYoutubeCommand(deck.frame, "unMute");
+      return;
+    }
+    if (deck.kind === "soundcloud" && deck.widget && typeof deck.widget.setVolume === "function") {
+      deck.widget.setVolume(vol);
+    }
+  };
+
+  const applyCrossfader = () => {
+    if (!djCrossfader) return;
+    const pos = Number(djCrossfader.value) || 50;
+    const volA = 100 - pos;
+    const volB = pos;
+    if (deckALevel) deckALevel.textContent = `A ${volA}%`;
+    if (deckBLevel) deckBLevel.textContent = `B ${volB}%`;
+    setDeckVolume(djDeckState.a, volA);
+    setDeckVolume(djDeckState.b, volB);
+  };
+
+  const mountDeck = (deckKey, sourceId) => {
+    const deck = djDeckState[deckKey];
+    const source = djDeckSources.find((item) => item.id === sourceId);
+    if (!deck || !source || !deck.frame) return;
+    deck.kind = source.kind;
+    deck.sourceId = source.id;
+    deck.widget = null;
+    if (deck.status) deck.status.textContent = `${deckKey === "a" ? "deck a" : "deck b"}: ${source.label}`;
+    deck.frame.src = source.embed;
+    deck.frame.addEventListener("load", () => {
+      if (source.kind === "soundcloud" && window.SC && typeof window.SC.Widget === "function") {
+        deck.widget = window.SC.Widget(deck.frame);
+        if (window.SC.Widget.Events?.READY) {
+          deck.widget.bind(window.SC.Widget.Events.READY, () => {
+            applyCrossfader();
+          });
+        }
+      } else {
+        setTimeout(applyCrossfader, 200);
+      }
+    }, { once: true });
+  };
+
+  const initDjCrossfader = () => {
+    if (!deckASelect || !deckBSelect || !deckALoad || !deckBLoad || !djCrossfader) return;
+    const optionHtml = djDeckSources
+      .map((source) => `<option value="${source.id}">${source.label}</option>`)
+      .join("");
+    deckASelect.innerHTML = optionHtml;
+    deckBSelect.innerHTML = optionHtml;
+    deckASelect.value = "aday-yt-uploads";
+    deckBSelect.value = "aday-sc-profile";
+    deckALoad.addEventListener("click", () => mountDeck("a", deckASelect.value));
+    deckBLoad.addEventListener("click", () => mountDeck("b", deckBSelect.value));
+    deckASelect.addEventListener("change", () => mountDeck("a", deckASelect.value));
+    deckBSelect.addEventListener("change", () => mountDeck("b", deckBSelect.value));
+    djCrossfader.addEventListener("input", applyCrossfader);
+    mountDeck("a", deckASelect.value);
+    mountDeck("b", deckBSelect.value);
+    applyCrossfader();
+  };
+
   const scrambleText = (el, target) => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
     let frame = 0;
@@ -812,6 +978,11 @@
           month: "short",
           day: "2-digit"
         });
+        const createdAt = new Date(repo.created_at).toLocaleDateString("en-AU", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit"
+        });
         card.innerHTML = `
           <div class="repo-tv-head">
             <h3>${repo.name}</h3>
@@ -823,6 +994,7 @@
           <p class="repo-meta">${blurb}</p>
           <p class="repo-meta repo-activity repo-activity-${activity}">activity: ${activity} / updated ${days}d ago</p>
           <p class="repo-meta">last commit signal: ${lastUpdated}</p>
+          <p class="repo-meta">project date: ${createdAt}</p>
           <div class="repo-tv-links">
             <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">open project page</a>
             <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">source</a>
@@ -855,6 +1027,8 @@
   initYoutubeDeck();
   initRandomImageDeck();
   initSoundcloudDeck();
+  initGalleryFilters();
+  initDjCrossfader();
   hydrateRepoGrid();
 
   document.querySelectorAll("img.mosh-image").forEach((img) => {
