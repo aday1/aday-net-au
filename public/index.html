@@ -144,6 +144,67 @@
       </div>
     </section>
 
+    <section class="panel media-panel">
+      <h2 class="decrypt">Music Signal Deck</h2>
+      <p>Quick playback/scan block for SoundCloud and Bandcamp nodes. Use selector modes to jump between profile, tracks, and playlists.</p>
+      <div class="grid two">
+        <article class="card">
+          <h3>SoundCloud rapid player</h3>
+          <div class="media-frame-wrap">
+            <iframe
+              id="scEmbedFrame"
+              class="media-embed"
+              title="Aday SoundCloud player"
+              loading="lazy"
+              allow="autoplay"
+              src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+            ></iframe>
+          </div>
+          <label for="scSelector">SoundCloud mode</label>
+          <select id="scSelector">
+            <option value="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">profile stream</option>
+            <option value="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/tracks&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">tracks stream</option>
+            <option value="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/sets&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">playlists stream</option>
+          </select>
+          <button id="scRandom" type="button">Random SoundCloud mode</button>
+          <a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">open soundcloud.com/adaynetau</a>
+        </article>
+        <article class="card">
+          <h3>Bandcamp collection node</h3>
+          <p>Bandcamp profile and collection signal: open source/modded/bendy/chip/h4xed enthusiasm.</p>
+          <a href="https://bandcamp.com/aday_net_au" target="_blank" rel="noopener noreferrer">bandcamp.com/aday_net_au</a>
+          <ul>
+            <li><a href="https://clananalogue.bandcamp.com/album/mobile-strategies-battery-powered-sonics" target="_blank" rel="noopener noreferrer">Mobile Strategies: Battery-Powered Sonics</a></li>
+            <li><a href="https://australianchiptunecollective.bandcamp.com/album/the-great-australian-barbecue-bash-vol-2" target="_blank" rel="noopener noreferrer">The Great Australian Barbecue Bash vol. 2</a></li>
+            <li><a href="https://thecaretaker.bandcamp.com/album/everywhere-at-the-end-of-time" target="_blank" rel="noopener noreferrer">Everywhere at the end of time</a></li>
+          </ul>
+          <img class="asset-image mosh-image" src="https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png" alt="Bandcamp collection visual card">
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="decrypt">Creator Channels</h2>
+      <div class="grid three">
+        <article class="card">
+          <h3>YouTube</h3>
+          <p>Main channel with live visuals, music experiments, and technical breakdowns.</p>
+          <a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">youtube.com/@aday1</a>
+        </article>
+        <article class="card">
+          <h3>GitHub</h3>
+          <p>Primary code signal: repos, experiments, automation stacks, and deploy infrastructure.</p>
+          <a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">github.com/aday1</a>
+        </article>
+        <article class="card">
+          <h3>Bandcamp + SoundCloud</h3>
+          <p>Music collection and streaming nodes connected into this portal’s playback deck.</p>
+          <a href="https://bandcamp.com/aday_net_au" target="_blank" rel="noopener noreferrer">Bandcamp profile</a>
+          <a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">SoundCloud profile</a>
+        </article>
+      </div>
+    </section>
+
     <section class="panel youtube-panel">
       <h2 class="decrypt">YouTube Broadcast Deck</h2>
       <p>CRT video selector for channel material. Randomizer mode rotates source presets in a TV-style switchboard.</p>

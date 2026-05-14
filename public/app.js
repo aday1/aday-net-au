@@ -17,6 +17,9 @@
   const ytRandom = document.getElementById("ytRandom");
   const randomImage = document.getElementById("randomImage");
   const randomImageBtn = document.getElementById("randomImageBtn");
+  const scFrame = document.getElementById("scEmbedFrame");
+  const scSelector = document.getElementById("scSelector");
+  const scRandom = document.getElementById("scRandom");
   let activeIndex = 0;
   let mediaIndex = 0;
 
@@ -93,6 +96,12 @@
     "https://opengraph.githubassets.com/aday-ab/aday1/artbastard.aday.net.au",
     "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1400&q=80",
     "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80"
+  ];
+
+  const soundcloudSources = [
+    "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true",
+    "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/tracks&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true",
+    "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/sets&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
   ];
 
   const livePageOverrides = {
@@ -646,6 +655,35 @@
     });
   };
 
+  const initSoundcloudDeck = () => {
+    if (!scFrame) return;
+    scSelector?.addEventListener("change", () => {
+      scFrame.src = scSelector.value;
+      if (window.anime) {
+        window.anime({
+          targets: ".media-frame-wrap",
+          opacity: [0.45, 1],
+          duration: 360,
+          easing: "easeOutQuad"
+        });
+      }
+    });
+    scRandom?.addEventListener("click", () => {
+      const src = soundcloudSources[Math.floor(Math.random() * soundcloudSources.length)];
+      scFrame.src = src;
+      if (scSelector) scSelector.value = src;
+      if (window.anime) {
+        window.anime({
+          targets: ".media-frame-wrap, #scRandom",
+          translateX: [-5, 0],
+          opacity: [0.65, 1],
+          duration: 420,
+          easing: "easeOutExpo"
+        });
+      }
+    });
+  };
+
   const scrambleText = (el, target) => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
     let frame = 0;
@@ -816,6 +854,7 @@
   animateHeaders();
   initYoutubeDeck();
   initRandomImageDeck();
+  initSoundcloudDeck();
   hydrateRepoGrid();
 
   document.querySelectorAll("img.mosh-image").forEach((img) => {
