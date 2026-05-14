@@ -467,7 +467,7 @@ body.boot-seq .shell {
   text-decoration: none;
   color: #9eff89;
   border: 1px solid #46618a;
-  padding: 10px 11px;
+  padding: 10px 11px 10px 34px;
   background:
     linear-gradient(180deg, rgba(13, 24, 42, 0.92), rgba(8, 16, 29, 0.9));
   transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
@@ -491,6 +491,113 @@ body.boot-seq .shell {
   border-color: #9ce0ff;
   box-shadow: 0 0 24px rgba(128, 201, 255, 0.4), inset 0 0 16px rgba(133, 203, 255, 0.2);
 }
+
+/* Symbolic link icons (ASCII-safe, no emoji). */
+:is(.quicklinks a, .card a, .footer a) {
+  --link-icon-text: ">>";
+  --link-icon-border: rgba(129, 198, 255, 0.52);
+  --link-icon-bg: rgba(12, 24, 43, 0.86);
+  --link-icon-color: #c9ecff;
+  position: relative;
+}
+
+.card a,
+.footer a {
+  padding-left: 23px;
+}
+
+:is(.quicklinks a, .card a, .footer a)::before {
+  content: var(--link-icon-text);
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 14px;
+  height: 14px;
+  border: 1px solid var(--link-icon-border);
+  background: var(--link-icon-bg);
+  color: var(--link-icon-color);
+  font-family: "IBM Plex Mono", "Cascadia Mono", monospace;
+  font-size: 0.52rem;
+  line-height: 12px;
+  text-align: center;
+  letter-spacing: -0.04em;
+  padding: 0 1px;
+  box-shadow: 0 0 8px rgba(101, 191, 255, 0.16), inset 0 0 5px rgba(137, 212, 255, 0.14);
+  pointer-events: none;
+}
+
+.quicklinks a[href*="github.com"],
+.card a[href*="github.com"],
+.footer a[href*="github.com"] { --link-icon-text: "GH"; }
+
+.quicklinks a[href*="youtube.com"],
+.card a[href*="youtube.com"],
+.footer a[href*="youtube.com"] { --link-icon-text: "YT"; }
+
+.quicklinks a[href*="mastodon"],
+.card a[href*="mastodon"],
+.footer a[href*="mastodon"] { --link-icon-text: "MD"; }
+
+.quicklinks a[href*="twitch.tv"],
+.card a[href*="twitch.tv"],
+.footer a[href*="twitch.tv"] { --link-icon-text: "TV"; }
+
+.quicklinks a[href*="soundcloud.com"],
+.card a[href*="soundcloud.com"],
+.footer a[href*="soundcloud.com"] { --link-icon-text: "SC"; }
+
+.quicklinks a[href*="codepen.io"],
+.card a[href*="codepen.io"],
+.footer a[href*="codepen.io"] { --link-icon-text: "CP"; }
+
+.quicklinks a[href*="blog.aday.net.au"],
+.card a[href*="blog.aday.net.au"],
+.footer a[href*="blog.aday.net.au"] { --link-icon-text: "BL"; }
+
+.quicklinks a[href*="keys.aday.net.au"],
+.card a[href*="keys.aday.net.au"],
+.footer a[href*="keys.aday.net.au"] { --link-icon-text: "KY"; }
+
+.quicklinks a[href*="dj.html"],
+.card a[href*="dj.html"],
+.footer a[href*="dj.html"] { --link-icon-text: "DJ"; }
+
+.quicklinks a[href*="qr-zipper"],
+.card a[href*="qr-zipper"],
+.footer a[href*="qr-zipper"] { --link-icon-text: "QR"; }
+
+.quicklinks a[href*="weeklybeats"],
+.card a[href*="weeklybeats"],
+.footer a[href*="weeklybeats"] { --link-icon-text: "WB"; }
+
+.quicklinks a[href*="macroverse"],
+.card a[href*="macroverse"],
+.footer a[href*="macroverse"] { --link-icon-text: "MV"; }
+
+.quicklinks a[href*="artbastard"],
+.card a[href*="artbastard"],
+.footer a[href*="artbastard"] { --link-icon-text: "AB"; }
+
+.quicklinks a[href*="acid-banger"],
+.card a[href*="acid-banger"],
+.footer a[href*="acid-banger"] { --link-icon-text: "A3"; }
+
+.quicklinks a[href*="zealpalace"],
+.card a[href*="zealpalace"],
+.footer a[href*="zealpalace"] { --link-icon-text: "ZP"; }
+
+.quicklinks a[href*="errordiffusion"],
+.card a[href*="errordiffusion"],
+.footer a[href*="errordiffusion"] { --link-icon-text: "ED"; }
+
+.quicklinks a[href*="movemusic"],
+.card a[href*="movemusic"],
+.footer a[href*="movemusic"] { --link-icon-text: "MM"; }
+
+.quicklinks a[href*="/packages"],
+.card a[href*="/packages"],
+.footer a[href*="/packages"] { --link-icon-text: "PK"; }
 
 .headliner-panel {
   border-color: #6d9ed7;
