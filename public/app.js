@@ -35,6 +35,8 @@
   const galleryCards = [...document.querySelectorAll(".gallery-card")];
   let activeIndex = 0;
   let mediaIndex = 0;
+  let bgCycleIndex = 0;
+  const sessionEdgeSeed = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 
   const mediaFeed = [
     {
@@ -82,6 +84,16 @@
       src: "https://opengraph.githubassets.com/1/aday1/acid-banger",
       title: "acid-banger repository card",
       fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
+    },
+    {
+      src: "https://media.demozoo.org/screens/t/dc/3c/d2ca.pl765305.jpg",
+      title: "demozoo / orbital syntax frame",
+      fallbacks: ["https://media.demozoo.org/screens/t/60/9a/54e1.352183.jpg"]
+    },
+    {
+      src: "https://media.demozoo.org/screens/t/0d/47/2883.187843.jpg",
+      title: "demozoo / demobus from the sky",
+      fallbacks: ["https://media.demozoo.org/screens/t/d7/36/0130.173990.png"]
     }
   ];
   const svgPreviewFallback = (title) => {
@@ -150,6 +162,8 @@
     "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png",
     "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png",
     "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png",
+    "https://media.demozoo.org/screens/t/dc/3c/d2ca.pl765305.jpg",
+    "https://media.demozoo.org/screens/t/0d/47/2883.187843.jpg",
     "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1400&q=80",
     "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80"
   ];
@@ -158,6 +172,13 @@
     "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true",
     "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/tracks&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true",
     "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/sets&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+  ];
+
+  const bgCyclePalette = [
+    { a: "#2a4572", b: "#13233f", c: "#091426", d: "#060d18" },
+    { a: "#4c2a72", b: "#1a203f", c: "#0a1628", d: "#060913" },
+    { a: "#1f5a64", b: "#122f42", c: "#08192a", d: "#050d17" },
+    { a: "#61334a", b: "#2a1d3f", c: "#121329", d: "#070913" }
   ];
 
   const djDeckSources = [
@@ -202,6 +223,30 @@
       label: "Clan Analogue SoundCloud",
       kind: "soundcloud",
       embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/clan-analogue&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+    },
+    {
+      id: "wb-cubic-waveform",
+      label: "WeeklyBeats / Cubic Waveform",
+      kind: "weeklybeats",
+      embed: "https://weeklybeats.com/music/aday"
+    },
+    {
+      id: "wb-late-calibration",
+      label: "WeeklyBeats / Late Calibration Test",
+      kind: "weeklybeats",
+      embed: "https://weeklybeats.com/music/aday"
+    },
+    {
+      id: "wb-doomsday-data",
+      label: "WeeklyBeats / Doomsday data",
+      kind: "weeklybeats",
+      embed: "https://weeklybeats.com/aday/music/doomsday-data"
+    },
+    {
+      id: "wb-anxious-goth-rabbit",
+      label: "WeeklyBeats / Anxious Goth Rabbit",
+      kind: "weeklybeats",
+      embed: "https://weeklybeats.com/aday/music/anxious-goth-rabbit-2"
     }
   ];
 
@@ -246,12 +291,19 @@
   });
 
   const bootDone = () => body.classList.remove("boot-seq");
+  const hideTransition = () => pageTransition?.classList.add("hidden");
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(hideTransition, 2200);
+  });
   window.addEventListener("load", () => {
     setTimeout(bootDone, 1100);
-    setTimeout(() => pageTransition?.classList.add("hidden"), 1300);
+    setTimeout(hideTransition, 1300);
+  });
+  window.addEventListener("pageshow", () => {
+    setTimeout(hideTransition, 240);
   });
   setTimeout(bootDone, 6500);
-  setTimeout(() => pageTransition?.classList.add("hidden"), 6800);
+  setTimeout(hideTransition, 6800);
 
   if (cursor) {
     window.addEventListener("mousemove", (event) => {
@@ -857,6 +909,11 @@
     }
     if (deck.kind === "soundcloud" && deck.widget && typeof deck.widget.setVolume === "function") {
       deck.widget.setVolume(vol);
+      return;
+    }
+    if (deck.kind === "weeklybeats") {
+      // WeeklyBeats pages do not expose an iframe API for programmatic volume control.
+      return;
     }
   };
 
@@ -878,7 +935,10 @@
     deck.kind = source.kind;
     deck.sourceId = source.id;
     deck.widget = null;
-    if (deck.status) deck.status.textContent = `${deckKey === "a" ? "deck a" : "deck b"}: ${source.label}`;
+    if (deck.status) {
+      const wbNote = source.kind === "weeklybeats" ? " (manual volume mode)" : "";
+      deck.status.textContent = `${deckKey === "a" ? "deck a" : "deck b"}: ${source.label}${wbNote}`;
+    }
     deck.frame.src = source.embed;
     deck.frame.addEventListener("load", () => {
       if (source.kind === "soundcloud" && window.SC && typeof window.SC.Widget === "function") {
@@ -892,6 +952,43 @@
         setTimeout(applyCrossfader, 200);
       }
     }, { once: true });
+  };
+
+  const randomizeFrameGeneration = () => {
+    document.querySelectorAll(".panel, .card").forEach((node) => {
+      const edgeLen = 8 + Math.floor(Math.random() * 20);
+      const edgeGap = 5 + Math.floor(Math.random() * 16);
+      const edgeCut = 7 + Math.floor(Math.random() * 14);
+      const edgeAlpha = (0.33 + Math.random() * 0.42).toFixed(2);
+      const edgeShift = 14 + Math.floor(Math.random() * 30);
+      const edgeDrift = (6.2 + Math.random() * 8.6).toFixed(2);
+      node.style.setProperty("--edge-len", `${edgeLen}px`);
+      node.style.setProperty("--edge-gap", `${edgeGap}px`);
+      node.style.setProperty("--edge-cut", `${edgeCut}px`);
+      node.style.setProperty("--edge-alpha", edgeAlpha);
+      node.style.setProperty("--edge-shift", `${edgeShift}px`);
+      node.style.setProperty("--edge-drift", `${edgeDrift}s`);
+      node.dataset.edgeSeed = sessionEdgeSeed;
+    });
+  };
+
+  const cycleBackgroundPalette = () => {
+    const swatch = bgCyclePalette[bgCycleIndex % bgCyclePalette.length];
+    bgCycleIndex += 1;
+    if (!swatch) return;
+    body.style.setProperty("--bg-cycle-a", swatch.a);
+    body.style.setProperty("--bg-cycle-b", swatch.b);
+    body.style.setProperty("--bg-cycle-c", swatch.c);
+    body.style.setProperty("--bg-cycle-d", swatch.d);
+  };
+
+  const scheduleFrameRandomizer = () => {
+    const roll = () => {
+      randomizeFrameGeneration();
+      const next = 5200 + Math.floor(Math.random() * 6200);
+      setTimeout(roll, next);
+    };
+    roll();
   };
 
   const initDjCrossfader = () => {
@@ -1100,6 +1197,7 @@
         if (img.complete) moshImage(img);
         else img.addEventListener("load", () => moshImage(img), { once: true });
       });
+      randomizeFrameGeneration();
     } catch {
       // silent degrade
     }
@@ -1115,12 +1213,16 @@
   setInterval(pulseCrtBurst, 6400);
   animateTextFx();
   waitForAnime(() => animateHeaders());
+  randomizeFrameGeneration();
+  cycleBackgroundPalette();
   initYoutubeDeck();
   initRandomImageDeck();
   initSoundcloudDeck();
   initGalleryFilters();
   initDjCrossfader();
   hydrateRepoGrid();
+  scheduleFrameRandomizer();
+  setInterval(cycleBackgroundPalette, 9200);
 
   document.querySelectorAll("img.mosh-image").forEach((img) => {
     armGenericImageFallback(img);

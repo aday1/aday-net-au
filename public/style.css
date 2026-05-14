@@ -5,6 +5,10 @@
   --ink: #d8ecff;
   --muted: #9ab2d8;
   --green: #8eff79;
+  --bg-cycle-a: #2a4572;
+  --bg-cycle-b: #13233f;
+  --bg-cycle-c: #091426;
+  --bg-cycle-d: #060d18;
 }
 
 * { box-sizing: border-box; }
@@ -12,10 +16,11 @@ html, body { margin: 0; padding: 0; min-height: 100%; }
 
 body {
   font-family: "Consolas", "Lucida Console", "Courier New", monospace;
-  background: radial-gradient(circle at 50% -10%, #2a4572 0%, #13233f 35%, #091426 70%, #060d18 100%);
+  background: radial-gradient(circle at 50% -10%, var(--bg-cycle-a) 0%, var(--bg-cycle-b) 35%, var(--bg-cycle-c) 70%, var(--bg-cycle-d) 100%);
   color: var(--ink);
   overflow-x: hidden;
   cursor: none;
+  transition: background 1400ms ease;
 }
 
 .page-transition {
@@ -28,6 +33,7 @@ body {
   color: #a8ffd7;
   transition: opacity 420ms ease;
   overflow: hidden;
+  animation: loaderAutoDismiss 0.01s linear 6.9s forwards;
 }
 
 .page-transition::before {
@@ -58,6 +64,7 @@ body {
 .page-transition.hidden {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .page-transition-inner {
@@ -77,6 +84,7 @@ body {
   letter-spacing: 0.08em;
   text-transform: lowercase;
   font-size: 0.82rem;
+  min-height: 1em;
 }
 
 .cuton-line {
@@ -98,6 +106,7 @@ body {
   z-index: 0;
   pointer-events: none;
   opacity: 0.6;
+  animation: shaderTintCycle 26s ease-in-out infinite;
 }
 
 body::before {
@@ -158,6 +167,7 @@ body::after {
   background: rgba(6, 11, 22, 0.82);
   box-shadow: 0 0 0 1px rgba(173, 206, 255, 0.22), 0 22px 90px rgba(0, 0, 0, 0.56), inset 0 0 50px rgba(0, 50, 110, 0.2);
   transform-origin: center;
+  animation: shellHuePulse 10.2s ease-in-out infinite;
 }
 
 body.boot-seq .shell {
@@ -246,9 +256,14 @@ body.boot-seq .shell {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent 38%, rgba(0, 0, 0, 0.72) 100%);
+  background:
+    radial-gradient(circle at 18% 24%, rgba(101, 145, 255, 0.18), transparent 44%),
+    radial-gradient(circle at 74% 68%, rgba(205, 95, 255, 0.14), transparent 48%),
+    radial-gradient(circle at 52% 12%, rgba(106, 255, 201, 0.09), transparent 38%),
+    radial-gradient(circle at center, transparent 36%, rgba(0, 0, 0, 0.74) 100%);
   pointer-events: none;
   z-index: 2;
+  animation: crtColorDrift 28s ease-in-out infinite;
 }
 
 .screen.crt-burst::before {
@@ -347,6 +362,7 @@ body.boot-seq .shell {
   box-shadow: inset 0 0 26px rgba(60, 122, 191, 0.08);
   position: relative;
   isolation: isolate;
+  animation: panelDrift 14s ease-in-out infinite;
 }
 
 .panel::before {
@@ -354,11 +370,12 @@ body.boot-seq .shell {
   position: absolute;
   inset: 6px;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: var(--edge-alpha, 0.55);
   z-index: 0;
   background:
-    repeating-linear-gradient(90deg, rgba(128, 198, 255, 0.88) 0 20px, transparent 20px 31px),
-    repeating-linear-gradient(0deg, rgba(128, 198, 255, 0.88) 0 20px, transparent 20px 31px);
+    repeating-linear-gradient(90deg, rgba(128, 198, 255, 0.88) 0 var(--edge-len, 20px), transparent var(--edge-len, 20px) calc(var(--edge-len, 20px) + var(--edge-gap, 11px))),
+    repeating-linear-gradient(0deg, rgba(128, 198, 255, 0.88) 0 var(--edge-len, 20px), transparent var(--edge-len, 20px) calc(var(--edge-len, 20px) + var(--edge-gap, 11px)));
+  background-position: 0 0, 0 0;
   -webkit-mask:
     linear-gradient(#000 0 0) top left / calc(100% - 26px) 1px no-repeat,
     linear-gradient(#000 0 0) top right / 1px calc(100% - 26px) no-repeat,
@@ -377,7 +394,8 @@ body.boot-seq .shell {
     linear-gradient(#000 0 0) top right / 17px 17px no-repeat,
     linear-gradient(#000 0 0) bottom right / 17px 17px no-repeat,
     linear-gradient(#000 0 0) bottom left / 17px 17px no-repeat;
-  clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px);
+  clip-path: polygon(var(--edge-cut, 16px) 0, calc(100% - var(--edge-cut, 16px)) 0, 100% var(--edge-cut, 16px), 100% calc(100% - var(--edge-cut, 16px)), calc(100% - var(--edge-cut, 16px)) 100%, var(--edge-cut, 16px) 100%, 0 calc(100% - var(--edge-cut, 16px)), 0 var(--edge-cut, 16px));
+  animation: edgeFlow var(--edge-drift, 10s) linear infinite;
 }
 
 .panel > * {
@@ -397,6 +415,7 @@ body.boot-seq .shell {
   padding: 11px;
   position: relative;
   isolation: isolate;
+  animation: panelDrift 12s ease-in-out infinite;
 }
 
 .card::before {
@@ -404,11 +423,12 @@ body.boot-seq .shell {
   position: absolute;
   inset: 5px;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: var(--edge-alpha, 0.5);
   z-index: 0;
   background:
-    repeating-linear-gradient(90deg, rgba(126, 191, 255, 0.95) 0 10px, transparent 10px 18px),
-    repeating-linear-gradient(0deg, rgba(126, 191, 255, 0.95) 0 10px, transparent 10px 18px);
+    repeating-linear-gradient(90deg, rgba(126, 191, 255, 0.95) 0 var(--edge-len, 10px), transparent var(--edge-len, 10px) calc(var(--edge-len, 10px) + var(--edge-gap, 8px))),
+    repeating-linear-gradient(0deg, rgba(126, 191, 255, 0.95) 0 var(--edge-len, 10px), transparent var(--edge-len, 10px) calc(var(--edge-len, 10px) + var(--edge-gap, 8px)));
+  background-position: 0 0, 0 0;
   -webkit-mask:
     linear-gradient(#000 0 0) top left / calc(100% - 20px) 1px no-repeat,
     linear-gradient(#000 0 0) top right / 1px calc(100% - 20px) no-repeat,
@@ -427,7 +447,8 @@ body.boot-seq .shell {
     linear-gradient(#000 0 0) top right / 12px 12px no-repeat,
     linear-gradient(#000 0 0) bottom right / 12px 12px no-repeat,
     linear-gradient(#000 0 0) bottom left / 12px 12px no-repeat;
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  clip-path: polygon(var(--edge-cut, 10px) 0, calc(100% - var(--edge-cut, 10px)) 0, 100% var(--edge-cut, 10px), 100% calc(100% - var(--edge-cut, 10px)), calc(100% - var(--edge-cut, 10px)) 100%, var(--edge-cut, 10px) 100%, 0 calc(100% - var(--edge-cut, 10px)), 0 var(--edge-cut, 10px));
+  animation: edgeFlow var(--edge-drift, 8s) linear infinite;
 }
 
 .card > * {
@@ -456,6 +477,7 @@ body.boot-seq .shell {
   font-size: 0.78rem;
   letter-spacing: 0.06em;
   background: rgba(8, 15, 28, 0.86);
+  animation: chipPulse 4.4s ease-in-out infinite;
 }
 
 .year-chip:hover {
@@ -622,6 +644,7 @@ body.boot-seq .shell {
   background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.34) 50%);
   background-size: 100% 4px;
   z-index: 2;
+  animation: crtStaticRoll 2.3s steps(3, end) infinite;
 }
 
 .repo-tv-screen::after {
@@ -799,6 +822,7 @@ body.boot-seq .shell {
   background: rgba(9, 18, 33, 0.92);
   padding: 8px;
   transition: opacity 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+  animation: panelDrift 10s ease-in-out infinite;
 }
 
 .gallery-card:hover {
@@ -1230,4 +1254,68 @@ a { cursor: none; }
   0% { filter: contrast(1) brightness(1) saturate(1); }
   50% { filter: contrast(1.34) brightness(1.22) saturate(1.25); }
   100% { filter: contrast(1) brightness(1) saturate(1); }
+}
+
+@keyframes loaderAutoDismiss {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+@keyframes shaderTintCycle {
+  0%, 100% { filter: hue-rotate(0deg) saturate(1) brightness(1); }
+  35% { filter: hue-rotate(10deg) saturate(1.1) brightness(1.03); }
+  70% { filter: hue-rotate(-9deg) saturate(1.06) brightness(0.98); }
+}
+
+@keyframes crtColorDrift {
+  0%, 100% {
+    background-position: 18% 24%, 74% 68%, 52% 12%, center;
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  35% {
+    background-position: 36% 18%, 62% 78%, 28% 26%, center;
+    filter: hue-rotate(14deg) saturate(1.07);
+  }
+  72% {
+    background-position: 14% 62%, 82% 46%, 64% 16%, center;
+    filter: hue-rotate(-11deg) saturate(1.1);
+  }
+}
+
+@keyframes edgeFlow {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: var(--edge-shift, 26px) 0, 0 var(--edge-shift, 26px);
+  }
+}
+
+@keyframes panelDrift {
+  0%, 100% { transform: translateY(0); }
+  35% { transform: translateY(-1px); }
+  70% { transform: translateY(1px); }
+}
+
+@keyframes chipPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(102, 183, 255, 0);
+    border-color: #4a6e97;
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(102, 183, 255, 0.34);
+    border-color: #78b4ef;
+  }
+}
+
+@keyframes shellHuePulse {
+  0%, 100% {
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  50% {
+    filter: hue-rotate(8deg) saturate(1.08);
+  }
 }
