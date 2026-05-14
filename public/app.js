@@ -1,8 +1,5 @@
 (() => {
   const body = document.body;
-  const button = document.getElementById("scanlineToggle");
-  const key = "aday.scanlines";
-  const bgShader = document.getElementById("bgShader");
   const canvas = document.getElementById("crtCanvas");
   const crtMedia = document.getElementById("crtMedia");
   const crtCaption = document.getElementById("crtCaption");
@@ -12,9 +9,6 @@
   const menuItems = [...document.querySelectorAll(".osd-menu li")];
   const repoGrid = document.getElementById("repoGrid");
   const pageTransition = document.getElementById("pageTransition");
-  const ytFrame = document.getElementById("ytEmbedFrame");
-  const ytSelector = document.getElementById("ytSelector");
-  const ytRandom = document.getElementById("ytRandom");
   const randomImage = document.getElementById("randomImage");
   const randomImageBtn = document.getElementById("randomImageBtn");
   const scFrame = document.getElementById("scEmbedFrame");
@@ -31,11 +25,21 @@
   const djCrossfader = document.getElementById("djCrossfader");
   const deckALevel = document.getElementById("deckALevel");
   const deckBLevel = document.getElementById("deckBLevel");
+  const acid303Canvas = document.getElementById("acid303Canvas");
+  const wbTrackSelector = document.getElementById("wbTrackSelector");
+  const wbOpenTrack = document.getElementById("wbOpenTrack");
   const galleryFilters = [...document.querySelectorAll(".gallery-filter")];
   const galleryCards = [...document.querySelectorAll(".gallery-card")];
+  const prefersReducedMotion = !!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  const coarsePointer = !!window.matchMedia?.("(pointer: coarse)")?.matches;
+  const smallViewport = window.innerWidth <= 820;
+  const performanceMode = prefersReducedMotion || coarsePointer || smallViewport;
+  const ultraLiteMode = prefersReducedMotion || window.innerWidth <= 640;
+  const crtFrameBudgetMs = ultraLiteMode ? 50 : (performanceMode ? 34 : 16);
+  const nodeMapFrameBudgetMs = ultraLiteMode ? 70 : (performanceMode ? 52 : 32);
+  const acidFrameBudgetMs = ultraLiteMode ? 64 : (performanceMode ? 42 : 16);
   let activeIndex = 0;
   let mediaIndex = 0;
-  let bgCycleIndex = 0;
   const sessionEdgeSeed = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 
   const mediaFeed = [
@@ -137,7 +141,6 @@
       armRepoImageFallback(img, repoData.owner, repoData.repo, img.alt || repoData.repo);
       return;
     }
-    if (!explicit.length) return;
     const label = img.alt || "image";
     const candidates = [...explicit, svgPreviewFallback(label)];
     let idx = 0;
@@ -149,13 +152,15 @@
     img.dataset.fallbackReady = "1";
   };
 
+  const hashString = (value) => {
+    let hash = 0;
+    for (let i = 0; i < value.length; i++) {
+      hash = ((hash << 5) - hash) + value.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  };
 
-  const ytSources = [
-    "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=aday1",
-    "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=Aday",
-    "https://www.youtube-nocookie.com/embed?listType=search&list=aday+macroverse+visual",
-    "https://www.youtube-nocookie.com/embed?listType=search&list=aday+chiptune+live"
-  ];
 
   const randomImageSources = [
     "https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png",
@@ -174,25 +179,18 @@
     "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/sets&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
   ];
 
-  const bgCyclePalette = [
-    { a: "#2a4572", b: "#13233f", c: "#091426", d: "#060d18" },
-    { a: "#4c2a72", b: "#1a203f", c: "#0a1628", d: "#060913" },
-    { a: "#1f5a64", b: "#122f42", c: "#08192a", d: "#050d17" },
-    { a: "#61334a", b: "#2a1d3f", c: "#121329", d: "#070913" }
-  ];
-
   const djDeckSources = [
     {
       id: "aday-yt-uploads",
       label: "Aday YouTube uploads",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=aday1&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/GFBpXcUfIqM?enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aday-yt-live",
       label: "Aday YouTube live visual search",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aday+chiptune+live+visual&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aday+live+visual+set&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aisjam-yt",
@@ -205,6 +203,18 @@
       label: "Clan Analogue YouTube channel",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed?listType=search&list=clan+analogue+live+electronic+music&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "vimeo-onlinedoof",
+      label: "Vimeo / Onlinedoof archive clip",
+      kind: "vimeo",
+      embed: "https://player.vimeo.com/video/35409288?autoplay=0&title=0&byline=0&portrait=0"
+    },
+    {
+      id: "vimeo-binaural",
+      label: "Vimeo / Binaural Percolator",
+      kind: "vimeo",
+      embed: "https://player.vimeo.com/video/84038041?autoplay=0&title=0&byline=0&portrait=0"
     },
     {
       id: "aday-sc-profile",
@@ -225,28 +235,10 @@
       embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/clan-analogue&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
     },
     {
-      id: "wb-cubic-waveform",
-      label: "WeeklyBeats / Cubic Waveform",
-      kind: "weeklybeats",
-      embed: "https://weeklybeats.com/music/aday"
-    },
-    {
-      id: "wb-late-calibration",
-      label: "WeeklyBeats / Late Calibration Test",
-      kind: "weeklybeats",
-      embed: "https://weeklybeats.com/music/aday"
-    },
-    {
-      id: "wb-doomsday-data",
-      label: "WeeklyBeats / Doomsday data",
-      kind: "weeklybeats",
-      embed: "https://weeklybeats.com/aday/music/doomsday-data"
-    },
-    {
-      id: "wb-anxious-goth-rabbit",
-      label: "WeeklyBeats / Anxious Goth Rabbit",
-      kind: "weeklybeats",
-      embed: "https://weeklybeats.com/aday/music/anxious-goth-rabbit-2"
+      id: "yt-livecoding",
+      label: "YouTube / Live coding visual search",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=live+coding+visuals+shader&enablejsapi=1&playsinline=1&rel=0"
     }
   ];
 
@@ -278,18 +270,6 @@
     "The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack": "High-speed MCP macro pack for repetitive DAW editing and envelope batching."
   };
 
-  const saved = localStorage.getItem(key);
-  if (saved === "off") {
-    body.classList.remove("scanlines-on");
-    body.classList.add("scanlines-off");
-  }
-
-  button?.addEventListener("click", () => {
-    const off = body.classList.toggle("scanlines-off");
-    body.classList.toggle("scanlines-on", !off);
-    localStorage.setItem(key, off ? "off" : "on");
-  });
-
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
   document.addEventListener("DOMContentLoaded", () => {
@@ -312,12 +292,22 @@
     });
   }
 
+  let crtWidth = 0;
+  let crtHeight = 0;
+  let nodeMapWidth = 0;
+  let nodeMapHeight = 0;
+
   const fit = () => {
     if (!canvas) return;
     const ratio = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.max(1, Math.floor(rect.width * ratio));
-    canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+    const nextWidth = Math.max(1, Math.floor(rect.width * ratio));
+    const nextHeight = Math.max(1, Math.floor(rect.height * ratio));
+    if (nextWidth === crtWidth && nextHeight === crtHeight) return;
+    crtWidth = nextWidth;
+    crtHeight = nextHeight;
+    canvas.width = crtWidth;
+    canvas.height = crtHeight;
   };
 
   const initShader = () => {
@@ -431,82 +421,6 @@
   const shader = initShader();
   const ctx2d = shader || !canvas ? null : canvas.getContext("2d");
 
-  const initBgShader = () => {
-    if (!bgShader) return null;
-    const gl = bgShader.getContext("webgl", { antialias: false, alpha: true });
-    if (!gl) return null;
-
-    const vsSource = `
-      attribute vec2 aPos;
-      void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
-    `;
-    const fsSource = `
-      precision mediump float;
-      uniform vec2 uRes;
-      uniform float uTime;
-
-      float h(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
-      float n(vec2 p){
-        vec2 i=floor(p), f=fract(p), u=f*f*(3.0-2.0*f);
-        return mix(mix(h(i),h(i+vec2(1.0,0.0)),u.x),mix(h(i+vec2(0.0,1.0)),h(i+vec2(1.0,1.0)),u.x),u.y);
-      }
-
-      void main(){
-        vec2 uv = gl_FragCoord.xy / uRes.xy;
-        vec2 p = uv*2.0-1.0;
-        p.x *= uRes.x/uRes.y;
-        float t = uTime * 0.22;
-
-        float m = n(uv*8.0 + vec2(t*0.6, -t*0.4));
-        float z = sin((p.x+p.y+t*0.4)*18.0) * 0.5 + 0.5;
-        float ring = smoothstep(0.55, 0.1, abs(length(p)-0.4-0.08*sin(t*0.8)));
-        float speck = n(uv * vec2(340.0, 220.0) + vec2(t * 45.0, t * 30.0));
-        float pulse = step(0.985, fract(uv.y * 6.5 + t * 1.2)) * 0.22;
-
-        vec3 col = vec3(0.02,0.06,0.15);
-        col += vec3(0.02,0.18,0.45) * m;
-        col += vec3(0.20,0.06,0.28) * z * 0.45;
-        col += vec3(0.10,0.35,0.18) * ring * 0.35;
-        col += vec3(0.09,0.11,0.14) * speck * 0.22;
-        col += vec3(pulse, pulse * 0.6, pulse * 0.9);
-
-        float fade = smoothstep(1.2,0.1,length(p));
-        col *= fade;
-        gl_FragColor = vec4(col, 0.85);
-      }
-    `;
-
-    const compile = (type, src) => {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) return null;
-      return s;
-    };
-    const vs = compile(gl.VERTEX_SHADER, vsSource);
-    const fs = compile(gl.FRAGMENT_SHADER, fsSource);
-    if (!vs || !fs) return null;
-    const program = gl.createProgram();
-    gl.attachShader(program, vs);
-    gl.attachShader(program, fs);
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null;
-
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
-    return {
-      gl,
-      program,
-      aPos: gl.getAttribLocation(program, "aPos"),
-      uRes: gl.getUniformLocation(program, "uRes"),
-      uTime: gl.getUniformLocation(program, "uTime"),
-      buffer
-    };
-  };
-
-  const bgShaderCtx = initBgShader();
-
   const drawFallback = (ctx, t) => {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
@@ -542,9 +456,14 @@
     }
   };
 
+  let lastCrtFrameTime = 0;
   const render = (t) => {
     if (!canvas) return;
-    fit();
+    if (t - lastCrtFrameTime < crtFrameBudgetMs) {
+      requestAnimationFrame(render);
+      return;
+    }
+    lastCrtFrameTime = t;
     if (shader) {
       const { gl, program, aPos, uRes, uTime, buffer } = shader;
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -564,26 +483,6 @@
     requestAnimationFrame(render);
   };
 
-  const renderBg = (t) => {
-    if (!bgShaderCtx || !bgShader) return;
-    const { gl, program, aPos, uRes, uTime, buffer } = bgShaderCtx;
-    const ratio = window.devicePixelRatio || 1;
-    const w = Math.max(1, Math.floor(window.innerWidth * ratio));
-    const h = Math.max(1, Math.floor(window.innerHeight * ratio));
-    if (bgShader.width !== w || bgShader.height !== h) {
-      bgShader.width = w;
-      bgShader.height = h;
-    }
-    gl.viewport(0, 0, w, h);
-    gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-    gl.uniform2f(uRes, w, h);
-    gl.uniform1f(uTime, t * 0.001);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-    requestAnimationFrame(renderBg);
-  };
 
   const runNodeMap = () => {
     if (!nodeMapCanvas) return;
@@ -607,6 +506,11 @@
       ["aday", "acid"], ["aday", "clan"], ["aday", "demozoo"], ["macroverse", "artbastard"],
       ["blog", "acid"], ["codepen", "artbastard"]
     ];
+    const particles = Array.from({ length: 22 }, (_, i) => ({
+      seed: i * 0.71 + 1,
+      speed: 0.11 + Math.random() * 0.24
+    }));
+    let lastFrameTime = 0;
 
     const pickNode = (mx, my) => {
       let picked = null;
@@ -652,10 +556,21 @@
     });
 
     const renderGraph = (time) => {
+      if (time - lastFrameTime < nodeMapFrameBudgetMs) {
+        requestAnimationFrame(renderGraph);
+        return;
+      }
+      lastFrameTime = time;
       const ratio = window.devicePixelRatio || 1;
       const rect = nodeMapCanvas.getBoundingClientRect();
-      nodeMapCanvas.width = Math.max(1, Math.floor(rect.width * ratio));
-      nodeMapCanvas.height = Math.max(1, Math.floor(rect.height * ratio));
+      const nextWidth = Math.max(1, Math.floor(rect.width * ratio));
+      const nextHeight = Math.max(1, Math.floor(rect.height * ratio));
+      if (nextWidth !== nodeMapWidth || nextHeight !== nodeMapHeight) {
+        nodeMapWidth = nextWidth;
+        nodeMapHeight = nextHeight;
+        nodeMapCanvas.width = nodeMapWidth;
+        nodeMapCanvas.height = nodeMapHeight;
+      }
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
       const w = rect.width;
@@ -685,12 +600,29 @@
         ctx.stroke();
       });
 
+      particles.forEach((particle) => {
+        const t2 = t * particle.speed + particle.seed;
+        const px = (0.5 + 0.45 * Math.sin(t2 * 1.3)) * w;
+        const py = (0.5 + 0.45 * Math.cos(t2 * 0.9)) * h;
+        const size = 1 + 1.6 * (0.5 + 0.5 * Math.sin(t2 * 2.6));
+        ctx.fillStyle = "rgba(150, 255, 190, 0.42)";
+        ctx.beginPath();
+        ctx.arc(px, py, size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
       map.forEach((n) => {
         const hovered = hoverNodeId === n.id;
         ctx.fillStyle = n.c;
         ctx.beginPath();
         ctx.arc(n.px, n.py, n.r + (hovered ? 2 : 0), 0, Math.PI * 2);
         ctx.fill();
+        const ringRadius = n.r + 8 + (2.4 * (0.5 + 0.5 * Math.sin(t * 2 + n.r)));
+        ctx.strokeStyle = "rgba(145, 255, 173, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(n.px, n.py, ringRadius, 0, Math.PI * 2);
+        ctx.stroke();
         ctx.shadowColor = n.c;
         ctx.shadowBlur = hovered ? 22 : 16;
         ctx.beginPath();
@@ -727,6 +659,116 @@
     };
 
     requestAnimationFrame(renderGraph);
+  };
+
+  const runAcid303Visual = () => {
+    if (!acid303Canvas) return;
+    const ctx = acid303Canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resize = () => {
+      const ratio = window.devicePixelRatio || 1;
+      const rect = acid303Canvas.getBoundingClientRect();
+      acid303Canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+      acid303Canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+
+    const drawKnob = (x, y, r, angle, color) => {
+      ctx.fillStyle = "rgba(16, 0, 8, 0.9)";
+      ctx.strokeStyle = "rgba(255, 126, 146, 0.7)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.cos(angle) * (r - 6), y + Math.sin(angle) * (r - 6));
+      ctx.stroke();
+    };
+    const sceneAsset = new Image();
+    sceneAsset.crossOrigin = "anonymous";
+    sceneAsset.src = "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif";
+    sceneAsset.onerror = () => {
+      sceneAsset.src = "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png";
+    };
+
+    let lastAcidFrameTime = 0;
+    const draw = (time) => {
+      if (time - lastAcidFrameTime < acidFrameBudgetMs) {
+        requestAnimationFrame(draw);
+        return;
+      }
+      lastAcidFrameTime = time;
+      const t = time * 0.001;
+      const w = acid303Canvas.clientWidth;
+      const h = acid303Canvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      const bg = ctx.createLinearGradient(0, 0, w, h);
+      bg.addColorStop(0, "#19030b");
+      bg.addColorStop(0.5, "#110108");
+      bg.addColorStop(1, "#080104");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      for (let i = 0; i < 8; i += 1) {
+        const laneY = h * (0.2 + i * 0.08);
+        const lanePulse = 0.2 + 0.25 * Math.sin(t * 2.2 + i * 0.7);
+        ctx.fillStyle = `rgba(255, 92, 128, ${Math.max(0.08, lanePulse).toFixed(3)})`;
+        ctx.fillRect(0, laneY, w, 2);
+      }
+
+      ctx.strokeStyle = "rgba(128, 255, 166, 0.82)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 6) {
+        const xn = x / w;
+        const seq = Math.sin((xn * 18 + t * 2.8) * Math.PI);
+        const accent = Math.sin((xn * 58 - t * 5.2) * Math.PI) * 0.24;
+        const y = h * 0.55 + (seq * 0.18 + accent) * h * 0.35;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      if (sceneAsset.complete && sceneAsset.naturalWidth > 0) {
+        const assetW = Math.min(w * 0.36, 280);
+        const assetH = assetW * 0.7;
+        ctx.save();
+        ctx.translate(w * 0.84, h * 0.24);
+        ctx.rotate(Math.sin(t * 0.9) * 0.08);
+        ctx.globalAlpha = 0.72;
+        ctx.drawImage(sceneAsset, -assetW / 2, -assetH / 2, assetW, assetH);
+        ctx.restore();
+      }
+
+      const ledCount = 16;
+      const ledW = Math.max(8, (w - 40) / ledCount - 6);
+      for (let i = 0; i < ledCount; i += 1) {
+        const ledX = 20 + i * (ledW + 6);
+        const strength = Math.sin(t * 4 + i * 0.9) * 0.5 + 0.5;
+        const active = strength > 0.45;
+        ctx.fillStyle = active ? "rgba(132, 255, 160, 0.9)" : "rgba(70, 34, 44, 0.8)";
+        ctx.fillRect(ledX, h - 44, ledW, 14);
+      }
+
+      const knobY = h - 90;
+      const spacing = w / 5;
+      drawKnob(spacing * 1, knobY, 26, -1.6 + Math.sin(t * 0.9) * 1.4, "rgba(255, 156, 176, 0.95)");
+      drawKnob(spacing * 2, knobY, 26, -1.2 + Math.sin(t * 1.2 + 1) * 1.3, "rgba(255, 156, 176, 0.95)");
+      drawKnob(spacing * 3, knobY, 26, -1.8 + Math.sin(t * 1.4 + 2) * 1.5, "rgba(132, 255, 160, 0.95)");
+      drawKnob(spacing * 4, knobY, 26, -1.4 + Math.sin(t * 1.1 + 3) * 1.2, "rgba(132, 255, 160, 0.95)");
+
+      requestAnimationFrame(draw);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    requestAnimationFrame(draw);
   };
 
   const cycleMenu = () => {
@@ -783,36 +825,6 @@
     if (!screen) return;
     screen.classList.add("crt-burst");
     setTimeout(() => screen.classList.remove("crt-burst"), 320);
-  };
-
-  const initYoutubeDeck = () => {
-    if (!ytFrame) return;
-    ytSelector?.addEventListener("change", () => {
-      ytFrame.src = ytSelector.value;
-      if (window.anime) {
-        window.anime({
-          targets: ".yt-crt",
-          opacity: [0.25, 1],
-          duration: 380,
-          easing: "easeOutQuad"
-        });
-      }
-    });
-
-    ytRandom?.addEventListener("click", () => {
-      const src = ytSources[Math.floor(Math.random() * ytSources.length)];
-      ytFrame.src = src;
-      if (ytSelector) ytSelector.value = src;
-      if (window.anime) {
-        window.anime({
-          targets: ".yt-controls, .yt-crt",
-          translateX: [-6, 0],
-          opacity: [0.6, 1],
-          duration: 450,
-          easing: "easeOutExpo"
-        });
-      }
-    });
   };
 
   const initRandomImageDeck = () => {
@@ -911,10 +923,6 @@
       deck.widget.setVolume(vol);
       return;
     }
-    if (deck.kind === "weeklybeats") {
-      // WeeklyBeats pages do not expose an iframe API for programmatic volume control.
-      return;
-    }
   };
 
   const applyCrossfader = () => {
@@ -936,8 +944,7 @@
     deck.sourceId = source.id;
     deck.widget = null;
     if (deck.status) {
-      const wbNote = source.kind === "weeklybeats" ? " (manual volume mode)" : "";
-      deck.status.textContent = `${deckKey === "a" ? "deck a" : "deck b"}: ${source.label}${wbNote}`;
+      deck.status.textContent = `${deckKey === "a" ? "deck a" : "deck b"}: ${source.label}`;
     }
     deck.frame.src = source.embed;
     deck.frame.addEventListener("load", () => {
@@ -972,23 +979,13 @@
     });
   };
 
-  const cycleBackgroundPalette = () => {
-    const swatch = bgCyclePalette[bgCycleIndex % bgCyclePalette.length];
-    bgCycleIndex += 1;
-    if (!swatch) return;
-    body.style.setProperty("--bg-cycle-a", swatch.a);
-    body.style.setProperty("--bg-cycle-b", swatch.b);
-    body.style.setProperty("--bg-cycle-c", swatch.c);
-    body.style.setProperty("--bg-cycle-d", swatch.d);
-  };
-
-  const scheduleFrameRandomizer = () => {
-    const roll = () => {
-      randomizeFrameGeneration();
-      const next = 5200 + Math.floor(Math.random() * 6200);
-      setTimeout(roll, next);
-    };
-    roll();
+  const initWeeklyBeatsNode = () => {
+    if (!wbTrackSelector || !wbOpenTrack) return;
+    wbOpenTrack.addEventListener("click", () => {
+      const url = wbTrackSelector.value;
+      if (!url) return;
+      window.open(url, "_blank", "noopener,noreferrer");
+    });
   };
 
   const initDjCrossfader = () => {
@@ -998,7 +995,7 @@
       .join("");
     deckASelect.innerHTML = optionHtml;
     deckBSelect.innerHTML = optionHtml;
-    deckASelect.value = "aday-yt-uploads";
+    deckASelect.value = "vimeo-onlinedoof";
     deckBSelect.value = "aday-sc-profile";
     deckALoad.addEventListener("click", () => mountDeck("a", deckASelect.value));
     deckBLoad.addEventListener("click", () => mountDeck("b", deckBSelect.value));
@@ -1028,70 +1025,71 @@
     run();
   };
 
-  const animateTextFx = () => {
-    const nodes = [...document.querySelectorAll(".decrypt")];
-    nodes.forEach((node, idx) => {
-      const text = node.dataset.text || node.textContent || "";
-      setTimeout(() => scrambleText(node, text), 180 + idx * 120);
-    });
-
-    const line = document.querySelector(".decrypt-line");
-    if (line) {
-      const txt = line.textContent || "";
-      line.textContent = "";
-      let i = 0;
-      const timer = setInterval(() => {
-        line.textContent += txt[i] || "";
-        i += 1;
-        if (i >= txt.length) clearInterval(timer);
-      }, 18);
-      if (window.anime) {
-        window.anime({
-          targets: ".decrypt-line",
-          opacity: [0.3, 1],
-          duration: 1400,
-          easing: "easeOutQuad"
-        });
-      }
-    }
+  const typeInText = (el, text, stepMs = 18) => {
+    if (!el) return;
+    el.textContent = "";
+    let i = 0;
+    const tick = () => {
+      el.textContent += text[i] || "";
+      i += 1;
+      if (i < text.length) setTimeout(tick, stepMs);
+    };
+    tick();
   };
 
-  const animateHeaders = () => {
+  const initHeaderLoops = () => {
     const headers = [...document.querySelectorAll("h1, h2, h3")];
-    if (!headers.length) return false;
-    if (!window.anime) return false;
-    window.anime({
-      targets: headers,
-      translateY: [14, 0],
-      opacity: [0, 1],
-      duration: 900,
-      delay: window.anime.stagger(70, { start: 120 }),
-      easing: "easeOutExpo"
-    });
-    return true;
-  };
+    const subHeaders = [...document.querySelectorAll(".decrypt-line")];
+    const nodes = [...headers, ...subHeaders];
+    if (!nodes.length) return;
 
-  const waitForAnime = (onReady) => {
-    if (typeof onReady !== "function") return;
-    if (window.anime) {
-      onReady();
-      return;
-    }
-    let attempts = 0;
-    const timer = setInterval(() => {
-      attempts += 1;
-      if (window.anime) {
-        clearInterval(timer);
-        onReady();
-      } else if (attempts >= 30) {
-        clearInterval(timer);
+    nodes.forEach((node, idx) => {
+      const baseText = (node.dataset.text || node.textContent || "").trim();
+      if (!baseText) return;
+      node.dataset.baseText = baseText;
+      if (performanceMode) {
+        setTimeout(() => typeInText(node, baseText, node.matches("h1") ? 22 : 18), 120 + idx * 60);
+        return;
       }
-    }, 120);
+      const run = () => {
+        scrambleText(node, baseText);
+        setTimeout(() => typeInText(node, baseText, node.matches("h1") ? 20 : 14), 260);
+        if (window.anime) {
+          window.anime({
+            targets: node,
+            translateX: [0, -1.2, 1.2, 0],
+            opacity: [1, 0.84, 1],
+            duration: 320,
+            easing: "linear"
+          });
+        }
+        const next = 5200 + Math.floor(Math.random() * 2600);
+        setTimeout(run, next);
+      };
+      setTimeout(run, 320 + idx * 120);
+    });
+
+    if (window.anime) {
+      window.anime({
+        targets: "h1, h2, h3, .decrypt-line",
+        textShadow: [
+          "0 0 4px rgba(132,255,160,0.2)",
+          "0 0 9px rgba(132,255,160,0.55)",
+          "0 0 4px rgba(132,255,160,0.2)"
+        ],
+        duration: 2200,
+        easing: "linear",
+        loop: true
+      });
+    }
   };
 
+  let activeMoshCount = 0;
+  const MAX_MOSH_IMAGES = performanceMode ? 0 : 2;
   const moshImage = (img) => {
     if (img.id === "crtMedia") return;
     if (img.dataset.moshReady === "1") return;
+    if (activeMoshCount >= MAX_MOSH_IMAGES) return;
     const wrap = document.createElement("div");
     wrap.className = "mosh-wrap";
     img.parentNode?.insertBefore(wrap, img);
@@ -1102,6 +1100,7 @@
     wrap.appendChild(layer);
     const lctx = layer.getContext("2d");
     if (!lctx) return;
+    activeMoshCount += 1;
 
     const size = () => {
       layer.width = img.clientWidth;
@@ -1123,7 +1122,13 @@
       lctx.fillRect(0, Math.random() * layer.height, layer.width, 1 + Math.random() * 2);
     };
 
-    setInterval(draw, 240);
+    let tick = 0;
+    setInterval(() => {
+      if (document.hidden) return;
+      tick += 1;
+      if (tick % 3 !== 0) return;
+      draw();
+    }, performanceMode ? 560 : 420);
     window.addEventListener("resize", size);
     img.dataset.moshReady = "1";
   };
@@ -1131,19 +1136,25 @@
   const hydrateRepoGrid = async () => {
     if (!repoGrid) return;
     try {
-      const response = await fetch("https://api.github.com/users/aday1/repos?per_page=100&sort=updated");
+      const response = await fetch("https://api.github.com/users/aday1/repos?per_page=40&sort=updated");
       if (!response.ok) return;
       const repos = await response.json();
       const picks = repos
         .filter((repo) => !repo.fork)
         .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-        .slice(0, 12);
+        .slice(0, 8);
 
       repoGrid.innerHTML = "";
       for (let i = 0; i < picks.length; i++) {
         const repo = picks[i];
+        const seed = hashString(repo.name);
+        const variant = seed % 4;
+        const hue = 126 + (seed % 42);
+        const channelModes = ["SYNC", "BURST", "FIELD", "NOISE", "DRIFT", "PHASE"];
+        const channelMode = channelModes[seed % channelModes.length];
         const card = document.createElement("article");
-        card.className = "card repo-tv";
+        card.className = `card repo-tv repo-tv-variant-${variant}`;
+        card.style.setProperty("--tv-hue", String(hue));
 
         const shot = repoImageOverrides[repo.name] || `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
         const override = livePageOverrides[repo.name];
@@ -1174,7 +1185,7 @@
         card.innerHTML = `
           <div class="repo-tv-head">
             <h3>${repo.name}</h3>
-            <span class="repo-tv-channel">TV-${String(i + 1).padStart(2, "0")}</span>
+            <span class="repo-tv-channel">${channelMode}-${String(i + 1).padStart(2, "0")}</span>
           </div>
           <div class="repo-tv-screen">
             <img class="repo-shot mosh-image" src="${shot}" alt="${repo.name} preview">
@@ -1206,27 +1217,28 @@
   window.addEventListener("resize", fit);
   fit();
   if (canvas) requestAnimationFrame(render);
-  if (bgShaderCtx) requestAnimationFrame(renderBg);
   runNodeMap();
-  setInterval(cycleMenu, 2200);
-  if (crtMedia) setInterval(cycleCrtMedia, 4200);
-  setInterval(pulseCrtBurst, 6400);
-  animateTextFx();
-  waitForAnime(() => animateHeaders());
+  runAcid303Visual();
+  setInterval(cycleMenu, performanceMode ? 4200 : 3000);
+  if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 6800 : 5200);
+  setInterval(pulseCrtBurst, performanceMode ? 9800 : 7800);
+  initHeaderLoops();
   randomizeFrameGeneration();
-  cycleBackgroundPalette();
-  initYoutubeDeck();
   initRandomImageDeck();
   initSoundcloudDeck();
+  initWeeklyBeatsNode();
   initGalleryFilters();
   initDjCrossfader();
-  hydrateRepoGrid();
-  scheduleFrameRandomizer();
-  setInterval(cycleBackgroundPalette, 9200);
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(() => hydrateRepoGrid(), { timeout: 3000 });
+  } else {
+    setTimeout(() => hydrateRepoGrid(), 1400);
+  }
 
   document.querySelectorAll("img.mosh-image").forEach((img) => {
     armGenericImageFallback(img);
     if (img.complete) moshImage(img);
     else img.addEventListener("load", () => moshImage(img), { once: true });
   });
+  document.querySelectorAll("img:not(.mosh-image)").forEach((img) => armGenericImageFallback(img));
 })();
