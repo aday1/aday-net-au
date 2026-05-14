@@ -33,7 +33,7 @@ body {
   color: #a8ffd7;
   transition: opacity 420ms ease;
   overflow: hidden;
-  animation: loaderAutoDismiss 0.01s linear 6.9s forwards;
+  animation: loaderAutoDismiss 0.01s linear 3.9s forwards;
 }
 
 .page-transition::before {
@@ -68,34 +68,15 @@ body {
 }
 
 .page-transition-inner {
-  position: relative;
-  width: min(440px, 70vw);
-  height: 120px;
-  border: 1px solid rgba(101, 154, 214, 0.54);
-  background: rgba(5, 12, 24, 0.45);
-  box-shadow: inset 0 0 24px rgba(111, 185, 255, 0.14), 0 0 22px rgba(130, 196, 255, 0.32);
+  display: none;
 }
 
 .cuton-label {
-  position: absolute;
-  left: 12px;
-  bottom: 10px;
-  color: #aefea2;
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-  font-size: 0.82rem;
-  min-height: 1em;
+  display: none;
 }
 
 .cuton-line {
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  top: 50%;
-  height: 2px;
-  transform: translateY(-50%);
-  background: linear-gradient(90deg, transparent, rgba(186, 244, 255, 0.92), transparent);
-  animation: cutOnBloom 880ms ease-out forwards;
+  display: none;
 }
 
 .bg-shader {
@@ -168,6 +149,18 @@ body::after {
   box-shadow: 0 0 0 1px rgba(173, 206, 255, 0.22), 0 22px 90px rgba(0, 0, 0, 0.56), inset 0 0 50px rgba(0, 50, 110, 0.2);
   transform-origin: center;
   animation: shellHuePulse 10.2s ease-in-out infinite;
+}
+
+.shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(121, 212, 255, 0.08), transparent 35%),
+    radial-gradient(circle at 88% 14%, rgba(207, 114, 255, 0.08), transparent 34%);
+  animation: shellAuroraSweep 17s ease-in-out infinite;
 }
 
 body.boot-seq .shell {
@@ -350,9 +343,15 @@ body.boot-seq .shell {
   color: #9eff89;
   border: 1px solid #46618a;
   padding: 10px 11px;
-  background: rgba(10, 18, 32, 0.86);
+  background:
+    linear-gradient(180deg, rgba(13, 24, 42, 0.92), rgba(8, 16, 29, 0.9));
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
-.quicklinks a:hover { border-color: #8ad4ff; box-shadow: 0 0 16px rgba(101, 191, 255, 0.3); }
+.quicklinks a:hover {
+  border-color: #8ad4ff;
+  box-shadow: 0 0 16px rgba(101, 191, 255, 0.3);
+  transform: translateY(-1px);
+}
 
 .quicklinks a.quicklink-headliner {
   border-color: #82d4ff;
@@ -478,6 +477,12 @@ body.boot-seq .shell {
   position: relative;
   isolation: isolate;
   animation: panelDrift 14s ease-in-out infinite;
+  transition: box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.panel:hover {
+  border-color: #6ea4e0;
+  box-shadow: inset 0 0 30px rgba(84, 152, 225, 0.14), 0 0 18px rgba(88, 165, 244, 0.12);
 }
 
 .panel::before {
@@ -876,6 +881,50 @@ body.boot-seq .shell {
     linear-gradient(180deg, rgba(8, 16, 31, 0.95), rgba(6, 12, 24, 0.95));
 }
 
+.acid-visual-panel {
+  border-color: #7392c9;
+  background:
+    radial-gradient(circle at 14% 10%, rgba(166, 96, 255, 0.14), transparent 44%),
+    radial-gradient(circle at 86% 9%, rgba(124, 255, 148, 0.12), transparent 42%),
+    linear-gradient(180deg, rgba(11, 18, 34, 0.96), rgba(6, 12, 24, 0.96));
+}
+
+.acid-visual-wrap {
+  border: 2px solid #7a96c9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #060a13;
+  box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.76), 0 0 26px rgba(149, 112, 255, 0.18);
+  position: relative;
+}
+
+.acid-visual-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 50%);
+  background-size: 100% 4px;
+}
+
+.acid-visual-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(circle at center, transparent 42%, rgba(0, 0, 0, 0.62) 100%);
+}
+
+.acid-visual-embed {
+  width: 100%;
+  min-height: 540px;
+  border: 0;
+  display: block;
+  filter: contrast(1.1) saturate(1.1);
+}
+
 .media-frame-wrap {
   border: 2px solid #5d83bb;
   border-radius: 10px;
@@ -1242,6 +1291,10 @@ a { cursor: none; }
     min-height: 230px;
   }
 
+  .acid-visual-embed {
+    min-height: 310px;
+  }
+
   .dj-frame {
     min-height: 220px;
   }
@@ -1433,4 +1486,10 @@ a { cursor: none; }
   50% {
     filter: hue-rotate(8deg) saturate(1.08);
   }
+}
+
+@keyframes shellAuroraSweep {
+  0%, 100% { transform: translate(0, 0); opacity: 0.22; }
+  35% { transform: translate(-1.1%, 0.6%); opacity: 0.32; }
+  70% { transform: translate(0.8%, -0.7%); opacity: 0.26; }
 }

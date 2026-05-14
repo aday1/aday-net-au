@@ -293,17 +293,17 @@
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
   document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(hideTransition, 2200);
+    setTimeout(hideTransition, 1500);
   });
   window.addEventListener("load", () => {
-    setTimeout(bootDone, 1100);
-    setTimeout(hideTransition, 1300);
+    setTimeout(bootDone, 800);
+    setTimeout(hideTransition, 900);
   });
   window.addEventListener("pageshow", () => {
-    setTimeout(hideTransition, 240);
+    setTimeout(hideTransition, 120);
   });
-  setTimeout(bootDone, 6500);
-  setTimeout(hideTransition, 6800);
+  setTimeout(bootDone, 3600);
+  setTimeout(hideTransition, 3800);
 
   if (cursor) {
     window.addEventListener("mousemove", (event) => {
