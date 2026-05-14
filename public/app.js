@@ -101,13 +101,15 @@
   };
 
   const projectBlurbOverrides = {
-    ZealPalace: "A 90s RPG/MUD-inspired AI social terrarium on Raspberry Pi with autonomous IRC personas and world simulation.",
-    "acid-banger": "Browser acid 303 groovebox and sequencer playground with performance-oriented controls.",
-    "macroverse.aday.net.au": "Live browser visual platform for shader-driven visuals and performance routing.",
-    "artbastard.aday.net.au": "OSC/MIDI/DMX/Art-Net control plane for live show and lighting workflows.",
-    "error-diffusion": "Experimental glitch diffusion and visual processing studies for VJ performance.",
-    OpenSoundLab: "Open music and audio coding experiments, tooling, and rough prototypes.",
-    "bitwig-mcp-server": "MCP bridge for scripting and automating Bitwig workflows."
+    ZealPalace: "Text-based RPG simulator fishbowl for Raspberry Pi with autonomous IRC personas, MUD loops, and social simulation.",
+    "acid-banger": "Acid 303 browser groovebox fork with extra sync/control workflows for live coding and performance sessions.",
+    "macroverse.aday.net.au": "Web browser GLSL and wire-VJ performance platform for live shader scenes and visual state routing.",
+    "artbastard.aday.net.au": "Web DMX platform and live control plane bridging OSC, MIDI, DMX, and Art-Net for stage rigs.",
+    "error-diffusion": "Live glitch processing lab and diffusion-visual toolkit powering errordiffusion.net experiments.",
+    OpenSoundLab: "Browser audio sandbox for synthesis, sequencing, and sonic prototype tooling.",
+    "bitwig-mcp-server": "MCP bridge exposing Bitwig operations for scripted and agent-driven automation.",
+    MoveMusicSaveEditor: "Save-file editing utility for Move Music workflows with fast controller test iteration.",
+    "The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack": "High-speed MCP macro pack for repetitive DAW editing and envelope batching."
   };
 
   const saved = localStorage.getItem(key);
