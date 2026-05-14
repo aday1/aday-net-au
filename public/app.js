@@ -38,36 +38,50 @@
 
   const mediaFeed = [
     {
-      src: "https://raw.githubusercontent.com/aday1/error-diffusion/main/public/assets/max-patch-1.png",
-      title: "error-diffusion / visual patch output"
+      src: "https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png",
+      title: "error-diffusion / visual patch output",
+      fallbacks: ["https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png"]
     },
     {
       src: "https://avatars.githubusercontent.com/u/1834001?v=4",
-      title: "aday avatar"
+      title: "aday avatar",
+      fallbacks: ["https://avatars.githubusercontent.com/u/1834001?v=4"]
     },
     {
       src: "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png",
-      title: "acid-banger project visual"
+      title: "acid-banger project visual",
+      fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
     },
     {
       src: "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif",
-      title: "acid-banger animated preview"
+      title: "acid-banger animated preview",
+      fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
     },
     {
       src: "https://opengraph.githubassets.com/1/aday1/macroverse.aday.net.au",
-      title: "macroverse project card"
+      title: "macroverse project card",
+      fallbacks: [
+        "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png",
+        "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/screenshot.png"
+      ]
     },
     {
       src: "https://opengraph.githubassets.com/1/aday1/artbastard.aday.net.au",
-      title: "artbastard project card"
+      title: "artbastard project card",
+      fallbacks: [
+        "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png",
+        "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/screenshot.png"
+      ]
     },
     {
       src: "https://content.pouet.net/logos/neuroxfra.gif",
-      title: "pouet scene archive visual"
+      title: "pouet scene archive visual",
+      fallbacks: ["https://content.pouet.net/logos/neuroxfra.gif"]
     },
     {
       src: "https://opengraph.githubassets.com/1/aday1/acid-banger",
-      title: "acid-banger repository card"
+      title: "acid-banger repository card",
+      fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
     }
   ];
   const svgPreviewFallback = (title) => {
@@ -94,6 +108,35 @@
     img.dataset.fallbackReady = "1";
   };
 
+  const parseRepoData = (value) => {
+    const parts = (value || "").split("/");
+    if (parts.length !== 2) return null;
+    return { owner: parts[0], repo: parts[1] };
+  };
+
+  const armGenericImageFallback = (img) => {
+    if (!img || img.dataset.fallbackReady === "1") return;
+    const explicit = (img.dataset.fallbacks || "")
+      .split("|")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const repoData = parseRepoData(img.dataset.repo || "");
+    if (repoData) {
+      armRepoImageFallback(img, repoData.owner, repoData.repo, img.alt || repoData.repo);
+      return;
+    }
+    if (!explicit.length) return;
+    const label = img.alt || "image";
+    const candidates = [...explicit, svgPreviewFallback(label)];
+    let idx = 0;
+    img.addEventListener("error", () => {
+      if (idx >= candidates.length) return;
+      img.src = candidates[idx];
+      idx += 1;
+    });
+    img.dataset.fallbackReady = "1";
+  };
+
 
   const ytSources = [
     "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=aday1",
@@ -103,10 +146,10 @@
   ];
 
   const randomImageSources = [
-    "https://raw.githubusercontent.com/aday1/error-diffusion/main/public/assets/max-patch-1.png",
+    "https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png",
     "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png",
-    "https://opengraph.githubassets.com/aday-mv/aday1/macroverse.aday.net.au",
-    "https://opengraph.githubassets.com/aday-ab/aday1/artbastard.aday.net.au",
+    "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png",
+    "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png",
     "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1400&q=80",
     "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80"
   ];
@@ -646,7 +689,15 @@
     if (!crtMedia) return;
     mediaIndex = (mediaIndex + 1) % mediaFeed.length;
     const item = mediaFeed[mediaIndex];
-    crtMedia.src = item.src;
+    const queue = [item.src, ...(item.fallbacks || []), svgPreviewFallback(item.title)];
+    let idx = 0;
+    const applyCandidate = () => {
+      if (idx >= queue.length) return;
+      crtMedia.src = queue[idx];
+      idx += 1;
+    };
+    crtMedia.onerror = () => applyCandidate();
+    applyCandidate();
     crtCaption.textContent = item.title;
     if (window.anime) {
       window.anime({
@@ -703,6 +754,7 @@
 
   const initRandomImageDeck = () => {
     if (!randomImage || !randomImageBtn) return;
+    armGenericImageFallback(randomImage);
     randomImageBtn.addEventListener("click", () => {
       const src = randomImageSources[Math.floor(Math.random() * randomImageSources.length)];
       randomImage.src = src;
@@ -876,7 +928,7 @@
     });
 
     const line = document.querySelector(".decrypt-line");
-    if (line && window.anime) {
+    if (line) {
       const txt = line.textContent || "";
       line.textContent = "";
       let i = 0;
@@ -885,18 +937,21 @@
         i += 1;
         if (i >= txt.length) clearInterval(timer);
       }, 18);
-      window.anime({
-        targets: ".decrypt-line",
-        opacity: [0.3, 1],
-        duration: 1400,
-        easing: "easeOutQuad"
-      });
+      if (window.anime) {
+        window.anime({
+          targets: ".decrypt-line",
+          opacity: [0.3, 1],
+          duration: 1400,
+          easing: "easeOutQuad"
+        });
+      }
     }
   };
 
   const animateHeaders = () => {
-    if (!window.anime) return;
     const headers = [...document.querySelectorAll("h1, h2, h3")];
+    if (!headers.length) return false;
+    if (!window.anime) return false;
     window.anime({
       targets: headers,
       translateY: [14, 0],
@@ -905,9 +960,29 @@
       delay: window.anime.stagger(70, { start: 120 }),
       easing: "easeOutExpo"
     });
+    return true;
+  };
+
+  const waitForAnime = (onReady) => {
+    if (typeof onReady !== "function") return;
+    if (window.anime) {
+      onReady();
+      return;
+    }
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (window.anime) {
+        clearInterval(timer);
+        onReady();
+      } else if (attempts >= 30) {
+        clearInterval(timer);
+      }
+    }, 120);
   };
 
   const moshImage = (img) => {
+    if (img.id === "crtMedia") return;
     if (img.dataset.moshReady === "1") return;
     const wrap = document.createElement("div");
     wrap.className = "mosh-wrap";
@@ -964,9 +1039,14 @@
 
         const shot = repoImageOverrides[repo.name] || `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
         const override = livePageOverrides[repo.name];
-        const liveGuess = override ? override : (repo.homepage && repo.homepage.trim() !== ""
-          ? repo.homepage
-          : (repo.name.includes(".aday.net.au") ? `https://${repo.name}` : `https://aday1.github.io/${repo.name}/`));
+        const homepage = (repo.homepage || "").trim();
+        const hasHomepage = homepage.startsWith("http://") || homepage.startsWith("https://");
+        const liveGuess = override
+          || (hasHomepage ? homepage : "")
+          || (repo.name.includes(".aday.net.au") ? `https://${repo.name}` : "")
+          || (repo.has_pages ? `https://aday1.github.io/${repo.name}/` : "");
+        const primaryHref = liveGuess || repo.html_url;
+        const primaryLabel = liveGuess ? "open project page" : "open repo";
 
         const updatedMs = Date.now() - new Date(repo.updated_at).getTime();
         const days = Math.floor(updatedMs / (1000 * 60 * 60 * 24));
@@ -996,7 +1076,7 @@
           <p class="repo-meta">last commit signal: ${lastUpdated}</p>
           <p class="repo-meta">project date: ${createdAt}</p>
           <div class="repo-tv-links">
-            <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">open project page</a>
+            <a href="${primaryHref}" target="_blank" rel="noopener noreferrer">${primaryLabel}</a>
             <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">source</a>
           </div>
         `;
@@ -1023,7 +1103,7 @@
   if (crtMedia) setInterval(cycleCrtMedia, 4200);
   setInterval(pulseCrtBurst, 6400);
   animateTextFx();
-  animateHeaders();
+  waitForAnime(() => animateHeaders());
   initYoutubeDeck();
   initRandomImageDeck();
   initSoundcloudDeck();
@@ -1032,16 +1112,8 @@
   hydrateRepoGrid();
 
   document.querySelectorAll("img.mosh-image").forEach((img) => {
+    armGenericImageFallback(img);
     if (img.complete) moshImage(img);
     else img.addEventListener("load", () => moshImage(img), { once: true });
-  });
-
-  document.querySelectorAll("img.repo-shot[data-repo]").forEach((img) => {
-    const parts = (img.dataset.repo || "").split("/");
-    if (parts.length === 2) {
-      armRepoImageFallback(img, parts[0], parts[1], parts[1]);
-    } else {
-      armRepoImageFallback(img, "", "", img.alt || "project card");
-    }
   });
 })();
