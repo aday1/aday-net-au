@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body class="scanlines-on boot-seq">
+  <div id="pageTransition" class="page-transition" aria-hidden="true">
+    <div class="page-transition-inner">loading signal...</div>
+  </div>
   <canvas id="bgShader" class="bg-shader" aria-hidden="true"></canvas>
   <div class="noise" aria-hidden="true"></div>
   <main class="shell">
@@ -111,6 +114,13 @@
           <img class="asset-image mosh-image" src="https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png" alt="Acid Banger preview image">
         </article>
       </div>
+      <div class="grid two" style="margin-top:10px;">
+        <article class="card">
+          <h3>Random image node</h3>
+          <button id="randomImageBtn" type="button">Randomize image feed</button>
+          <img id="randomImage" class="asset-image mosh-image" src="https://raw.githubusercontent.com/aday1/error-diffusion/main/public/assets/max-patch-1.png" alt="Randomized visual asset">
+        </article>
+      </div>
     </section>
 
     <section class="panel">
@@ -130,6 +140,33 @@
             <li><a href="https://github.com/aday1/Aisjam-V-Aday-Chiptune_Australian-BBQ-Bash-" target="_blank" rel="noopener noreferrer">Aisjam V Aday chiptune collab</a></li>
           </ul>
         </article>
+      </div>
+    </section>
+
+    <section class="panel youtube-panel">
+      <h2 class="decrypt">YouTube Broadcast Deck</h2>
+      <p>CRT video selector for channel material. Randomizer mode rotates source presets in a TV-style switchboard.</p>
+      <div class="youtube-deck">
+        <div class="yt-crt">
+          <iframe
+            id="ytEmbedFrame"
+            title="Aday YouTube feed"
+            src="https://www.youtube-nocookie.com/embed?listType=user_uploads&list=aday1"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="yt-controls">
+          <label for="ytSelector">Channel selector</label>
+          <select id="ytSelector">
+            <option value="https://www.youtube-nocookie.com/embed?listType=user_uploads&list=aday1">uploads stream</option>
+            <option value="https://www.youtube-nocookie.com/embed?listType=user_uploads&list=Aday">legacy user stream</option>
+            <option value="https://www.youtube-nocookie.com/embed?listType=search&list=aday+chiptune+live+visual">search feed</option>
+          </select>
+          <button id="ytRandom" type="button">Random channel/video mode</button>
+          <p class="repo-meta">If YouTube resolves to the wrong channel, update source presets in `app.js` once final channel IDs are known.</p>
+        </div>
       </div>
     </section>
 
@@ -259,9 +296,12 @@
       </div>
     </section>
 
-    <footer class="footer">
+    <footer class="footer signal-footer">
+      <div class="footer-wave" aria-hidden="true"></div>
       <button id="scanlineToggle" type="button">Toggle scanlines</button>
       <a href="https://web.archive.org/web/20260316231632/http://aday.net.au/" target="_blank" rel="noopener noreferrer">Wayback snapshot reference</a>
+      <a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">YouTube channel</a>
+      <span class="repo-meta">system footer inspired by synth-wave scope visuals</span>
     </footer>
   </main>
   <div id="retroCursor" class="retro-cursor" aria-hidden="true"></div>

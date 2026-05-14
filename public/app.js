@@ -10,6 +10,12 @@
   const cursor = document.getElementById("retroCursor");
   const menuItems = [...document.querySelectorAll(".osd-menu li")];
   const repoGrid = document.getElementById("repoGrid");
+  const pageTransition = document.getElementById("pageTransition");
+  const ytFrame = document.getElementById("ytEmbedFrame");
+  const ytSelector = document.getElementById("ytSelector");
+  const ytRandom = document.getElementById("ytRandom");
+  const randomImage = document.getElementById("randomImage");
+  const randomImageBtn = document.getElementById("randomImageBtn");
   let activeIndex = 0;
   let mediaIndex = 0;
 
@@ -48,6 +54,22 @@
     }
   ];
 
+  const ytSources = [
+    "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=aday1",
+    "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=Aday",
+    "https://www.youtube-nocookie.com/embed?listType=search&list=aday+macroverse+visual",
+    "https://www.youtube-nocookie.com/embed?listType=search&list=aday+chiptune+live"
+  ];
+
+  const randomImageSources = [
+    "https://raw.githubusercontent.com/aday1/error-diffusion/main/public/assets/max-patch-1.png",
+    "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png",
+    "https://opengraph.githubassets.com/aday-mv/aday1/macroverse.aday.net.au",
+    "https://opengraph.githubassets.com/aday-ab/aday1/artbastard.aday.net.au",
+    "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80"
+  ];
+
   const saved = localStorage.getItem(key);
   if (saved === "off") {
     body.classList.remove("scanlines-on");
@@ -61,8 +83,12 @@
   });
 
   const bootDone = () => body.classList.remove("boot-seq");
-  window.addEventListener("load", () => setTimeout(bootDone, 820));
+  window.addEventListener("load", () => {
+    setTimeout(bootDone, 820);
+    setTimeout(() => pageTransition?.classList.add("hidden"), 460);
+  });
   setTimeout(bootDone, 1200);
+  setTimeout(() => pageTransition?.classList.add("hidden"), 1400);
 
   if (cursor) {
     window.addEventListener("mousemove", (event) => {
@@ -450,6 +476,53 @@
     }
   };
 
+  const initYoutubeDeck = () => {
+    if (!ytFrame) return;
+    ytSelector?.addEventListener("change", () => {
+      ytFrame.src = ytSelector.value;
+      if (window.anime) {
+        window.anime({
+          targets: ".yt-crt",
+          opacity: [0.25, 1],
+          duration: 380,
+          easing: "easeOutQuad"
+        });
+      }
+    });
+
+    ytRandom?.addEventListener("click", () => {
+      const src = ytSources[Math.floor(Math.random() * ytSources.length)];
+      ytFrame.src = src;
+      if (ytSelector) ytSelector.value = src;
+      if (window.anime) {
+        window.anime({
+          targets: ".yt-controls, .yt-crt",
+          translateX: [-6, 0],
+          opacity: [0.6, 1],
+          duration: 450,
+          easing: "easeOutExpo"
+        });
+      }
+    });
+  };
+
+  const initRandomImageDeck = () => {
+    if (!randomImage || !randomImageBtn) return;
+    randomImageBtn.addEventListener("click", () => {
+      const src = randomImageSources[Math.floor(Math.random() * randomImageSources.length)];
+      randomImage.src = src;
+      if (window.anime) {
+        window.anime({
+          targets: randomImage,
+          scale: [0.985, 1],
+          opacity: [0.55, 1],
+          duration: 460,
+          easing: "easeOutExpo"
+        });
+      }
+    });
+  };
+
   const scrambleText = (el, target) => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
     let frame = 0;
@@ -567,9 +640,14 @@
           ? repo.homepage
           : (repo.name.includes(".aday.net.au") ? `https://${repo.name}` : `https://aday1.github.io/${repo.name}/`);
 
+        const updatedMs = Date.now() - new Date(repo.updated_at).getTime();
+        const days = Math.floor(updatedMs / (1000 * 60 * 60 * 24));
+        const activity = days < 14 ? "hot" : days < 60 ? "warm" : "cold";
+
         card.innerHTML = `
           <h3>${repo.name}</h3>
           <p class="repo-meta">${(repo.description || "No description yet").slice(0, 120)}</p>
+          <p class="repo-meta repo-activity repo-activity-${activity}">activity: ${activity} / updated ${days}d ago</p>
           <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">repo</a>
           <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">live/page</a>
           <img class="repo-shot mosh-image" src="${shot}" alt="${repo.name} preview">
@@ -595,6 +673,8 @@
   if (crtMedia) setInterval(cycleCrtMedia, 4200);
   animateTextFx();
   animateHeaders();
+  initYoutubeDeck();
+  initRandomImageDeck();
   hydrateRepoGrid();
 
   document.querySelectorAll("img.mosh-image").forEach((img) => {
