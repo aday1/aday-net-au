@@ -387,22 +387,67 @@
     if (!nodeMapCanvas) return;
     const ctx = nodeMapCanvas.getContext("2d");
     if (!ctx) return;
+    let hoverNodeId = "";
+    const liveNodes = new Map();
 
     const nodes = [
-      { id: "aday", x: 0.50, y: 0.25, r: 7, c: "#9eff89", label: "aday.net.au" },
-      { id: "macroverse", x: 0.27, y: 0.50, r: 6, c: "#9fd4ff", label: "macroverse" },
-      { id: "artbastard", x: 0.73, y: 0.50, r: 6, c: "#9fd4ff", label: "artbastard" },
-      { id: "acid", x: 0.20, y: 0.74, r: 6, c: "#d697ff", label: "acid-banger" },
-      { id: "blog", x: 0.50, y: 0.74, r: 6, c: "#9eff89", label: "blog" },
-      { id: "codepen", x: 0.80, y: 0.74, r: 6, c: "#88f7ff", label: "codepen" },
-      { id: "clan", x: 0.12, y: 0.33, r: 5, c: "#b2ffa8", label: "clan" },
-      { id: "demozoo", x: 0.88, y: 0.33, r: 5, c: "#b2ffa8", label: "demozoo" }
+      { id: "aday", x: 0.50, y: 0.25, r: 7, c: "#9eff89", label: "aday.net.au", url: "https://aday.net.au" },
+      { id: "macroverse", x: 0.27, y: 0.50, r: 6, c: "#9fd4ff", label: "macroverse", url: "https://macroverse.aday.net.au" },
+      { id: "artbastard", x: 0.73, y: 0.50, r: 6, c: "#9fd4ff", label: "artbastard", url: "https://artbastard.aday.net.au" },
+      { id: "acid", x: 0.20, y: 0.74, r: 6, c: "#d697ff", label: "acid-banger", url: "https://aday1.github.io/acid-banger/" },
+      { id: "blog", x: 0.50, y: 0.74, r: 6, c: "#9eff89", label: "blog", url: "https://blog.aday.net.au" },
+      { id: "codepen", x: 0.80, y: 0.74, r: 6, c: "#88f7ff", label: "codepen", url: "https://codepen.io/aday_net_au/" },
+      { id: "clan", x: 0.12, y: 0.33, r: 5, c: "#b2ffa8", label: "clan", url: "https://www.clananalogue.org/artists/aday/" },
+      { id: "demozoo", x: 0.88, y: 0.33, r: 5, c: "#b2ffa8", label: "demozoo", url: "https://demozoo.org/sceners/28006/" }
     ];
     const edges = [
       ["aday", "macroverse"], ["aday", "artbastard"], ["aday", "blog"], ["aday", "codepen"],
       ["aday", "acid"], ["aday", "clan"], ["aday", "demozoo"], ["macroverse", "artbastard"],
       ["blog", "acid"], ["codepen", "artbastard"]
     ];
+
+    const pickNode = (mx, my) => {
+      let picked = null;
+      liveNodes.forEach((node) => {
+        const dx = mx - node.px;
+        const dy = my - node.py;
+        const distSq = dx * dx + dy * dy;
+        const hitR = node.r + 9;
+        if (distSq <= hitR * hitR) picked = node;
+      });
+      return picked;
+    };
+
+    const pointerPosition = (event) => {
+      const rect = nodeMapCanvas.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+    };
+
+    nodeMapCanvas.addEventListener("mousemove", (event) => {
+      const p = pointerPosition(event);
+      const node = pickNode(p.x, p.y);
+      hoverNodeId = node?.id || "";
+      nodeMapCanvas.style.cursor = node ? "pointer" : "none";
+    });
+
+    nodeMapCanvas.addEventListener("mouseleave", () => {
+      hoverNodeId = "";
+      nodeMapCanvas.style.cursor = "none";
+    });
+
+    nodeMapCanvas.addEventListener("click", (event) => {
+      const p = pointerPosition(event);
+      const node = pickNode(p.x, p.y);
+      if (!node?.url) return;
+      if (event.metaKey || event.ctrlKey) {
+        window.open(node.url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      window.location.href = node.url;
+    });
 
     const renderGraph = (time) => {
       const ratio = window.devicePixelRatio || 1;
@@ -422,6 +467,8 @@
         const ny = n.y * h + Math.cos(t * 0.9 + i * 0.5) * 5;
         map.set(n.id, { ...n, px: nx, py: ny });
       });
+      liveNodes.clear();
+      map.forEach((n) => liveNodes.set(n.id, n));
 
       edges.forEach(([a, b], idx) => {
         const na = map.get(a);
@@ -437,17 +484,25 @@
       });
 
       map.forEach((n) => {
+        const hovered = hoverNodeId === n.id;
         ctx.fillStyle = n.c;
         ctx.beginPath();
-        ctx.arc(n.px, n.py, n.r, 0, Math.PI * 2);
+        ctx.arc(n.px, n.py, n.r + (hovered ? 2 : 0), 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowColor = n.c;
-        ctx.shadowBlur = 16;
+        ctx.shadowBlur = hovered ? 22 : 16;
         ctx.beginPath();
         ctx.arc(n.px, n.py, n.r * 0.65, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0;
-        ctx.fillStyle = "rgba(200,240,255,0.9)";
+        if (hovered) {
+          ctx.strokeStyle = "rgba(190,255,185,0.92)";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(n.px, n.py, n.r + 6, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.fillStyle = hovered ? "rgba(220,255,228,0.96)" : "rgba(200,240,255,0.9)";
         ctx.font = "12px Consolas, monospace";
         ctx.fillText(n.label, n.px + 10, n.py + 4);
       });
