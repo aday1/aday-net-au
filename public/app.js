@@ -108,7 +108,7 @@
     "error-diffusion": "Live glitch processing lab and diffusion-visual toolkit powering errordiffusion.net experiments.",
     OpenSoundLab: "Browser audio sandbox for synthesis, sequencing, and sonic prototype tooling.",
     "bitwig-mcp-server": "MCP bridge exposing Bitwig operations for scripted and agent-driven automation.",
-    MoveMusicSaveEditor: "Save-file editing utility for Move Music workflows with fast controller test iteration.",
+    MoveMusicSaveEditor: "Move Music save editor for quickly patching controller maps, choreography data, and test-state values.",
     "The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack": "High-speed MCP macro pack for repetitive DAW editing and envelope batching."
   };
 
