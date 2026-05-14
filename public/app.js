@@ -247,11 +247,11 @@
 
   const bootDone = () => body.classList.remove("boot-seq");
   window.addEventListener("load", () => {
-    setTimeout(bootDone, 600);
-    setTimeout(() => pageTransition?.classList.add("hidden"), 600);
+    setTimeout(bootDone, 1100);
+    setTimeout(() => pageTransition?.classList.add("hidden"), 1300);
   });
-  setTimeout(bootDone, 5000);
-  setTimeout(() => pageTransition?.classList.add("hidden"), 5000);
+  setTimeout(bootDone, 6500);
+  setTimeout(() => pageTransition?.classList.add("hidden"), 6800);
 
   if (cursor) {
     window.addEventListener("mousemove", (event) => {
@@ -317,11 +317,15 @@
         p.x *= uRes.x / uRes.y;
 
         float t = uTime * 0.32;
-        float wave = sin((uv.y + t * 0.9) * 92.0) * 0.05;
-        float scan = sin((uv.y + t) * 1220.0) * 0.09;
+        float wave = sin((uv.y + t * 0.9) * 92.0) * 0.06;
+        float scan = sin((uv.y + t) * 1520.0) * 0.11;
         float n = noise(uv * 450.0 + t * 40.0) * 0.18;
         float neb = fbm(uv * 6.0 + vec2(t * 0.8, -t * 0.25));
         float swirl = sin((p.x * p.x + p.y * p.y) * 18.0 - t * 4.0);
+        float snow = noise(uv * vec2(900.0, 600.0) + vec2(t * 120.0, t * 80.0));
+        float bar = step(0.975, fract(uv.y * 7.0 + t * 1.6)) * (0.12 + 0.12 * noise(vec2(t * 12.0, uv.y * 32.0)));
+        vec2 gUv = uv + vec2(sin(uv.y * 40.0 + t * 8.0) * 0.003, 0.0);
+        float ghost = fbm(gUv * 8.2 + vec2(t * 0.2, t * -0.14));
 
         vec3 col = vec3(0.03, 0.10, 0.32);
         col += vec3(0.06, 0.16, 0.45) * neb;
@@ -329,6 +333,9 @@
         col += vec3(0.02, 0.24, 0.16) * smoothstep(0.4, 0.8, neb);
         col += vec3(wave + scan + n);
         col += vec3(0.1, 0.24, 0.08) * smoothstep(0.7, 1.0, sin((uv.y - t * 0.6) * 26.0));
+        col += vec3(0.08, 0.14, 0.2) * ghost * 0.45;
+        col += vec3(0.12, 0.12, 0.12) * snow * 0.3;
+        col += vec3(bar, bar * 0.85, bar * 0.65);
 
         float vignette = smoothstep(1.15, 0.38, length(p));
         col *= vignette;
@@ -401,11 +408,15 @@
         float m = n(uv*8.0 + vec2(t*0.6, -t*0.4));
         float z = sin((p.x+p.y+t*0.4)*18.0) * 0.5 + 0.5;
         float ring = smoothstep(0.55, 0.1, abs(length(p)-0.4-0.08*sin(t*0.8)));
+        float speck = n(uv * vec2(340.0, 220.0) + vec2(t * 45.0, t * 30.0));
+        float pulse = step(0.985, fract(uv.y * 6.5 + t * 1.2)) * 0.22;
 
         vec3 col = vec3(0.02,0.06,0.15);
         col += vec3(0.02,0.18,0.45) * m;
         col += vec3(0.20,0.06,0.28) * z * 0.45;
         col += vec3(0.10,0.35,0.18) * ring * 0.35;
+        col += vec3(0.09,0.11,0.14) * speck * 0.22;
+        col += vec3(pulse, pulse * 0.6, pulse * 0.9);
 
         float fade = smoothstep(1.2,0.1,length(p));
         col *= fade;

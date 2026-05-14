@@ -11,7 +11,10 @@
 </head>
 <body class="scanlines-on boot-seq">
   <div id="pageTransition" class="page-transition" aria-hidden="true">
-    <div class="page-transition-inner">loading signal...</div>
+    <div class="page-transition-inner">
+      <span class="cuton-label">crt cut-on</span>
+      <span class="cuton-line"></span>
+    </div>
   </div>
   <canvas id="bgShader" class="bg-shader" aria-hidden="true"></canvas>
   <div class="noise" aria-hidden="true"></div>
@@ -542,6 +545,7 @@
     <footer class="footer signal-footer">
       <div class="footer-wave" aria-hidden="true"></div>
       <button id="scanlineToggle" type="button">Toggle scanlines</button>
+      <a href="https://keys.aday.net.au">keys.aday.net.au</a>
       <a href="https://web.archive.org/web/20260316231632/http://aday.net.au/" target="_blank" rel="noopener noreferrer">Wayback snapshot reference</a>
       <a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">YouTube channel</a>
       <span class="repo-meta">system footer inspired by synth-wave scope visuals</span>
