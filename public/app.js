@@ -94,6 +94,11 @@
     "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80"
   ];
 
+  const livePageOverrides = {
+    ZealPalace: "https://aday1.github.io/ZealPalace/",
+    "acid-banger": "https://aday1.github.io/acid-banger/"
+  };
+
   const saved = localStorage.getItem(key);
   if (saved === "off") {
     body.classList.remove("scanlines-on");
@@ -108,11 +113,11 @@
 
   const bootDone = () => body.classList.remove("boot-seq");
   window.addEventListener("load", () => {
-    setTimeout(bootDone, 820);
-    setTimeout(() => pageTransition?.classList.add("hidden"), 460);
+    setTimeout(bootDone, 600);
+    setTimeout(() => pageTransition?.classList.add("hidden"), 600);
   });
-  setTimeout(bootDone, 1200);
-  setTimeout(() => pageTransition?.classList.add("hidden"), 1400);
+  setTimeout(bootDone, 5000);
+  setTimeout(() => pageTransition?.classList.add("hidden"), 5000);
 
   if (cursor) {
     window.addEventListener("mousemove", (event) => {
@@ -715,9 +720,10 @@
         card.className = "card";
 
         const shot = `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
-        const liveGuess = repo.homepage && repo.homepage.trim() !== ""
+        const override = livePageOverrides[repo.name];
+        const liveGuess = override ? override : (repo.homepage && repo.homepage.trim() !== ""
           ? repo.homepage
-          : (repo.name.includes(".aday.net.au") ? `https://${repo.name}` : `https://aday1.github.io/${repo.name}/`);
+          : (repo.name.includes(".aday.net.au") ? `https://${repo.name}` : `https://aday1.github.io/${repo.name}/`));
 
         const updatedMs = Date.now() - new Date(repo.updated_at).getTime();
         const days = Math.floor(updatedMs / (1000 * 60 * 60 * 24));
@@ -727,8 +733,8 @@
           <h3>${repo.name}</h3>
           <p class="repo-meta">${(repo.description || "No description yet").slice(0, 120)}</p>
           <p class="repo-meta repo-activity repo-activity-${activity}">activity: ${activity} / updated ${days}d ago</p>
-          <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">repo</a>
-          <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">live/page</a>
+          <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">open project page</a>
+          <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">source</a>
           <img class="repo-shot mosh-image" src="${shot}" alt="${repo.name} preview">
         `;
         repoGrid.appendChild(card);
