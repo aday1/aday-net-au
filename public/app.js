@@ -6,6 +6,7 @@
   const canvas = document.getElementById("crtCanvas");
   const crtMedia = document.getElementById("crtMedia");
   const crtCaption = document.getElementById("crtCaption");
+  const screen = document.querySelector(".screen");
   const nodeMapCanvas = document.getElementById("nodeMapCanvas");
   const cursor = document.getElementById("retroCursor");
   const menuItems = [...document.querySelectorAll(".osd-menu li")];
@@ -97,7 +98,12 @@
   const livePageOverrides = {
     ZealPalace: "https://aday1.github.io/ZealPalace/",
     "acid-banger": "https://aday1.github.io/acid-banger/",
-    "error-diffusion": "https://errordiffusion.net"
+    "error-diffusion": "https://errordiffusion.net",
+    MoveMusicSaveEditor: "https://movemusic.com/"
+  };
+
+  const repoImageOverrides = {
+    MoveMusicSaveEditor: "https://raw.githubusercontent.com/aday1/MoveMusicSaveEditor/main/test.gif"
   };
 
   const projectBlurbOverrides = {
@@ -108,7 +114,7 @@
     "error-diffusion": "Live glitch processing lab and diffusion-visual toolkit powering errordiffusion.net experiments.",
     OpenSoundLab: "Browser audio sandbox for synthesis, sequencing, and sonic prototype tooling.",
     "bitwig-mcp-server": "MCP bridge exposing Bitwig operations for scripted and agent-driven automation.",
-    MoveMusicSaveEditor: "Move Music save editor for quickly patching controller maps, choreography data, and test-state values.",
+    MoveMusicSaveEditor: "Move Music save editor for quickly patching controller maps and choreography data for Tim Arterbury's MoveMusic platform.",
     "The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack": "High-speed MCP macro pack for repetitive DAW editing and envelope batching."
   };
 
@@ -523,6 +529,20 @@
         ctx.fillStyle = hovered ? "rgba(220,255,228,0.96)" : "rgba(200,240,255,0.9)";
         ctx.font = "12px Consolas, monospace";
         ctx.fillText(n.label, n.px + 10, n.py + 4);
+        if (hovered) {
+          const tip = `open: ${n.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
+          ctx.font = "11px Consolas, monospace";
+          const tw = ctx.measureText(tip).width;
+          const tx = Math.min(w - tw - 16, n.px + 12);
+          const ty = Math.max(14, n.py - 14);
+          ctx.fillStyle = "rgba(7, 14, 25, 0.9)";
+          ctx.fillRect(tx - 6, ty - 12, tw + 12, 18);
+          ctx.strokeStyle = "rgba(142, 255, 137, 0.7)";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(tx - 6, ty - 12, tw + 12, 18);
+          ctx.fillStyle = "rgba(180, 255, 169, 0.95)";
+          ctx.fillText(tip, tx, ty + 1);
+        }
       });
 
       requestAnimationFrame(renderGraph);
@@ -571,6 +591,12 @@
         easing: "easeOutExpo"
       });
     }
+  };
+
+  const pulseCrtBurst = () => {
+    if (!screen) return;
+    screen.classList.add("crt-burst");
+    setTimeout(() => screen.classList.remove("crt-burst"), 320);
   };
 
   const initYoutubeDeck = () => {
@@ -730,9 +756,9 @@
       for (let i = 0; i < picks.length; i++) {
         const repo = picks[i];
         const card = document.createElement("article");
-        card.className = "card";
+        card.className = "card repo-tv";
 
-        const shot = `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
+        const shot = repoImageOverrides[repo.name] || `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
         const override = livePageOverrides[repo.name];
         const liveGuess = override ? override : (repo.homepage && repo.homepage.trim() !== ""
           ? repo.homepage
@@ -743,13 +769,26 @@
         const activity = days < 14 ? "hot" : days < 60 ? "warm" : "cold";
 
         const blurb = projectBlurbOverrides[repo.name] || (repo.description || "No description yet").slice(0, 120);
+        const lastUpdated = new Date(repo.updated_at).toLocaleDateString("en-AU", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit"
+        });
         card.innerHTML = `
-          <h3>${repo.name}</h3>
+          <div class="repo-tv-head">
+            <h3>${repo.name}</h3>
+            <span class="repo-tv-channel">TV-${String(i + 1).padStart(2, "0")}</span>
+          </div>
+          <div class="repo-tv-screen">
+            <img class="repo-shot mosh-image" src="${shot}" alt="${repo.name} preview">
+          </div>
           <p class="repo-meta">${blurb}</p>
           <p class="repo-meta repo-activity repo-activity-${activity}">activity: ${activity} / updated ${days}d ago</p>
-          <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">open project page</a>
-          <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">source</a>
-          <img class="repo-shot mosh-image" src="${shot}" alt="${repo.name} preview">
+          <p class="repo-meta">last commit signal: ${lastUpdated}</p>
+          <div class="repo-tv-links">
+            <a href="${liveGuess}" target="_blank" rel="noopener noreferrer">open project page</a>
+            <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">source</a>
+          </div>
         `;
         repoGrid.appendChild(card);
         const image = card.querySelector("img.repo-shot");
@@ -772,6 +811,7 @@
   runNodeMap();
   setInterval(cycleMenu, 2200);
   if (crtMedia) setInterval(cycleCrtMedia, 4200);
+  setInterval(pulseCrtBurst, 6400);
   animateTextFx();
   animateHeaders();
   initYoutubeDeck();
