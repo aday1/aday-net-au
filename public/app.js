@@ -37,11 +37,11 @@
       title: "acid-banger animated preview"
     },
     {
-      src: "https://opengraph.githubassets.com/aday-mv/aday1/macroverse.aday.net.au",
+      src: "https://opengraph.githubassets.com/1/aday1/macroverse.aday.net.au",
       title: "macroverse project card"
     },
     {
-      src: "https://opengraph.githubassets.com/aday-ab/aday1/artbastard.aday.net.au",
+      src: "https://opengraph.githubassets.com/1/aday1/artbastard.aday.net.au",
       title: "artbastard project card"
     },
     {
@@ -49,10 +49,34 @@
       title: "pouet scene archive visual"
     },
     {
-      src: "https://opengraph.githubassets.com/aday-acid/aday1/acid-banger",
+      src: "https://opengraph.githubassets.com/1/aday1/acid-banger",
       title: "acid-banger repository card"
     }
   ];
+  const svgPreviewFallback = (title) => {
+    const safe = (title || "project card").slice(0, 42);
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%' stop-color='#0b1832'/><stop offset='100%' stop-color='#132f52'/></linearGradient></defs><rect width='1200' height='630' fill='url(#g)'/><rect x='32' y='32' width='1136' height='566' fill='none' stroke='#4f8ccf' stroke-width='4'/><text x='72' y='312' fill='#bde7ff' font-family='Consolas, monospace' font-size='42'>${safe}</text><text x='72' y='362' fill='#8eff79' font-family='Consolas, monospace' font-size='24'>preview unavailable - fallback render</text></svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  };
+
+  const armRepoImageFallback = (img, owner, repo, label) => {
+    if (!img || img.dataset.fallbackReady === "1") return;
+    const rawCandidates = owner && repo ? [
+      `https://raw.githubusercontent.com/${owner}/${repo}/main/preview.png`,
+      `https://raw.githubusercontent.com/${owner}/${repo}/master/preview.png`,
+      `https://raw.githubusercontent.com/${owner}/${repo}/main/screenshot.png`,
+      `https://raw.githubusercontent.com/${owner}/${repo}/main/docs/preview.png`
+    ] : [];
+    const candidates = [...rawCandidates, svgPreviewFallback(label)];
+    let idx = 0;
+    img.addEventListener("error", () => {
+      if (idx >= candidates.length) return;
+      img.src = candidates[idx];
+      idx += 1;
+    });
+    img.dataset.fallbackReady = "1";
+  };
+
 
   const ytSources = [
     "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=aday1",
@@ -627,7 +651,7 @@
       const picks = repos
         .filter((repo) => !repo.fork)
         .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-        .slice(0, 24);
+        .slice(0, 12);
 
       repoGrid.innerHTML = "";
       for (let i = 0; i < picks.length; i++) {
@@ -635,7 +659,7 @@
         const card = document.createElement("article");
         card.className = "card";
 
-        const shot = `https://opengraph.githubassets.com/aday-radar-${i}/${repo.owner.login}/${repo.name}`;
+        const shot = `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
         const liveGuess = repo.homepage && repo.homepage.trim() !== ""
           ? repo.homepage
           : (repo.name.includes(".aday.net.au") ? `https://${repo.name}` : `https://aday1.github.io/${repo.name}/`);
@@ -653,6 +677,8 @@
           <img class="repo-shot mosh-image" src="${shot}" alt="${repo.name} preview">
         `;
         repoGrid.appendChild(card);
+        const image = card.querySelector("img.repo-shot");
+        armRepoImageFallback(image, repo.owner.login, repo.name, repo.name);
       }
 
       document.querySelectorAll("img.mosh-image").forEach((img) => {
@@ -680,5 +706,14 @@
   document.querySelectorAll("img.mosh-image").forEach((img) => {
     if (img.complete) moshImage(img);
     else img.addEventListener("load", () => moshImage(img), { once: true });
+  });
+
+  document.querySelectorAll("img.repo-shot[data-repo]").forEach((img) => {
+    const parts = (img.dataset.repo || "").split("/");
+    if (parts.length === 2) {
+      armRepoImageFallback(img, parts[0], parts[1], parts[1]);
+    } else {
+      armRepoImageFallback(img, "", "", img.alt || "project card");
+    }
   });
 })();
