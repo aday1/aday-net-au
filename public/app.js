@@ -5,6 +5,8 @@
   const crtMedia = document.getElementById("crtMedia");
   const crtCaption = document.getElementById("crtCaption");
   const screen = document.querySelector(".screen");
+  const crtChannelLabel = document.querySelector(".channel");
+  const osdMenuHeader = document.querySelector(".osd-menu header");
   const nodeMapCanvas = document.getElementById("nodeMapCanvas");
   const cursor = document.getElementById("retroCursor");
   const menuItems = [...document.querySelectorAll(".osd-menu li")];
@@ -42,13 +44,17 @@
   const wbTrackMeta = document.getElementById("wbTrackMeta");
   const galleryFilters = [...document.querySelectorAll(".gallery-filter")];
   const galleryCards = [...document.querySelectorAll(".gallery-card")];
+  const ENABLE_RETRO_CURSOR = true;
+  const UI_PREF_KEY = "aday-ui-prefs-v1";
   const prefersReducedMotion = !!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   const coarsePointer = !!window.matchMedia?.("(pointer: coarse)")?.matches;
   const smallViewport = window.innerWidth <= 820;
   const performanceMode = prefersReducedMotion || coarsePointer || smallViewport;
   const ultraLiteMode = prefersReducedMotion || window.innerWidth <= 640;
+  const MAX_CANVAS_DPR = 1;
   const crtFrameBudgetMs = ultraLiteMode ? 50 : (performanceMode ? 34 : 16);
   const nodeMapFrameBudgetMs = ultraLiteMode ? 70 : (performanceMode ? 52 : 32);
+  const canUseRetroCursor = ENABLE_RETRO_CURSOR && !coarsePointer;
   let activeIndex = 0;
   let mediaIndex = 0;
   const sessionEdgeSeed = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
@@ -57,35 +63,55 @@
     {
       src: "https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png",
       title: "error-diffusion / visual patch output",
+      menuLabel: "Error Diffusion",
+      osdTitle: "Max patch output",
+      href: "https://github.com/aday1/error-diffusion",
       fallbacks: ["https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png"]
     },
     {
       src: "https://avatars.githubusercontent.com/u/1834001?v=4",
       title: "aday avatar",
+      menuLabel: "GitHub",
+      osdTitle: "aday1 account",
+      href: "https://github.com/aday1",
       fallbacks: ["https://avatars.githubusercontent.com/u/1834001?v=4"]
     },
     {
       src: "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png",
       title: "acid-banger project visual",
+      menuLabel: "Acid Banger",
+      osdTitle: "Project preview",
+      href: "https://github.com/aday1/acid-banger",
       fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
     },
     {
       src: "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif",
       title: "acid-banger animated preview",
+      menuLabel: "Acid Banger",
+      osdTitle: "Original visual loop",
+      href: "https://aday1.github.io/acid-banger/",
       fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
     },
     {
-      src: "https://opengraph.githubassets.com/1/aday1/macroverse.aday.net.au",
-      title: "macroverse project card",
+      src: "/assets/repo-cards/macroverse-loop-pingpong.gif",
+      title: "macroverse visual relay card",
+      menuLabel: "Macroverse",
+      osdTitle: "Live visual relay card",
+      href: "https://macroverse.aday.net.au",
       fallbacks: [
+        "/assets/repo-cards/card-radar-core.jpg",
         "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png",
         "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/screenshot.png"
       ]
     },
     {
-      src: "https://opengraph.githubassets.com/1/aday1/artbastard.aday.net.au",
-      title: "artbastard project card",
+      src: "/assets/repo-cards/artbastard-loop-pingpong.gif",
+      title: "artbastard live control card",
+      menuLabel: "ArtBastard",
+      osdTitle: "Live control card",
+      href: "https://artbastard.aday.net.au",
       fallbacks: [
+        "/assets/repo-cards/card-dmx-console.jpg",
         "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png",
         "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/screenshot.png"
       ]
@@ -93,24 +119,249 @@
     {
       src: "https://content.pouet.net/logos/neuroxfra.gif",
       title: "pouet scene archive visual",
+      menuLabel: "Pouet",
+      osdTitle: "Scene archive visual",
+      href: "https://m.pouet.net/groups.php?which=12461",
       fallbacks: ["https://content.pouet.net/logos/neuroxfra.gif"]
     },
     {
-      src: "https://opengraph.githubassets.com/1/aday1/acid-banger",
-      title: "acid-banger repository card",
-      fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
+      src: "/assets/repo-cards/movemusicsaveeditor-loop-pingpong.gif",
+      title: "MoveMusicSaveEditor workflow signal",
+      menuLabel: "GitHub",
+      osdTitle: "MoveMusicSaveEditor",
+      href: "https://github.com/aday1/MoveMusicSaveEditor",
+      fallbacks: [
+        "https://raw.githubusercontent.com/aday1/MoveMusicSaveEditor/main/test.gif",
+        "/assets/repo-cards/card-daw-timeline.jpg"
+      ]
+    },
+    {
+      src: "/assets/repo-cards/card-forum-map.jpg",
+      title: "blog post / Media Deck and Time Log",
+      menuLabel: "Blog",
+      osdTitle: "Media Deck and Time Log",
+      href: "https://blog.aday.net.au/posts/2026-05-14-media-deck-and-timelog.html",
+      fallbacks: ["/assets/repo-cards/card-neon-code.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-system-tree.jpg",
+      title: "blog node / recent ingest log",
+      menuLabel: "Blog",
+      osdTitle: "Recent ingest log",
+      href: "https://blog.aday.net.au",
+      fallbacks: ["/assets/repo-cards/card-forum-map.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-synth-rack.jpg",
+      title: "weeklybeats / 2026 release index",
+      menuLabel: "WeeklyBeats",
+      osdTitle: "2026 releases",
+      href: "https://weeklybeats.com/music/aday?year=2026",
+      fallbacks: ["/assets/repo-cards/card-daw-timeline.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-daw-timeline.jpg",
+      title: "weeklybeats / EpochJam (PixiTracker)",
+      menuLabel: "WeeklyBeats",
+      osdTitle: "EpochJam",
+      href: "https://weeklybeats.com/aday/music/epochjam-pixitracker",
+      fallbacks: ["/assets/repo-cards/card-synth-rack.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-audio-rack.jpg",
+      title: "weeklybeats / Anxious Goth Rabbit",
+      menuLabel: "WeeklyBeats",
+      osdTitle: "Anxious Rabbit",
+      href: "https://weeklybeats.com/aday/music/anxious-goth-rabbit-2",
+      fallbacks: ["/assets/repo-cards/card-daw-timeline.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-circuit-blue.jpg",
+      title: "weeklybeats / Doomsday data",
+      menuLabel: "WeeklyBeats",
+      osdTitle: "Doomsday Data",
+      href: "https://weeklybeats.com/aday/music/doomsday-data",
+      fallbacks: ["/assets/repo-cards/card-audio-rack.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-synth-rack.jpg",
+      title: "weeklybeats / Cubic Waveform",
+      menuLabel: "WeeklyBeats",
+      osdTitle: "Cubic Waveform",
+      href: "https://weeklybeats.com/music/aday",
+      fallbacks: ["/assets/repo-cards/card-audio-rack.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-daw-timeline.jpg",
+      title: "weeklybeats / Late Calibration Test",
+      menuLabel: "WeeklyBeats",
+      osdTitle: "Late Calibration",
+      href: "https://weeklybeats.com/music/aday",
+      fallbacks: ["/assets/repo-cards/card-synth-rack.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-social-map-crt.jpg",
+      title: "mastodon / @aday_net_au",
+      menuLabel: "Mastodon",
+      osdTitle: "@aday_net_au",
+      href: "https://mastodon.social/@aday_net_au",
+      fallbacks: ["https://avatars.githubusercontent.com/u/1834001?v=4"]
+    },
+    {
+      src: "/assets/repo-cards/card-circuit-blue.jpg",
+      title: "youtube / channel feed",
+      menuLabel: "YouTube",
+      osdTitle: "@aday1 channel",
+      href: "https://www.youtube.com/@aday1",
+      fallbacks: ["https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png"]
+    },
+    {
+      src: "/assets/repo-cards/card-radar-core.jpg",
+      title: "twitch / live stream node",
+      menuLabel: "Twitch",
+      osdTitle: "aday_net_au live",
+      href: "https://www.twitch.tv/aday_net_au",
+      fallbacks: ["/assets/repo-cards/card-social-map-crt.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-audio-rack.jpg",
+      title: "soundcloud / profile signal",
+      menuLabel: "Soundcloud",
+      osdTitle: "adaynetau tracks",
+      href: "https://soundcloud.com/adaynetau",
+      fallbacks: ["/assets/repo-cards/card-daw-timeline.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-neon-code.jpg",
+      title: "codepen / sketch feed",
+      menuLabel: "CodePen",
+      osdTitle: "aday_net_au pens",
+      href: "https://codepen.io/aday_net_au/",
+      fallbacks: ["/assets/repo-cards/card-forum-map.jpg"]
+    },
+    {
+      src: "/assets/repo-cards/card-security-lock.jpg",
+      title: "keys / trust and identity",
+      menuLabel: "Keys",
+      osdTitle: "public key vault",
+      href: "https://keys.aday.net.au",
+      fallbacks: ["/assets/repo-cards/card-system-tree.jpg"]
     },
     {
       src: "https://media.demozoo.org/screens/t/dc/3c/d2ca.pl765305.jpg",
       title: "demozoo / orbital syntax frame",
+      menuLabel: "Demozoo",
+      osdTitle: "Orbital Syntax frame",
+      href: "https://demozoo.org/graphics/380235/",
       fallbacks: ["https://media.demozoo.org/screens/t/60/9a/54e1.352183.jpg"]
     },
     {
       src: "https://media.demozoo.org/screens/t/0d/47/2883.187843.jpg",
       title: "demozoo / demobus from the sky",
+      menuLabel: "Demozoo",
+      osdTitle: "Demobus from the Sky",
+      href: "https://demozoo.org/graphics/204829/",
       fallbacks: ["https://media.demozoo.org/screens/t/d7/36/0130.173990.png"]
     }
   ];
+  const gifPingPongSourceMap = {
+    "/assets/repo-cards/macroverse-loop.gif": "/assets/repo-cards/macroverse-loop-pingpong.gif",
+    "/assets/repo-cards/artbastard-loop.gif": "/assets/repo-cards/artbastard-loop-pingpong.gif",
+    "https://raw.githubusercontent.com/aday1/MoveMusicSaveEditor/main/test.gif": "/assets/repo-cards/movemusicsaveeditor-loop-pingpong.gif"
+  };
+  const normalizeKnownGifSource = (value) => {
+    const src = String(value || "");
+    return gifPingPongSourceMap[src] || src;
+  };
+  const isGifLikeSource = (value) => /\.gif(?:[?#].*)?$/i.test(String(value || ""));
+  const classifySignalImage = (img, sourceValue) => {
+    if (!(img instanceof HTMLImageElement)) return;
+    const probe = normalizeKnownGifSource(sourceValue || img.currentSrc || img.src || "");
+    const animated = isGifLikeSource(probe);
+    img.classList.toggle("signal-animated", animated);
+    img.classList.toggle("signal-static", !animated);
+  };
+  const getMenuLabel = (item) => {
+    if (item?.menuLabel) return item.menuLabel;
+    return "Signal";
+  };
+  const formatOsdEntry = (item) => {
+    const label = (item?.menuLabel || "Signal").toUpperCase();
+    const title = (item?.osdTitle || item?.title || "preview").replace(/^.*\/\s*/, "");
+    return `${label} // ${title}`;
+  };
+  const getOsdItemHref = (item) => {
+    return item?.href || "";
+  };
+  const renderOsdPreviewList = (currentItem) => {
+    if (!menuItems.length || !mediaFeed.length) return;
+    const visibleCount = menuItems.length;
+    const activeSlot = Math.min(2, visibleCount - 1);
+    for (let slot = 0; slot < visibleCount; slot += 1) {
+      const feedIndex = (mediaIndex - activeSlot + slot + mediaFeed.length) % mediaFeed.length;
+      const item = mediaFeed[feedIndex];
+      const row = menuItems[slot];
+      const href = getOsdItemHref(item);
+      let link = row.querySelector("a");
+      if (!link) {
+        link = document.createElement("a");
+        row.textContent = "";
+        row.appendChild(link);
+      }
+      let textSpan = link.querySelector(".osd-link-text");
+      if (!textSpan) {
+        textSpan = document.createElement("span");
+        textSpan.className = "osd-link-text";
+        link.textContent = "";
+        link.appendChild(textSpan);
+      }
+      const rowText = formatOsdEntry(item);
+      textSpan.textContent = rowText;
+      link.classList.remove("is-scrolling");
+      link.style.removeProperty("--osd-scroll-distance");
+      link.style.removeProperty("--osd-scroll-duration");
+      if (href) {
+        link.setAttribute("href", href);
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noopener noreferrer");
+      } else {
+        link.removeAttribute("href");
+        link.removeAttribute("target");
+        link.removeAttribute("rel");
+      }
+      row.classList.toggle("active", slot === activeSlot);
+      if (slot === activeSlot && uiPrefs.osdMarquee) {
+        requestAnimationFrame(() => {
+          const overflowPx = textSpan.scrollWidth - link.clientWidth;
+          if (overflowPx > 6) {
+            const distance = Math.ceil(overflowPx + 24);
+            const duration = Math.min(16, Math.max(7, distance / 20));
+            link.style.setProperty("--osd-scroll-distance", `${distance}px`);
+            link.style.setProperty("--osd-scroll-duration", `${duration}s`);
+            link.classList.add("is-scrolling");
+          }
+        });
+      }
+    }
+    activeIndex = activeSlot;
+    const menuText = (currentItem?.menuLabel || getMenuLabel(currentItem)).trim();
+    if (crtChannelLabel) crtChannelLabel.textContent = `CH-${String(mediaIndex + 1).padStart(2, "0")} ${menuText.toUpperCase()}`;
+    if (osdMenuHeader) osdMenuHeader.textContent = `Surf // ${menuText}`;
+  };
+  const syncCrtMenuState = (item) => {
+    if (!menuItems.length) return;
+    renderOsdPreviewList(item);
+    const next = menuItems[activeIndex];
+    if (window.anime && next) {
+      window.anime({
+        targets: next,
+        translateX: [-8, 0],
+        opacity: [0.45, 1],
+        duration: 300,
+        easing: "easeOutExpo"
+      });
+    }
+  };
   const svgPreviewFallback = (title) => {
     const safe = (title || "project card").slice(0, 42);
     const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%' stop-color='#0b1832'/><stop offset='100%' stop-color='#132f52'/></linearGradient></defs><rect width='1200' height='630' fill='url(#g)'/><rect x='32' y='32' width='1136' height='566' fill='none' stroke='#4f8ccf' stroke-width='4'/><text x='72' y='312' fill='#bde7ff' font-family='Consolas, monospace' font-size='42'>${safe}</text><text x='72' y='362' fill='#8eff79' font-family='Consolas, monospace' font-size='24'>preview unavailable - fallback render</text></svg>`;
@@ -129,7 +380,8 @@
     let idx = 0;
     img.addEventListener("error", () => {
       if (idx >= candidates.length) return;
-      img.src = candidates[idx];
+      img.src = normalizeKnownGifSource(candidates[idx]);
+      classifySignalImage(img, img.src);
       idx += 1;
     });
     img.dataset.fallbackReady = "1";
@@ -143,9 +395,12 @@
 
   const armGenericImageFallback = (img) => {
     if (!img || img.dataset.fallbackReady === "1") return;
+    img.src = normalizeKnownGifSource(img.getAttribute("src") || img.src);
+    classifySignalImage(img, img.src);
     const explicit = (img.dataset.fallbacks || "")
       .split("|")
       .map((item) => item.trim())
+      .map((item) => normalizeKnownGifSource(item))
       .filter(Boolean);
     const repoData = parseRepoData(img.dataset.repo || "");
     if (repoData) {
@@ -157,7 +412,8 @@
     let idx = 0;
     img.addEventListener("error", () => {
       if (idx >= candidates.length) return;
-      img.src = candidates[idx];
+      img.src = normalizeKnownGifSource(candidates[idx]);
+      classifySignalImage(img, img.src);
       idx += 1;
     });
     img.dataset.fallbackReady = "1";
@@ -440,11 +696,11 @@
   };
 
   const repoImageOverrides = {
-    MoveMusicSaveEditor: "/assets/repo-cards/card-daw-timeline.jpg",
-    "macroverse.aday.net.au": "/assets/repo-cards/card-radar-core.jpg",
-    "artbastard.aday.net.au": "/assets/repo-cards/card-dmx-console.jpg",
+    MoveMusicSaveEditor: "/assets/repo-cards/movemusicsaveeditor-loop-pingpong.gif",
+    "macroverse.aday.net.au": "/assets/repo-cards/macroverse-loop-pingpong.gif",
+    "artbastard.aday.net.au": "/assets/repo-cards/artbastard-loop-pingpong.gif",
     "error-diffusion": "/assets/repo-cards/card-security-lock.jpg",
-    "acid-banger": "/assets/repo-cards/card-daw-timeline.jpg",
+    "acid-banger": "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif",
     "blog.aday.net.au": "/assets/repo-cards/card-forum-map.jpg",
     "aday-net-au": "/assets/repo-cards/card-synth-rack.jpg",
     "keys-aday-net-au": "/assets/repo-cards/card-security-lock.jpg",
@@ -471,12 +727,13 @@
   const pickLocalRepoCard = (repoName, seed) => {
     const lower = (repoName || "").toLowerCase();
     if (lower.includes("key") || lower.includes("auth") || lower.includes("secure")) return "/assets/repo-cards/card-security-lock.jpg";
-    if (lower.includes("macroverse")) return "/assets/repo-cards/card-radar-core.jpg";
-    if (lower.includes("art") || lower.includes("dmx") || lower.includes("light")) return "/assets/repo-cards/card-dmx-console.jpg";
+    if (lower.includes("macroverse")) return "/assets/repo-cards/macroverse-loop-pingpong.gif";
+    if (lower.includes("art") || lower.includes("dmx") || lower.includes("light")) return "/assets/repo-cards/artbastard-loop-pingpong.gif";
     if (lower.includes("sound") || lower.includes("audio") || lower.includes("music") || lower.includes("daw")) return "/assets/repo-cards/card-audio-rack.jpg";
     if (lower.includes("blog") || lower.includes("forum")) return "/assets/repo-cards/card-forum-map.jpg";
     if (lower.includes("breakcore")) return "/assets/repo-cards/card-social-map-crt.jpg";
-    if (lower.includes("acid")) return "/assets/repo-cards/card-daw-timeline.jpg";
+    if (lower.includes("acid")) return "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif";
+    if (lower.includes("move") && lower.includes("music")) return "/assets/repo-cards/movemusicsaveeditor-loop-pingpong.gif";
     if (!localRepoCardPool.length) return "";
     return localRepoCardPool[seed % localRepoCardPool.length];
   };
@@ -484,6 +741,7 @@
   const wrapMediaWithCrtEffect = (root = document) => {
     const mediaNodes = root.querySelectorAll("img.repo-shot, img.asset-image, img.project-loop, video");
     mediaNodes.forEach((node) => {
+      if (node instanceof HTMLImageElement) classifySignalImage(node, node.getAttribute("src") || node.src);
       const parent = node.parentElement;
       if (!parent || parent.classList.contains("crt-media-wrap")) return;
       const wrap = document.createElement("span");
@@ -510,6 +768,110 @@
 
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
+  const loadUiPrefs = () => {
+    const defaults = {
+      retroCursor: canUseRetroCursor,
+      crtStatic: true,
+      osdMenu: true,
+      scanlines: true,
+      animations: true,
+      bgShader: true,
+      osdMarquee: true
+    };
+    try {
+      const raw = localStorage.getItem(UI_PREF_KEY);
+      if (!raw) return defaults;
+      const parsed = JSON.parse(raw);
+      return {
+        retroCursor: canUseRetroCursor && parsed.retroCursor !== false,
+        crtStatic: parsed.crtStatic !== false,
+        osdMenu: parsed.osdMenu !== false,
+        scanlines: parsed.scanlines !== false,
+        animations: parsed.animations !== false,
+        bgShader: parsed.bgShader !== false,
+        osdMarquee: parsed.osdMarquee !== false
+      };
+    } catch {
+      return defaults;
+    }
+  };
+  const uiPrefs = loadUiPrefs();
+  const saveUiPrefs = () => {
+    try {
+      localStorage.setItem(UI_PREF_KEY, JSON.stringify(uiPrefs));
+    } catch {
+      // ignore storage errors
+    }
+  };
+  const applyUiPrefs = () => {
+    body.classList.toggle("retro-cursor-on", canUseRetroCursor && uiPrefs.retroCursor);
+    body.classList.toggle("hide-crt-static", !uiPrefs.crtStatic);
+    body.classList.toggle("hide-osd-menu", !uiPrefs.osdMenu);
+    body.classList.toggle("scanlines-off", !uiPrefs.scanlines);
+    body.classList.toggle("animations-off", !uiPrefs.animations);
+    body.classList.toggle("hide-atz-bg", !uiPrefs.bgShader);
+    body.classList.toggle("disable-osd-marquee", !uiPrefs.osdMarquee);
+    if (cursor) cursor.style.display = "none";
+  };
+  const initUiToggleMenu = () => {
+    const menu = document.createElement("div");
+    menu.className = "ui-toggle-menu";
+    menu.innerHTML = [
+      "<button type=\"button\" data-pref=\"retroCursor\">Toggle retro cursor</button>",
+      "<button type=\"button\" data-pref=\"scanlines\">Toggle scanlines</button>",
+      "<button type=\"button\" data-pref=\"animations\">Toggle animations</button>",
+      "<button type=\"button\" data-pref=\"bgShader\">Toggle shader background</button>",
+      "<button type=\"button\" data-pref=\"osdMarquee\">Toggle OSD marquee</button>",
+      "<button type=\"button\" data-pref=\"crtStatic\">Toggle CRT static overlay</button>",
+      "<button type=\"button\" data-pref=\"osdMenu\">Toggle TV OSD menu</button>"
+    ].join("");
+    const updateMenuState = () => {
+      menu.querySelectorAll("button[data-pref]").forEach((btn) => {
+        const key = btn.getAttribute("data-pref");
+        const active = !!uiPrefs[key];
+        btn.classList.toggle("is-on", active);
+        btn.textContent = `${active ? "[on] " : "[off] "}${btn.textContent.replace(/^\[(?:on|off)\]\s+/i, "")}`;
+      });
+    };
+    const closeMenu = () => {
+      menu.classList.remove("is-open");
+    };
+    document.body.appendChild(menu);
+    updateMenuState();
+
+    document.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      updateMenuState();
+      const menuW = 240;
+      const menuH = (menu.querySelectorAll("button[data-pref]").length * 36) + 16;
+      const x = Math.min(event.clientX, window.innerWidth - menuW - 8);
+      const y = Math.min(event.clientY, window.innerHeight - menuH - 8);
+      menu.style.left = `${Math.max(8, x)}px`;
+      menu.style.top = `${Math.max(8, y)}px`;
+      menu.classList.add("is-open");
+    });
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (!menu.contains(target)) {
+        closeMenu();
+        return;
+      }
+      const button = target.closest("button[data-pref]");
+      if (!(button instanceof HTMLButtonElement)) return;
+      const pref = button.getAttribute("data-pref");
+      if (!pref || !(pref in uiPrefs)) return;
+      uiPrefs[pref] = !uiPrefs[pref];
+      if (pref === "retroCursor" && !canUseRetroCursor) uiPrefs[pref] = false;
+      applyUiPrefs();
+      saveUiPrefs();
+      updateMenuState();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu();
+    });
+    window.addEventListener("resize", closeMenu);
+  };
   document.addEventListener("DOMContentLoaded", () => {
     setTimeout(hideTransition, 1500);
   });
@@ -522,13 +884,8 @@
   });
   setTimeout(bootDone, 3600);
   setTimeout(hideTransition, 3800);
-
-  if (cursor) {
-    window.addEventListener("mousemove", (event) => {
-      cursor.style.left = `${event.clientX}px`;
-      cursor.style.top = `${event.clientY}px`;
-    });
-  }
+  applyUiPrefs();
+  initUiToggleMenu();
 
   let crtWidth = 0;
   let crtHeight = 0;
@@ -537,7 +894,7 @@
 
   const fit = () => {
     if (!canvas) return;
-    const ratio = window.devicePixelRatio || 1;
+    const ratio = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR);
     const rect = canvas.getBoundingClientRect();
     const nextWidth = Math.max(1, Math.floor(rect.width * ratio));
     const nextHeight = Math.max(1, Math.floor(rect.height * ratio));
@@ -717,7 +1074,7 @@
       gl.uniform1f(uTime, t * 0.001);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     } else if (ctx2d) {
-      const ratio = window.devicePixelRatio || 1;
+      const ratio = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR);
       ctx2d.setTransform(ratio, 0, 0, ratio, 0, 0);
       drawFallback(ctx2d, t);
     }
@@ -816,7 +1173,7 @@
         return;
       }
       lastFrameTime = time;
-      const ratio = window.devicePixelRatio || 1;
+      const ratio = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR);
       const rect = nodeMapCanvas.getBoundingClientRect();
       const nextWidth = Math.max(1, Math.floor(rect.width * ratio));
       const nextHeight = Math.max(1, Math.floor(rect.height * ratio));
@@ -957,54 +1314,44 @@
   };
 
   const cycleMenu = () => {
-    if (!menuItems.length) return;
-    const prev = menuItems[activeIndex];
-    prev?.classList.remove("active");
-    activeIndex = (activeIndex + 1) % menuItems.length;
-    const next = menuItems[activeIndex];
-    next?.classList.add("active");
-
-    if (window.anime && next) {
-      window.anime({
-        targets: next,
-        translateX: [-8, 0],
-        opacity: [0.45, 1],
-        duration: 420,
-        easing: "easeOutExpo"
-      });
-    }
+    syncCrtMenuState(mediaFeed[mediaIndex]);
   };
 
   const cycleCrtMedia = () => {
     if (!crtMedia) return;
     mediaIndex = (mediaIndex + 1) % mediaFeed.length;
     const item = mediaFeed[mediaIndex];
-    const queue = [item.src, ...(item.fallbacks || []), svgPreviewFallback(item.title)];
+    const menuLabel = getMenuLabel(item);
+    const queue = [item.src, ...(item.fallbacks || []), svgPreviewFallback(item.title)]
+      .map((candidate) => normalizeKnownGifSource(candidate));
     let idx = 0;
     const applyCandidate = () => {
       if (idx >= queue.length) return;
       crtMedia.src = queue[idx];
+      classifySignalImage(crtMedia, queue[idx]);
       idx += 1;
     };
     crtMedia.onerror = () => applyCandidate();
     applyCandidate();
-    crtCaption.textContent = item.title;
+    crtCaption.textContent = `${menuLabel.toLowerCase()} // ${item.title}`;
+    syncCrtMenuState(item);
     if (screen) {
       screen.classList.add("crt-switching");
-      setTimeout(() => screen.classList.remove("crt-switching"), 260);
+      setTimeout(() => screen.classList.remove("crt-switching"), 700);
     }
     if (window.anime) {
       window.anime({
         targets: crtMedia,
-        opacity: [0.2, 0.82],
-        duration: 650,
+        opacity: [0.12, 0.86],
+        scale: [1.02, 1],
+        duration: 1050,
         easing: "easeOutCubic"
       });
       window.anime({
         targets: crtCaption,
-        translateY: [8, 0],
-        opacity: [0.3, 1],
-        duration: 420,
+        translateY: [12, 0],
+        opacity: [0.15, 1],
+        duration: 760,
         easing: "easeOutExpo"
       });
     }
@@ -1089,6 +1436,7 @@
       });
     });
   };
+
 
   const sendYoutubeCommand = (frame, func, args = []) => {
     if (!frame?.contentWindow) return;
@@ -1397,13 +1745,14 @@ vec3 render(vec2 uv) {
     float ao = occ(p, n, 0.5) * 0.8 * occ(p, n, 1.0);
     float ld = distance(lp, p);
     float atten = 1.0 / (1.0 + ld * 0.25 + ld * ld * 0.125);
-    vec3 mat = vec3(4.0, 1.6, 0.6);
-    col += 0.08 + dif * mat * ao * atten;
-    col += spe * atten;
+    vec3 mat = vec3(5.8, 2.6, 1.2);
+    col += 0.16 + dif * mat * ao * atten * 1.25;
+    col += spe * atten * 1.4;
+    col += vec3(0.18, 0.07, 0.03) * ao * atten;
   }
   col = mix(vec3(0.0), col, exp(-0.0125 * dd * dd * dd));
-  col = tanh(col * col);
-  col = sqrt(col);
+  col = tanh(col * 1.18);
+  col = pow(col, vec3(0.82));
   col = mix(vec3(0.0), col, min(time * 0.3, 1.0));
   vec2 c = FC / R;
   c *= 1.0 - c.yx;
@@ -1455,24 +1804,14 @@ void main() {
     const moveLoc = gl.getUniformLocation(program, "move");
     const wheelLoc = gl.getUniformLocation(program, "wheel");
 
-    let moveX = 0;
-    let wheelY = 0;
+    let autoMoveX = 0;
+    let autoWheelY = 0;
     let raf = 0;
     let last = 0;
     const fpsStep = 1000 / 20;
 
-    const onMove = (event) => {
-      moveX = event.clientX || 0;
-    };
-    const onWheel = (event) => {
-      wheelY += event.deltaY * 0.08;
-      wheelY = Math.max(-420, Math.min(420, wheelY));
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("wheel", onWheel, { passive: true });
-
     const resizeBackdrop = () => {
-      const scale = Math.min(window.devicePixelRatio || 1, 1.2);
+      const scale = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR);
       const width = Math.max(1, Math.floor(window.innerWidth * scale));
       const height = Math.max(1, Math.floor(window.innerHeight * scale));
       atzCanvas.width = width;
@@ -1491,11 +1830,14 @@ void main() {
       if (document.hidden) return;
       if (now - last < fpsStep) return;
       last = now;
+      const axis = Math.min(atzCanvas.width, atzCanvas.height);
+      autoMoveX = Math.sin(now * 0.00023) * axis * 0.18;
+      autoWheelY = (Math.sin(now * 0.00017) + Math.sin(now * 0.00007) * 0.5) * 90.0;
       gl.useProgram(program);
       gl.uniform1f(timeLoc, now * 0.001);
       gl.uniform2f(resLoc, atzCanvas.width, atzCanvas.height);
-      gl.uniform2f(moveLoc, moveX, 0);
-      gl.uniform2f(wheelLoc, 0, wheelY);
+      gl.uniform2f(moveLoc, autoMoveX, 0);
+      gl.uniform2f(wheelLoc, 0, autoWheelY);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
     raf = requestAnimationFrame(draw);
@@ -1702,16 +2044,16 @@ void main() {
         card.style.setProperty("--tv-hue", String(hue));
 
         const localShot = repoImageOverrides[repo.name] || pickLocalRepoCard(repo.name, seed);
-        const repoOgShot = `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`;
-        const shot = localShot || buildRepoPoster(repo, seed);
+        const generatedShot = buildRepoPoster(repo, seed);
+        const shot = normalizeKnownGifSource(localShot || generatedShot);
         const shotFallbacks = [
           localShot,
-          repoOgShot,
+          generatedShot,
           `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/main/preview.png`,
           `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/master/preview.png`,
           `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/main/screenshot.png`,
           `https://raw.githubusercontent.com/${repo.owner.login}/${repo.name}/main/docs/preview.png`
-        ].filter((url, idx, all) => url && all.indexOf(url) === idx);
+        ].map((url) => normalizeKnownGifSource(url)).filter((url, idx, all) => url && all.indexOf(url) === idx);
         const mediaMarkup = `<img class="repo-shot" src="${shot}" alt="${repo.name} preview" data-fallbacks="${shotFallbacks.join("|")}">`;
         const override = livePageOverrides[repo.name];
         const homepage = (repo.homepage || "").trim();
@@ -1758,6 +2100,7 @@ void main() {
         repoGrid.appendChild(card);
         const image = card.querySelector("img.repo-shot");
         if (image) {
+          classifySignalImage(image, image.src);
           armGenericImageFallback(image);
           wrapMediaWithCrtEffect(card);
         }
@@ -1779,7 +2122,11 @@ void main() {
   if (canvas) requestAnimationFrame(render);
   runNodeMap();
   initAcidVisualCrossfade();
-  setInterval(cycleMenu, performanceMode ? 4600 : 3400);
+  if (crtMedia) {
+    crtMedia.src = normalizeKnownGifSource(crtMedia.getAttribute("src") || crtMedia.src);
+    classifySignalImage(crtMedia, crtMedia.src);
+  }
+  cycleMenu();
   if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 12500 : 10000);
   setInterval(pulseCrtBurst, performanceMode ? 9800 : 7800);
   initHeaderLoops();
@@ -1796,11 +2143,17 @@ void main() {
   }
 
   document.querySelectorAll("img.mosh-image").forEach((img) => {
+    img.src = normalizeKnownGifSource(img.getAttribute("src") || img.src);
+    classifySignalImage(img, img.src);
     armGenericImageFallback(img);
     if (img.complete) moshImage(img);
     else img.addEventListener("load", () => moshImage(img), { once: true });
   });
-  document.querySelectorAll("img:not(.mosh-image)").forEach((img) => armGenericImageFallback(img));
+  document.querySelectorAll("img:not(.mosh-image)").forEach((img) => {
+    img.src = normalizeKnownGifSource(img.getAttribute("src") || img.src);
+    classifySignalImage(img, img.src);
+    armGenericImageFallback(img);
+  });
   wrapMediaWithCrtEffect();
   document.addEventListener("visibilitychange", () => {
     const repoVideos = document.querySelectorAll("video.repo-shot-video");

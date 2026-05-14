@@ -34,24 +34,25 @@
       <div class="screen">
         <canvas id="crtCanvas" class="picture" width="960" height="540"></canvas>
         <img id="crtMedia" class="crt-media mosh-image" src="https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png" alt="Aday media feed">
+        <div class="crt-static-overlay" aria-hidden="true"></div>
         <div id="crtCaption" class="crt-caption">error-diffusion visual stream</div>
         <div class="overlay">
           <div class="channel">AV-1</div>
           <aside class="osd-menu">
             <header>Main Menu</header>
             <ul>
-              <li class="active"><a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">YouTube</a></li>
-              <li><a href="https://www.twitch.tv/aday_net_au" target="_blank" rel="noopener noreferrer">Twitch</a></li>
-              <li><a href="https://mastodon.social/@aday_net_au" target="_blank" rel="me noopener noreferrer">Mastodon</a></li>
-              <li><a href="https://blog.aday.net.au">Blog</a></li>
-              <li><a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">Soundcloud</a></li>
-              <li><a href="https://codepen.io/aday_net_au/" target="_blank" rel="noopener noreferrer">CodePen</a></li>
-              <li><a href="https://keys.aday.net.au">Keys</a></li>
-              <li><a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+              <li class="active"><a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">loading channel feed</a></li>
+              <li><a href="https://www.twitch.tv/aday_net_au" target="_blank" rel="noopener noreferrer">loading channel feed</a></li>
+              <li><a href="https://mastodon.social/@aday_net_au" target="_blank" rel="me noopener noreferrer">loading channel feed</a></li>
+              <li><a href="https://blog.aday.net.au" target="_blank" rel="noopener noreferrer">loading channel feed</a></li>
+              <li><a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">loading channel feed</a></li>
+              <li><a href="https://codepen.io/aday_net_au/" target="_blank" rel="noopener noreferrer">loading channel feed</a></li>
+              <li><a href="https://keys.aday.net.au" target="_blank" rel="noopener noreferrer">loading channel feed</a></li>
+              <li><a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">loading channel feed</a></li>
             </ul>
             <footer>
-              <div>Exit: <span>1</span></div>
-              <div>Select: <span>2</span></div>
+              <div>Menu: <span>BACK</span></div>
+              <div>Tune: <span>OK</span></div>
             </footer>
           </aside>
         </div>
@@ -59,34 +60,29 @@
     </section>
 
     <nav aria-label="primary" class="quicklinks">
-      <a class="quicklink-headliner" href="https://macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">Macroverse // live visual tool</a>
-      <a class="quicklink-headliner" href="https://artbastard.aday.net.au" target="_blank" rel="noopener noreferrer">ArtBastard // live control tool</a>
-      <a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">YouTube</a>
-      <a href="https://www.twitch.tv/aday_net_au" target="_blank" rel="noopener noreferrer">Twitch</a>
-      <a href="https://mastodon.social/@aday_net_au" target="_blank" rel="me noopener noreferrer">Mastodon</a>
-      <a href="https://blog.aday.net.au">Blog</a>
-      <a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">Soundcloud</a>
-      <a href="https://codepen.io/aday_net_au/" target="_blank" rel="noopener noreferrer">CodePen</a>
-      <a href="https://keys.aday.net.au">Keys</a>
-      <a href="./dj.html">DJ Console</a>
-      <a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a class="quicklink-headliner" href="https://macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">Macroverse // live shader engine</a>
+      <a class="quicklink-headliner" href="https://artbastard.aday.net.au" target="_blank" rel="noopener noreferrer">ArtBastard // live control plane</a>
+      <a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">YouTube // @aday1 channel</a>
+      <a href="https://www.twitch.tv/aday_net_au" target="_blank" rel="noopener noreferrer">Twitch // aday_net_au stream</a>
+      <a href="https://mastodon.social/@aday_net_au" target="_blank" rel="me noopener noreferrer">Mastodon // @aday_net_au profile</a>
+      <a href="https://blog.aday.net.au">Blog // dev notes archive</a>
+      <a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">Soundcloud // adaynetau tracks</a>
+      <a href="https://codepen.io/aday_net_au/" target="_blank" rel="noopener noreferrer">CodePen // aday_net_au pens</a>
+      <a href="https://keys.aday.net.au">Keys // public key vault</a>
+      <a href="./dj.html">DJ Console // dual deck mix</a>
+      <a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">GitHub // aday1 repos</a>
     </nav>
 
     <section class="panel headliner-panel">
       <h2 class="decrypt headliner-title">
-        <span class="icon-radar icon-radar-badge">
-          <img class="headliner-badge mosh-image" src="https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png" alt="glitch signal icon" data-fallbacks="https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png|https://media.demozoo.org/screens/t/dc/3c/d2ca.pl765305.jpg">
-        </span>
+        <img class="headliner-badge service-icon-lite icon-badge" src="https://raw.githubusercontent.com/feathericons/feather/master/icons/zap.svg" alt="live signal icon" data-fallbacks="/assets/repo-cards/card-circuit-blue.jpg|/assets/repo-cards/card-radar-core.jpg">
         Live AV and Stage Tools
       </h2>
       <p>Active browser tools used for live AV shows, from projector visuals to DMX/lighting control.</p>
       <div class="headliner-grid">
         <article class="card headliner-card">
-          <img class="headliner-bg mosh-image" src="https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png" alt="Macroverse cue art" data-repo="aday1/macroverse.aday.net.au">
           <div class="headliner-head">
-            <span class="icon-radar">
-              <img class="service-icon mosh-image" src="https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png" alt="Macroverse icon" data-repo="aday1/macroverse.aday.net.au">
-            </span>
+            <img class="service-icon service-icon-lite icon-macroverse" src="https://raw.githubusercontent.com/feathericons/feather/master/icons/aperture.svg" alt="Macroverse icon" data-fallbacks="/assets/repo-cards/card-radar-core.jpg|/assets/repo-cards/macroverse-loop-pingpong.gif">
             <h3>Macroverse</h3>
           </div>
           <p>Live GLSL visual performance stack.</p>
@@ -99,11 +95,8 @@
           <a href="https://github.com/aday1/macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">open source repo</a>
         </article>
         <article class="card headliner-card">
-          <img class="headliner-bg mosh-image" src="https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png" alt="ArtBastard cue art" data-repo="aday1/artbastard.aday.net.au">
           <div class="headliner-head">
-            <span class="icon-radar">
-              <img class="service-icon mosh-image" src="https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png" alt="ArtBastard icon" data-repo="aday1/artbastard.aday.net.au">
-            </span>
+            <img class="service-icon service-icon-lite icon-artbastard" src="https://raw.githubusercontent.com/feathericons/feather/master/icons/sliders.svg" alt="ArtBastard icon" data-fallbacks="/assets/repo-cards/card-dmx-console.jpg|/assets/repo-cards/artbastard-loop-pingpong.gif">
             <h3>ArtBastard</h3>
           </div>
           <p>Live browser DMX/OSC/MIDI control stack.</p>
@@ -120,19 +113,13 @@
 
     <section class="panel">
       <h2 class="decrypt">System Feed</h2>
-      <p>This portal is now a curated front page for your public output: music, gigs, art, VJ tools, creative coding experiments, web projects, and engineering repos.</p>
+      <p>Live link feed for your public channels and writing output.</p>
       <ul class="feed">
-        <li><span>now</span> rebuilt CRT/glitch style with always-on scanlines and archive-driven link map</li>
-        <li><span>live</span> project links, repo links, and subdomain apps in one place</li>
-        <li><span>blog</span> commit-driven writing at <a href="https://blog.aday.net.au">blog.aday.net.au</a></li>
-        <li><span>social</span> Mastodon linked (light activity; planned automation path).</li>
+        <li><span>mastodon</span> <a href="https://mastodon.social/@aday_net_au" target="_blank" rel="me noopener noreferrer">follow @aday_net_au</a> for social updates</li>
+        <li><span>blog</span> <a href="https://blog.aday.net.au">blog.aday.net.au</a> for commit-driven posts and timeline notes</li>
+        <li><span>latest</span> <a href="https://blog.aday.net.au/posts/2026-05-14-media-deck-and-timelog.html">Media Deck and Time Log</a> post is live</li>
+        <li><span>ingest</span> <a href="https://blog.aday.net.au">recent ingest log</a> tracks newest linked entries</li>
       </ul>
-    </section>
-
-    <section class="panel wired-panel">
-      <h2 class="decrypt">Wired Status</h2>
-      <p>Scene archives, code repos, visual assets, music output.</p>
-      <p><a href="https://codepen.io/aday_net_au/" target="_blank" rel="noopener noreferrer">CodePen node link</a> in the wired map.</p>
     </section>
 
     <section class="panel">
@@ -145,14 +132,14 @@
           <a href="https://github.com/aday1/macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">source repo</a>
           <a href="https://www.melbournefringe.com.au/whats-on/events/macroverse" target="_blank" rel="noopener noreferrer">Melbourne Fringe collab</a>
           <a href="https://nickewilson.net/2026/01/19/macroverse-nominated-for-fringe-award/" target="_blank" rel="noopener noreferrer">MacroVerse Fringe nomination write-up</a>
-          <img class="repo-shot project-loop" src="/assets/repo-cards/macroverse-loop.gif" alt="Macroverse animated visual card" data-fallbacks="/assets/repo-cards/card-radar-core.jpg">
+          <img class="repo-shot project-loop" src="/assets/repo-cards/macroverse-loop-pingpong.gif" alt="Macroverse animated visual card" data-fallbacks="/assets/repo-cards/card-radar-core.jpg">
         </article>
         <article class="card project-primary">
           <h3>ArtBastard</h3>
           <p>Web DMX performance platform and control plane: browser UI for OSC, MIDI, DMX, and Art-Net workflows, designed for live lighting and visual rigs.</p>
           <a href="https://artbastard.aday.net.au" target="_blank" rel="noopener noreferrer">live preview</a>
           <a href="https://github.com/aday1/artbastard.aday.net.au" target="_blank" rel="noopener noreferrer">source repo</a>
-          <img class="repo-shot project-loop" src="/assets/repo-cards/artbastard-loop.gif" alt="ArtBastard animated visual card" data-fallbacks="/assets/repo-cards/card-dmx-console.jpg">
+          <img class="repo-shot project-loop" src="/assets/repo-cards/artbastard-loop-pingpong.gif" alt="ArtBastard animated visual card" data-fallbacks="/assets/repo-cards/card-dmx-console.jpg">
         </article>
       </div>
     </section>
@@ -333,7 +320,7 @@
       </div>
       <div id="galleryGrid" class="gallery-grid">
         <article class="gallery-card" data-album="gigs">
-          <img class="asset-image mosh-image" src="https://opengraph.githubassets.com/1/aday1/macroverse.aday.net.au" alt="Macroverse gig scene frame" data-repo="aday1/macroverse.aday.net.au">
+          <img class="asset-image mosh-image" src="/assets/repo-cards/macroverse-loop-pingpong.gif" alt="Macroverse gig scene frame" data-fallbacks="/assets/repo-cards/card-radar-core.jpg|https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png" data-repo="aday1/macroverse.aday.net.au">
           <h3>MacroVerse stage frame</h3>
           <p class="repo-meta">album: gigs</p>
         </article>
@@ -531,7 +518,7 @@
           <h3>Code Snippets and Utility Projects</h3>
           <p><a href="https://github.com/aday1/MoveMusicSaveEditor" target="_blank" rel="noopener noreferrer">MoveMusicSaveEditor</a> - save editor for Move Music projects that lets you quickly patch controller maps, choreography data, and test-state values without manual hex/file surgery.</p>
           <p><a href="https://movemusic.com/" target="_blank" rel="noopener noreferrer">MoveMusic (official)</a> - VR music platform by Tim Arterbury.</p>
-          <img class="repo-shot mosh-image" src="https://raw.githubusercontent.com/aday1/MoveMusicSaveEditor/main/test.gif" alt="MoveMusicSaveEditor workflow preview" data-repo="aday1/MoveMusicSaveEditor">
+          <img class="repo-shot mosh-image" src="/assets/repo-cards/movemusicsaveeditor-loop-pingpong.gif" alt="MoveMusicSaveEditor workflow preview" data-fallbacks="https://raw.githubusercontent.com/aday1/MoveMusicSaveEditor/main/test.gif|/assets/repo-cards/card-daw-timeline.jpg" data-repo="aday1/MoveMusicSaveEditor">
           <p><a href="https://github.com/aday1/bitwig-mcp-server" target="_blank" rel="noopener noreferrer">bitwig-mcp-server</a> - MCP automation bridge exposing Bitwig operations to scripted and agentic workflows.</p>
           <p><a href="https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack" target="_blank" rel="noopener noreferrer">DAW Horsemen MCP pack</a> - battle-tested MCP macro pack for aggressive DAW editing, envelope shaping, and repetitive production tasks.</p>
         </article>
@@ -554,15 +541,25 @@
 
     <section class="panel">
       <h2 class="decrypt">Blog</h2>
-      <div class="grid two">
+      <div class="grid three">
         <article class="card">
           <h3>Writing and updates</h3>
           <p>Entries are generated from markdown commits in the blog repo and published automatically.</p>
           <a href="https://blog.aday.net.au">Open blog</a>
         </article>
         <article class="card">
-          <h3>Publishing source</h3>
-          <a href="https://github.com/aday1/blog.aday.net.au" target="_blank" rel="noopener noreferrer">github.com/aday1/blog.aday.net.au</a>
+          <h3>Mastodon follow</h3>
+          <p>Follow social updates, link drops, and feed cross-posts.</p>
+          <a href="https://mastodon.social/@aday_net_au" target="_blank" rel="me noopener noreferrer">mastodon.social/@aday_net_au</a>
+        </article>
+        <article class="card">
+          <h3>Latest blog entries</h3>
+          <ul>
+            <li><a href="https://blog.aday.net.au/posts/2026-05-14-media-deck-and-timelog.html" target="_blank" rel="noopener noreferrer">Media Deck and Time Log</a></li>
+            <li><a href="https://blog.aday.net.au" target="_blank" rel="noopener noreferrer">Recent ingest log</a></li>
+            <li><a href="https://blog.aday.net.au" target="_blank" rel="noopener noreferrer">Presence timeline</a></li>
+          </ul>
+          <a href="https://github.com/aday1/blog.aday.net.au" target="_blank" rel="noopener noreferrer">publishing source repo</a>
         </article>
       </div>
     </section>
