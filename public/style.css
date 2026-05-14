@@ -492,12 +492,11 @@ body.boot-seq .shell {
   box-shadow: 0 0 24px rgba(128, 201, 255, 0.4), inset 0 0 16px rgba(133, 203, 255, 0.2);
 }
 
-/* Symbolic link icons (ASCII-safe, no emoji). */
+/* Public SVG icon badges for links (free icon sources). */
 :is(.quicklinks a, .card a, .footer a) {
-  --link-icon-text: ">>";
+  --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/link-2.svg");
   --link-icon-border: rgba(129, 198, 255, 0.52);
   --link-icon-bg: rgba(12, 24, 43, 0.86);
-  --link-icon-color: #c9ecff;
   position: relative;
 }
 
@@ -507,97 +506,97 @@ body.boot-seq .shell {
 }
 
 :is(.quicklinks a, .card a, .footer a)::before {
-  content: var(--link-icon-text);
+  content: "";
   position: absolute;
   left: 9px;
   top: 50%;
   transform: translateY(-50%);
-  min-width: 14px;
+  width: 14px;
   height: 14px;
   border: 1px solid var(--link-icon-border);
-  background: var(--link-icon-bg);
-  color: var(--link-icon-color);
-  font-family: "IBM Plex Mono", "Cascadia Mono", monospace;
-  font-size: 0.52rem;
-  line-height: 12px;
-  text-align: center;
-  letter-spacing: -0.04em;
-  padding: 0 1px;
+  background:
+    var(--link-icon-url) center / 11px 11px no-repeat,
+    var(--link-icon-bg);
   box-shadow: 0 0 8px rgba(101, 191, 255, 0.16), inset 0 0 5px rgba(137, 212, 255, 0.14);
+  filter: invert(90%) sepia(20%) saturate(265%) hue-rotate(162deg) brightness(1.02) contrast(1.02);
   pointer-events: none;
 }
 
 .quicklinks a[href*="github.com"],
 .card a[href*="github.com"],
-.footer a[href*="github.com"] { --link-icon-text: "GH"; }
+.footer a[href*="github.com"] { --link-icon-url: url("https://cdn.simpleicons.org/github/9cd9ff"); }
 
 .quicklinks a[href*="youtube.com"],
 .card a[href*="youtube.com"],
-.footer a[href*="youtube.com"] { --link-icon-text: "YT"; }
+.footer a[href*="youtube.com"] { --link-icon-url: url("https://cdn.simpleicons.org/youtube/9cd9ff"); }
 
 .quicklinks a[href*="mastodon"],
 .card a[href*="mastodon"],
-.footer a[href*="mastodon"] { --link-icon-text: "MD"; }
+.footer a[href*="mastodon"] { --link-icon-url: url("https://cdn.simpleicons.org/mastodon/9cd9ff"); }
 
 .quicklinks a[href*="twitch.tv"],
 .card a[href*="twitch.tv"],
-.footer a[href*="twitch.tv"] { --link-icon-text: "TV"; }
+.footer a[href*="twitch.tv"] { --link-icon-url: url("https://cdn.simpleicons.org/twitch/9cd9ff"); }
 
 .quicklinks a[href*="soundcloud.com"],
 .card a[href*="soundcloud.com"],
-.footer a[href*="soundcloud.com"] { --link-icon-text: "SC"; }
+.footer a[href*="soundcloud.com"] { --link-icon-url: url("https://cdn.simpleicons.org/soundcloud/9cd9ff"); }
 
 .quicklinks a[href*="codepen.io"],
 .card a[href*="codepen.io"],
-.footer a[href*="codepen.io"] { --link-icon-text: "CP"; }
+.footer a[href*="codepen.io"] { --link-icon-url: url("https://cdn.simpleicons.org/codepen/9cd9ff"); }
 
 .quicklinks a[href*="blog.aday.net.au"],
 .card a[href*="blog.aday.net.au"],
-.footer a[href*="blog.aday.net.au"] { --link-icon-text: "BL"; }
+.footer a[href*="blog.aday.net.au"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/file-text.svg"); }
 
 .quicklinks a[href*="keys.aday.net.au"],
 .card a[href*="keys.aday.net.au"],
-.footer a[href*="keys.aday.net.au"] { --link-icon-text: "KY"; }
+.footer a[href*="keys.aday.net.au"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/key.svg"); }
 
 .quicklinks a[href*="dj.html"],
 .card a[href*="dj.html"],
-.footer a[href*="dj.html"] { --link-icon-text: "DJ"; }
+.footer a[href*="dj.html"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/disc.svg"); }
+
+.quicklinks a[href*="friends.html"],
+.card a[href*="friends.html"],
+.footer a[href*="friends.html"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/users.svg"); }
 
 .quicklinks a[href*="qr-zipper"],
 .card a[href*="qr-zipper"],
-.footer a[href*="qr-zipper"] { --link-icon-text: "QR"; }
+.footer a[href*="qr-zipper"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/grid.svg"); }
 
 .quicklinks a[href*="weeklybeats"],
 .card a[href*="weeklybeats"],
-.footer a[href*="weeklybeats"] { --link-icon-text: "WB"; }
+.footer a[href*="weeklybeats"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/music.svg"); }
 
 .quicklinks a[href*="macroverse"],
 .card a[href*="macroverse"],
-.footer a[href*="macroverse"] { --link-icon-text: "MV"; }
+.footer a[href*="macroverse"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/aperture.svg"); }
 
 .quicklinks a[href*="artbastard"],
 .card a[href*="artbastard"],
-.footer a[href*="artbastard"] { --link-icon-text: "AB"; }
+.footer a[href*="artbastard"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/sliders.svg"); }
 
 .quicklinks a[href*="acid-banger"],
 .card a[href*="acid-banger"],
-.footer a[href*="acid-banger"] { --link-icon-text: "A3"; }
+.footer a[href*="acid-banger"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/activity.svg"); }
 
 .quicklinks a[href*="zealpalace"],
 .card a[href*="zealpalace"],
-.footer a[href*="zealpalace"] { --link-icon-text: "ZP"; }
+.footer a[href*="zealpalace"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/cpu.svg"); }
 
 .quicklinks a[href*="errordiffusion"],
 .card a[href*="errordiffusion"],
-.footer a[href*="errordiffusion"] { --link-icon-text: "ED"; }
+.footer a[href*="errordiffusion"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/zap.svg"); }
 
 .quicklinks a[href*="movemusic"],
 .card a[href*="movemusic"],
-.footer a[href*="movemusic"] { --link-icon-text: "MM"; }
+.footer a[href*="movemusic"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/music.svg"); }
 
 .quicklinks a[href*="/packages"],
 .card a[href*="/packages"],
-.footer a[href*="/packages"] { --link-icon-text: "PK"; }
+.footer a[href*="/packages"] { --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/package.svg"); }
 
 .headliner-panel {
   border-color: #6d9ed7;

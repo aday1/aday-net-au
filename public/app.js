@@ -575,61 +575,65 @@
   ];
 
   let djDeckSources = [
+    // Stable uploads playlists (avoid deprecated listType=user_uploads/search embeds).
+    // Aday: UCIAFCgAIIABAjGuoBogfmAQ -> uploads playlist UUIAFCgAIIABAjGuoBogfmAQ
+    // Clan Analogue: UC7t6b5NpEJGq71jPu8DqBVW -> uploads playlist UU7t6b5NpEJGq71jPu8DqBVW
+    // Aisjam: UC1_w2-bcOXGXzxS79c2qnqA -> uploads playlist UU1_w2-bcOXGXzxS79c2qnqA
     {
       id: "aday-yt-uploads",
       label: "Aday YouTube uploads",
       type: "music",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/GFBpXcUfIqM?enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aday-yt-legacy",
-      label: "Aday YouTube legacy user uploads",
+      label: "Aday YouTube archive uploads",
       type: "music",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=user_uploads&list=Aday&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aday-yt-live",
-      label: "Aday YouTube live visual search",
+      label: "Aday YouTube live visual stream",
       type: "live",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aday+live+visual+set&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aday-yt-weeklybeats",
-      label: "Aday YouTube WeeklyBeats search",
+      label: "Aday YouTube WeeklyBeats clips",
       type: "weeklybeats",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aday+weeklybeats&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aisjam-yt",
-      label: "Aisjam YouTube channel search",
+      label: "Aisjam YouTube uploads",
       type: "music",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aisjam+chiptune&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UU1_w2-bcOXGXzxS79c2qnqA&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "clan-yt",
-      label: "Clan Analogue YouTube channel",
+      label: "Clan Analogue YouTube uploads",
       type: "live",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=clan+analogue+live+electronic+music&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UU7t6b5NpEJGq71jPu8DqBVW&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "hungee-funk-yt",
-      label: "Hungee Funk YouTube search",
+      label: "Aday + friends YouTube mix",
       type: "friends",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=hungee+funk+chiptune&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "friend-breakcore-yt",
-      label: "Friends breakcore channel search",
+      label: "Breakcore + scene YouTube mix",
       type: "friends",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=melbourne+breakcore+live&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UU7t6b5NpEJGq71jPu8DqBVW&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "vimeo-onlinedoof",
@@ -668,17 +672,17 @@
     },
     {
       id: "yt-livecoding",
-      label: "YouTube / Live coding visual search",
+      label: "YouTube / Live coding visual picks",
       type: "coding",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=live+coding+visuals+shader&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "yt-drone-flight",
-      label: "YouTube / Drone flight reels",
+      label: "YouTube / Drone flight reels (curated)",
       type: "drone",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=drone+flight+cinematic+fpv&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UU1_w2-bcOXGXzxS79c2qnqA&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "weeklybeats-profile",
@@ -2120,13 +2124,49 @@ void main() {
   const hydrateRepoGrid = async () => {
     if (!repoGrid) return;
     try {
-      const response = await fetch("https://api.github.com/users/aday1/repos?per_page=40&sort=updated");
+      const response = await fetch("https://api.github.com/users/aday1/repos?per_page=100&sort=updated");
       if (!response.ok) return;
       const repos = await response.json();
+      const mustIncludeRepos = new Set([
+        "macroverse.aday.net.au",
+        "artbastard.aday.net.au",
+        "error-diffusion",
+        "acid-banger",
+        "qr-zipper",
+        "MoveMusicSaveEditor",
+        "bitwig-mcp-server",
+        "The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack",
+        "ZealPalace",
+        "Cidewinder",
+        "OpenSoundLab",
+        "ArtBastard-DMX512",
+        "glsl-vjay",
+        "soundstagevr"
+      ]);
+      const skipRepoNames = new Set([
+        "blog-aday-net-au",
+        "breakcore-com-au",
+        "breakcore-forums-placeholder"
+      ]);
+      const placeholderPattern = /(placeholder|test[_-]?branch|backup|tmp|temp)/i;
+      const twoYearsMs = 1000 * 60 * 60 * 24 * 365 * 2;
+      const nowMs = Date.now();
       const picks = repos
-        .filter((repo) => !repo.fork)
+        .filter((repo) => !repo.fork && !repo.private && !repo.archived)
+        .filter((repo) => {
+          if (mustIncludeRepos.has(repo.name)) return true;
+          if (skipRepoNames.has(repo.name)) return false;
+          const description = (repo.description || "").trim();
+          if (placeholderPattern.test(repo.name) || placeholderPattern.test(description)) return false;
+          const updatedMs = new Date(repo.updated_at).getTime();
+          const stale = Number.isFinite(updatedMs) && (nowMs - updatedMs) > twoYearsMs;
+          const tinySkeleton = (repo.size || 0) < 20 && !repo.has_pages && !(repo.homepage || "").trim();
+          if (stale && tinySkeleton) return false;
+          if (!description && tinySkeleton) return false;
+          return true;
+        })
         .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-        .slice(0, performanceMode ? 6 : 8);
+        .slice(0, performanceMode ? 10 : 16);
 
       repoGrid.innerHTML = "";
       for (let i = 0; i < picks.length; i++) {
