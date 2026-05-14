@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>aday.net.au // DJ Crossfader Console</title>
+  <meta name="description" content="aday.net.au DJ Crossfader Console">
+  <meta name="theme-color" content="#100005">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <script defer src="https://w.soundcloud.com/player/api.js"></script>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="scanlines-on boot-seq keys-cuton">
+  <main class="shell">
+    <header class="masthead">
+      <p class="sysline">aday.net.au // dj console</p>
+      <div class="masthead-brand">
+        <img class="masthead-avatar" src="https://avatars.githubusercontent.com/u/1834001?v=4" alt="Aday avatar">
+        <h1 class="logo glitch decrypt" data-text="dj.crossfader">dj.crossfader</h1>
+      </div>
+      <p class="tagline decrypt-line">two-deck mix rig for archive and live source blending</p>
+    </header>
+
+    <nav aria-label="primary" class="quicklinks">
+      <a class="quicklink-headliner" href="./index.html">Back to aday.net.au</a>
+      <a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">Soundcloud</a>
+      <a href="https://blog.aday.net.au">Blog</a>
+      <a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+
+    <section class="panel dj-panel">
+      <h2 class="decrypt">DJ Crossfader Console</h2>
+      <p>Two-deck mix rig for YouTube, Vimeo, and SoundCloud sources. Load separate material into Deck A and Deck B, then blend with the crossfader.</p>
+      <p class="repo-meta">This page isolates the DJ console from the main feed for cleaner performance and no duplicated playback.</p>
+      <div class="dj-decks">
+        <article class="card dj-deck">
+          <h3>Deck A</h3>
+          <label for="deckATypeFilter">Type filter</label>
+          <select id="deckATypeFilter"></select>
+          <label for="deckASelect">Source select</label>
+          <select id="deckASelect"></select>
+          <button id="deckALoad" type="button">Load Deck A</button>
+          <div class="dj-frame-wrap">
+            <iframe id="deckAFrame" class="dj-frame" title="DJ Deck A player" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" src=""></iframe>
+          </div>
+          <p id="deckAState" class="repo-meta">deck a: waiting for source</p>
+        </article>
+        <article class="card dj-deck">
+          <h3>Deck B</h3>
+          <label for="deckBTypeFilter">Type filter</label>
+          <select id="deckBTypeFilter"></select>
+          <label for="deckBSelect">Source select</label>
+          <select id="deckBSelect"></select>
+          <button id="deckBLoad" type="button">Load Deck B</button>
+          <div class="dj-frame-wrap">
+            <iframe id="deckBFrame" class="dj-frame" title="DJ Deck B player" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" src=""></iframe>
+          </div>
+          <p id="deckBState" class="repo-meta">deck b: waiting for source</p>
+        </article>
+      </div>
+      <div class="dj-crossfader">
+        <label for="djCrossfader">Crossfader</label>
+        <input id="djCrossfader" type="range" min="0" max="100" step="1" value="50">
+        <div class="dj-meter">
+          <span id="deckALevel">A 50%</span>
+          <span id="deckBLevel">B 50%</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="retroCursor" class="retro-cursor" aria-hidden="true"></div>
+  <script src="./app.js"></script>
+</body>
+</html>

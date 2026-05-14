@@ -22,6 +22,8 @@
   const deckBLoad = document.getElementById("deckBLoad");
   const deckBFrame = document.getElementById("deckBFrame");
   const deckBState = document.getElementById("deckBState");
+  const deckATypeFilter = document.getElementById("deckATypeFilter");
+  const deckBTypeFilter = document.getElementById("deckBTypeFilter");
   const djCrossfader = document.getElementById("djCrossfader");
   const deckALevel = document.getElementById("deckALevel");
   const deckBLevel = document.getElementById("deckBLevel");
@@ -30,6 +32,13 @@
   const acidRelayLoop = document.getElementById("acidRelayLoop");
   const wbTrackSelector = document.getElementById("wbTrackSelector");
   const wbOpenTrack = document.getElementById("wbOpenTrack");
+  const wbSortSelector = document.getElementById("wbSortSelector");
+  const wbYearFilter = document.getElementById("wbYearFilter");
+  const wbWeekFilter = document.getElementById("wbWeekFilter");
+  const wbPageSelect = document.getElementById("wbPageSelect");
+  const wbPagePrev = document.getElementById("wbPagePrev");
+  const wbPageNext = document.getElementById("wbPageNext");
+  const wbTrackMeta = document.getElementById("wbTrackMeta");
   const galleryFilters = [...document.querySelectorAll(".gallery-filter")];
   const galleryCards = [...document.querySelectorAll(".gallery-card")];
   const prefersReducedMotion = !!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
@@ -312,64 +321,110 @@
     {
       id: "aday-yt-uploads",
       label: "Aday YouTube uploads",
+      type: "music",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed/GFBpXcUfIqM?enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aday-yt-live",
       label: "Aday YouTube live visual search",
+      type: "live",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed?listType=search&list=aday+live+visual+set&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aisjam-yt",
       label: "Aisjam YouTube feature",
+      type: "music",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed/GFBpXcUfIqM?enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "clan-yt",
       label: "Clan Analogue YouTube channel",
+      type: "live",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed?listType=search&list=clan+analogue+live+electronic+music&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "vimeo-onlinedoof",
       label: "Vimeo / Onlinedoof archive clip",
+      type: "archive",
       kind: "vimeo",
       embed: "https://player.vimeo.com/video/35409288?autoplay=0&title=0&byline=0&portrait=0"
     },
     {
       id: "vimeo-binaural",
       label: "Vimeo / Binaural Percolator",
+      type: "archive",
       kind: "vimeo",
       embed: "https://player.vimeo.com/video/84038041?autoplay=0&title=0&byline=0&portrait=0"
     },
     {
       id: "aday-sc-profile",
       label: "Aday SoundCloud profile",
+      type: "music",
       kind: "soundcloud",
       embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
     },
     {
       id: "aday-sc-tracks",
       label: "Aday SoundCloud tracks",
+      type: "music",
       kind: "soundcloud",
       embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/adaynetau/tracks&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
     },
     {
       id: "clan-sc",
       label: "Clan Analogue SoundCloud",
+      type: "music",
       kind: "soundcloud",
       embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/clan-analogue&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
     },
     {
       id: "yt-livecoding",
       label: "YouTube / Live coding visual search",
+      type: "coding",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed?listType=search&list=live+coding+visuals+shader&enablejsapi=1&playsinline=1&rel=0"
+    },
+    {
+      id: "yt-drone-flight",
+      label: "YouTube / Drone flight reels",
+      type: "drone",
+      kind: "youtube",
+      embed: "https://www.youtube-nocookie.com/embed?listType=search&list=drone+flight+cinematic+fpv&enablejsapi=1&playsinline=1&rel=0"
     }
   ];
+
+  const inferDjSourceType = (source) => {
+    if (source.type) return source.type;
+    const haystack = `${source.label || ""} ${source.id || ""} ${source.embed || ""}`.toLowerCase();
+    if (haystack.includes("drone") || haystack.includes("fpv") || haystack.includes("flight")) return "drone";
+    if (haystack.includes("live coding") || haystack.includes("shader") || haystack.includes("coding")) return "coding";
+    if (haystack.includes("archive") || haystack.includes("vimeo")) return "archive";
+    if (haystack.includes("live")) return "live";
+    return "music";
+  };
+
+  const djTypeLabel = (type) => {
+    if (type === "all") return "All";
+    if (!type) return "Other";
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  };
+
+  const getDjTypes = () => {
+    const types = [...new Set(djDeckSources.map((source) => inferDjSourceType(source)))];
+    return ["all", ...types];
+  };
+
+  const buildDeckOptionHtml = (typeFilter = "all") => {
+    const activeType = typeFilter || "all";
+    return djDeckSources
+      .filter((source) => activeType === "all" || inferDjSourceType(source) === activeType)
+      .map((source) => `<option value="${source.id}">${source.label}</option>`)
+      .join("");
+  };
 
   const djDeckState = {
     a: { frame: deckAFrame, status: deckAState, kind: "", widget: null, sourceId: "" },
@@ -391,7 +446,7 @@
     "acid-banger": "/assets/repo-cards/card-daw-timeline.jpg",
     "blog.aday.net.au": "/assets/repo-cards/card-forum-map.jpg",
     "aday-net-au": "/assets/repo-cards/card-synth-rack.jpg",
-    "keys-aday-net-au": "/assets/repo-cards/card-circuit-blue.jpg",
+    "keys-aday-net-au": "/assets/repo-cards/card-security-lock.jpg",
     "breakcore-forums-placeholder": "/assets/repo-cards/card-system-tree.jpg",
     "breakcore-com-au": "/assets/repo-cards/card-social-map-crt.jpg",
     OpenSoundLab: "/assets/repo-cards/card-audio-rack.jpg",
@@ -941,6 +996,10 @@
     crtMedia.onerror = () => applyCandidate();
     applyCandidate();
     crtCaption.textContent = item.title;
+    if (screen) {
+      screen.classList.add("crt-switching");
+      setTimeout(() => screen.classList.remove("crt-switching"), 260);
+    }
     if (window.anime) {
       window.anime({
         targets: crtMedia,
@@ -1116,31 +1175,171 @@
     });
   };
 
-  const initWeeklyBeatsNode = () => {
-    if (!wbTrackSelector || !wbOpenTrack) return;
+  const initWeeklyBeatsNode = async () => {
+    if (!wbTrackSelector || !wbOpenTrack || !wbSortSelector || !wbYearFilter || !wbWeekFilter || !wbPageSelect || !wbPagePrev || !wbPageNext || !wbTrackMeta) return;
+    let tracks = [];
+    let filtered = [];
+    let page = 1;
+    const pageSize = 10;
+
+    const sortTracks = (rows) => {
+      const mode = wbSortSelector.value || "year-desc";
+      const list = [...rows];
+      list.sort((a, b) => {
+        if (mode === "year-asc") return (a.year - b.year) || ((a.week || 99) - (b.week || 99));
+        if (mode === "week-asc") return ((a.week || 99) - (b.week || 99)) || (b.year - a.year);
+        if (mode === "week-desc") return ((b.week || 0) - (a.week || 0)) || (b.year - a.year);
+        if (mode === "title-asc") return String(a.title || "").localeCompare(String(b.title || ""));
+        return (b.year - a.year) || ((a.week || 99) - (b.week || 99));
+      });
+      return list;
+    };
+
+    const renderTrackOptions = () => {
+      const year = wbYearFilter.value || "all";
+      const week = wbWeekFilter.value || "all";
+      filtered = sortTracks(tracks.filter((item) => {
+        const yearPass = year === "all" || String(item.year) === year;
+        const weekPass = week === "all" || String(item.week || "") === week;
+        return yearPass && weekPass;
+      }));
+      const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
+      page = Math.max(1, Math.min(page, pages));
+
+      wbPageSelect.innerHTML = "";
+      for (let i = 1; i <= pages; i++) {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = `page ${i} / ${pages}`;
+        if (i === page) opt.selected = true;
+        wbPageSelect.appendChild(opt);
+      }
+
+      const start = (page - 1) * pageSize;
+      const pageItems = filtered.slice(start, start + pageSize);
+      wbTrackSelector.innerHTML = "";
+      pageItems.forEach((item) => {
+        const opt = document.createElement("option");
+        opt.value = item.url;
+        opt.textContent = `${item.year} / W${item.week || "?"} / ${item.title}`;
+        opt.dataset.description = item.description || "";
+        wbTrackSelector.appendChild(opt);
+      });
+      wbPagePrev.disabled = page <= 1;
+      wbPageNext.disabled = page >= pages;
+      if (!pageItems.length) {
+        wbTrackMeta.textContent = "No tracks in this filter selection.";
+      } else {
+        wbTrackSelector.selectedIndex = 0;
+        const desc = pageItems[0].description || "No track description available.";
+        wbTrackMeta.textContent = desc;
+      }
+    };
+
+    try {
+      const resp = await fetch("./data/weeklybeats_tracks.json", { cache: "no-store" });
+      if (!resp.ok) throw new Error("weeklybeats manifest load failed");
+      const payload = await resp.json();
+      tracks = Array.isArray(payload.tracks) ? payload.tracks : [];
+    } catch {
+      tracks = [];
+    }
+
+    const years = [...new Set(tracks.map((item) => item.year).filter((v) => Number.isFinite(v)))].sort((a, b) => b - a);
+    years.forEach((y) => {
+      const opt = document.createElement("option");
+      opt.value = String(y);
+      opt.textContent = String(y);
+      wbYearFilter.appendChild(opt);
+    });
+    const weeks = [...new Set(tracks.map((item) => item.week).filter((v) => Number.isFinite(v)))].sort((a, b) => a - b);
+    weeks.forEach((w) => {
+      const opt = document.createElement("option");
+      opt.value = String(w);
+      opt.textContent = `week ${w}`;
+      wbWeekFilter.appendChild(opt);
+    });
+
+    wbSortSelector.addEventListener("change", () => {
+      page = 1;
+      renderTrackOptions();
+    });
+    wbYearFilter.addEventListener("change", () => {
+      page = 1;
+      renderTrackOptions();
+    });
+    wbWeekFilter.addEventListener("change", () => {
+      page = 1;
+      renderTrackOptions();
+    });
+    wbPageSelect.addEventListener("change", () => {
+      page = Number(wbPageSelect.value) || 1;
+      renderTrackOptions();
+    });
+    wbPagePrev.addEventListener("click", () => {
+      page = Math.max(1, page - 1);
+      renderTrackOptions();
+    });
+    wbPageNext.addEventListener("click", () => {
+      page += 1;
+      renderTrackOptions();
+    });
+    wbTrackSelector.addEventListener("change", () => {
+      const opt = wbTrackSelector.selectedOptions[0];
+      wbTrackMeta.textContent = opt?.dataset.description || "No track description available.";
+    });
     wbOpenTrack.addEventListener("click", () => {
       const url = wbTrackSelector.value;
       if (!url) return;
       window.open(url, "_blank", "noopener,noreferrer");
     });
+
+    renderTrackOptions();
   };
 
   const initDjCrossfader = () => {
     if (!deckASelect || !deckBSelect || !deckALoad || !deckBLoad || !djCrossfader) return;
-    const optionHtml = djDeckSources
-      .map((source) => `<option value="${source.id}">${source.label}</option>`)
-      .join("");
-    deckASelect.innerHTML = optionHtml;
-    deckBSelect.innerHTML = optionHtml;
-    deckASelect.value = "vimeo-onlinedoof";
-    deckBSelect.value = "aday-sc-profile";
+    const applyTypeFilterOptions = (filterEl) => {
+      if (!filterEl) return;
+      const typeOptions = getDjTypes()
+        .map((type) => `<option value="${type}">${djTypeLabel(type)}</option>`)
+        .join("");
+      filterEl.innerHTML = typeOptions;
+      filterEl.value = "all";
+    };
+    const loadOptionsForDeck = (deckKey) => {
+      const isDeckA = deckKey === "a";
+      const selectEl = isDeckA ? deckASelect : deckBSelect;
+      const filterEl = isDeckA ? deckATypeFilter : deckBTypeFilter;
+      const fallbackSource = isDeckA ? "vimeo-onlinedoof" : "aday-sc-profile";
+      const currentValue = selectEl.value;
+      const optionHtml = buildDeckOptionHtml(filterEl?.value || "all");
+      selectEl.innerHTML = optionHtml;
+      if (!selectEl.options.length) {
+        selectEl.innerHTML = `<option value="${fallbackSource}">fallback source</option>`;
+      }
+      if ([...selectEl.options].some((opt) => opt.value === currentValue)) {
+        selectEl.value = currentValue;
+      } else if ([...selectEl.options].some((opt) => opt.value === fallbackSource)) {
+        selectEl.value = fallbackSource;
+      } else {
+        selectEl.selectedIndex = 0;
+      }
+      mountDeck(deckKey, selectEl.value);
+    };
+
+    applyTypeFilterOptions(deckATypeFilter);
+    applyTypeFilterOptions(deckBTypeFilter);
+    loadOptionsForDeck("a");
+    loadOptionsForDeck("b");
+
     deckALoad.addEventListener("click", () => mountDeck("a", deckASelect.value));
     deckBLoad.addEventListener("click", () => mountDeck("b", deckBSelect.value));
     deckASelect.addEventListener("change", () => mountDeck("a", deckASelect.value));
     deckBSelect.addEventListener("change", () => mountDeck("b", deckBSelect.value));
+    deckATypeFilter?.addEventListener("change", () => loadOptionsForDeck("a"));
+    deckBTypeFilter?.addEventListener("change", () => loadOptionsForDeck("b"));
     djCrossfader.addEventListener("input", applyCrossfader);
-    mountDeck("a", deckASelect.value);
-    mountDeck("b", deckBSelect.value);
     applyCrossfader();
   };
 
@@ -1395,8 +1594,8 @@
   if (canvas) requestAnimationFrame(render);
   runNodeMap();
   initAcidVisualCrossfade();
-  setInterval(cycleMenu, performanceMode ? 4200 : 3000);
-  if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 6800 : 5200);
+  setInterval(cycleMenu, performanceMode ? 4600 : 3400);
+  if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 12500 : 10000);
   setInterval(pulseCrtBurst, performanceMode ? 9800 : 7800);
   initHeaderLoops();
   randomizeFrameGeneration();
