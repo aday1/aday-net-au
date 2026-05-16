@@ -858,8 +858,8 @@
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
   /* Overlap shell reveal with the tail of the CRT wash so load does not feel stuck behind a dead-air overlay */
-  const CUTON_BOOT_MS = 520;
-  const CUTON_HIDE_MS = 960;
+  const CUTON_BOOT_MS = 2550;
+  const CUTON_HIDE_MS = 3150;
   let cutOnScheduled = false;
   const runCutOnSequence = (forceImmediate = false) => {
     if (forceImmediate) {
@@ -922,7 +922,7 @@
     const menu = document.createElement("div");
     menu.className = "ui-toggle-menu";
     menu.innerHTML = [
-      "<button type=\"button\" data-pref=\"retroCursor\">Toggle VGA pointer (Win 3.x vibe)</button>",
+      "<button type=\"button\" data-pref=\"retroCursor\">Toggle Amiga pointer (macroverse shape, white/cyan)</button>",
       "<button type=\"button\" data-pref=\"scanlines\">Toggle scanlines</button>",
       "<button type=\"button\" data-pref=\"animations\">Toggle animations</button>",
       "<button type=\"button\" data-pref=\"bgShader\">Toggle shader background</button>",
@@ -978,10 +978,10 @@
     window.addEventListener("resize", closeMenu);
   };
   document.addEventListener("DOMContentLoaded", () => {
-    runCutOnSequence();
+    runCutOnSequence(prefersReducedMotion);
   });
   window.addEventListener("load", () => {
-    runCutOnSequence();
+    runCutOnSequence(prefersReducedMotion);
   });
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) runCutOnSequence(true);
