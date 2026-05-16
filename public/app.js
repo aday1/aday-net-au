@@ -856,8 +856,9 @@
 
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
-  const CUTON_BOOT_MS = 1450;
-  const CUTON_HIDE_MS = 1850;
+  /* Overlap shell reveal with the tail of the CRT wash so load does not feel stuck behind a dead-air overlay */
+  const CUTON_BOOT_MS = 520;
+  const CUTON_HIDE_MS = 960;
   let cutOnScheduled = false;
   const runCutOnSequence = (forceImmediate = false) => {
     if (forceImmediate) {

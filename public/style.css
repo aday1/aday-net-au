@@ -2183,7 +2183,7 @@ body.animations-off *::after {
   }
 }
 
-/* Slow rounded CRT power-on override */
+/* CRT power-on overlay: keys.aday palette, faster bloom + scan sweep */
 body.boot-seq .shell {
   opacity: 0;
   visibility: hidden;
@@ -2194,13 +2194,21 @@ body.boot-seq .shell {
 body:not(.boot-seq) .shell {
   opacity: 1;
   visibility: visible;
-  animation: crtShellReveal 700ms cubic-bezier(0.16, 0.82, 0.16, 1) both;
+  animation: crtShellReveal 480ms cubic-bezier(0.2, 0.9, 0.18, 1) both;
 }
 
 .page-transition {
-  transition: opacity 320ms ease;
-  background: radial-gradient(circle at 50% 48%, rgba(15, 10, 24, 0.98), rgba(1, 1, 5, 1));
+  transition: opacity 260ms ease;
+  background: radial-gradient(circle at 50% 48%, rgba(14, 0, 6, 0.98), rgba(0, 0, 0, 1));
   animation: none;
+}
+
+body.keys-cuton .page-transition::before {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 105, 132, 0.2) 0 1px, transparent 1px 4px),
+    repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.09) 0 1px, transparent 1px 3px);
+  opacity: 0.52;
+  animation: portalCutOnNoise 128ms steps(2, end) infinite;
 }
 
 .page-transition::after {
@@ -2212,14 +2220,14 @@ body:not(.boot-seq) .shell {
   height: auto;
   transform: translate(-50%, -50%);
   border-radius: 50% 50% 48% 48% / 58% 58% 42% 42%;
-  border: 1px solid rgba(188, 232, 255, 0.5);
+  border: 1px solid rgba(255, 164, 188, 0.48);
   background:
-    radial-gradient(circle at 50% 50%, rgba(112, 196, 255, 0.44), rgba(70, 118, 255, 0.12) 48%, rgba(0, 0, 0, 0) 76%),
-    radial-gradient(circle at 50% 44%, rgba(255, 140, 190, 0.2), rgba(0, 0, 0, 0) 62%);
+    radial-gradient(circle at 50% 52%, rgba(255, 120, 144, 0.4), rgba(255, 78, 118, 0.14) 48%, rgba(0, 0, 0, 0) 76%),
+    radial-gradient(circle at 50% 46%, rgba(255, 216, 224, 0.22), rgba(0, 0, 0, 0) 63%);
   box-shadow:
-    inset 0 0 80px rgba(160, 230, 255, 0.24),
-    0 0 120px rgba(105, 160, 255, 0.22);
-  animation: cutOnCrtBloom 1.65s cubic-bezier(0.14, 0.74, 0.18, 1) forwards;
+    inset 0 0 86px rgba(255, 144, 170, 0.24),
+    0 0 120px rgba(255, 86, 126, 0.2);
+  animation: cutOnCrtBloom 740ms cubic-bezier(0.14, 0.74, 0.18, 1) forwards;
 }
 
 .page-transition-inner {
@@ -2237,9 +2245,9 @@ body:not(.boot-seq) .shell {
   height: 4px;
   transform: translate(-50%, -50%);
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(180, 230, 255, 0), rgba(190, 235, 255, 1), rgba(180, 230, 255, 0));
-  box-shadow: 0 0 26px rgba(180, 240, 255, 0.9), 0 0 56px rgba(110, 172, 255, 0.72);
-  animation: cutOnScanlineSlow 1.25s cubic-bezier(0.2, 0.82, 0.14, 1) forwards;
+  background: linear-gradient(90deg, rgba(255, 220, 228, 0), rgba(255, 236, 240, 1), rgba(255, 220, 228, 0));
+  box-shadow: 0 0 26px rgba(255, 220, 228, 0.95), 0 0 58px rgba(255, 118, 152, 0.8);
+  animation: cutOnScanlineSlow 520ms cubic-bezier(0.2, 0.82, 0.14, 1) forwards;
 }
 
 .page-transition-inner::after {
@@ -2251,35 +2259,41 @@ body:not(.boot-seq) .shell {
   aspect-ratio: 4 / 3;
   transform: translate(-50%, -50%);
   border-radius: 50% 50% 48% 48% / 58% 58% 42% 42%;
-  border: 1px solid rgba(164, 222, 255, 0.35);
+  border: 1px solid rgba(255, 180, 200, 0.38);
   opacity: 0;
-  animation: cutOnRoundHalo 1.4s ease-out forwards;
+  animation: cutOnRoundHalo 620ms ease-out forwards;
+}
+
+@keyframes portalCutOnNoise {
+  0% { transform: translate(0, 0); opacity: 0.28; }
+  50% { transform: translate(-1.6%, 0.95%); opacity: 0.56; }
+  100% { transform: translate(1.1%, -0.85%); opacity: 0.32; }
 }
 
 @keyframes cutOnScanlineSlow {
   0% { opacity: 0.2; transform: translate(-50%, -50%) scaleX(0.03) scaleY(0.05); }
   32% { opacity: 1; transform: translate(-50%, -50%) scaleX(0.92) scaleY(0.08); }
-  60% { opacity: 0.9; transform: translate(-50%, -50%) scaleX(1) scaleY(0.42); }
+  58% { opacity: 0.9; transform: translate(-50%, -50%) scaleX(1) scaleY(0.42); }
   100% { opacity: 0; transform: translate(-50%, -50%) scaleX(1.04) scaleY(1); }
 }
 
 @keyframes cutOnCrtBloom {
-  0% { opacity: 0.18; filter: blur(0.6px) brightness(1.6); transform: translate(-50%, -50%) scale(0.74, 0.04); }
-  34% { opacity: 0.96; filter: blur(0) brightness(1.28); transform: translate(-50%, -50%) scale(1, 0.16); }
-  64% { opacity: 0.9; filter: blur(0) brightness(1.1); transform: translate(-50%, -50%) scale(1.02, 0.86); }
-  100% { opacity: 0.18; filter: blur(0.15px) brightness(1); transform: translate(-50%, -50%) scale(1); }
+  0% { opacity: 0.22; filter: blur(0.55px) brightness(1.75); transform: translate(-50%, -50%) scale(0.72, 0.04); }
+  34% { opacity: 0.98; filter: blur(0) brightness(1.38); transform: translate(-50%, -50%) scale(1, 0.18); }
+  62% { opacity: 0.9; filter: blur(0) brightness(1.14); transform: translate(-50%, -50%) scale(1.02, 0.88); }
+  100% { opacity: 0.16; filter: blur(0.1px) brightness(1); transform: translate(-50%, -50%) scale(1); }
 }
 
 @keyframes cutOnRoundHalo {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.18); }
-  28% { opacity: 0.88; transform: translate(-50%, -50%) scale(0.76); }
+  26% { opacity: 0.88; transform: translate(-50%, -50%) scale(0.76); }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.08); }
 }
 
 @keyframes crtShellReveal {
-  0% { opacity: 0; filter: brightness(2.6) contrast(1.35); transform: scale(1, 0.02); }
-  42% { opacity: 0.92; filter: brightness(1.65) contrast(1.2); transform: scale(1, 0.2); }
-  76% { opacity: 1; filter: brightness(1.18) contrast(1.08); transform: scale(1.01, 0.95); }
+  0% { opacity: 0; filter: brightness(2.75) contrast(1.38); transform: scale(1, 0.02); }
+  36% { opacity: 0.92; filter: brightness(2.05) contrast(1.22); transform: scale(1, 0.12); }
+  68% { opacity: 1; filter: brightness(1.32) contrast(1.09); transform: scale(1.015, 0.93); }
   100% { opacity: 1; filter: brightness(1) contrast(1); transform: scale(1); }
 }
 
