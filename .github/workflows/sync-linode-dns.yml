@@ -1,0 +1,44 @@
+name: sync-linode-dns
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-dns-and-nginx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout macroverse stack (nginx + DNS script)
+        uses: actions/checkout@v4
+        with:
+          repository: aday1/macroverse.aday.net.au
+          ref: main
+          path: macroverse-stack
+
+      - name: Upsert Cloudflare A records for Linode stack
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_NAME: aday.net.au
+        run: bash macroverse-stack/ops/sync-cloudflare-dns.sh
+
+      - name: Deploy nginx config on Linode
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: ${{ secrets.LINODE_USER }}
+          key: ${{ secrets.LINODE_SSH_KEY }}
+          script: |
+            flock /tmp/macroverse-deploy.lock bash -lc '
+              set -e
+              cd ~/compose/macroverse.aday.net.au
+              if [ -f nginx/auth/aday.htpasswd ] && ! git ls-files --error-unmatch nginx/auth/aday.htpasswd >/dev/null 2>&1; then
+                mv nginx/auth/aday.htpasswd "nginx/auth/aday.htpasswd.bak.$(date +%s)"
+              fi
+              git pull --ff-only origin main
+              if [ -f nginx/auth/aday.htpasswd ]; then
+                sed -i "s/\r$//" nginx/auth/aday.htpasswd
+              fi
+              docker compose pull
+              docker compose up -d --remove-orphans
+              docker compose exec -T edge_nginx nginx -t
+              docker restart edge_nginx
+            '
