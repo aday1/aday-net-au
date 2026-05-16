@@ -477,6 +477,43 @@ body.cuton-settled .shell {
   animation: crtOverlayNoise 0.12s steps(2, end) infinite, crtOverlayDrift 0.9s steps(3, end) infinite;
 }
 
+.screen.crt-about-compact .crt-about-portrait-fx,
+.screen.crt-about-compact .crt-about-radar {
+  display: none !important;
+}
+
+.screen.crt-about-compact .crt-static-overlay {
+  opacity: 0.28;
+  animation: none;
+}
+
+.screen.crt-about-compact.crt-about-active .crt-media.crt-about-portrait {
+  animation: none;
+  filter: contrast(1.08) saturate(1.05);
+}
+
+.screen.crt-about-compact .crt-about-bio {
+  max-height: 32%;
+  left: auto;
+  width: min(340px, 52%);
+}
+
+.crt-about-teaser {
+  margin: 0 0 8px;
+  color: #c5f0ff;
+  line-height: 1.4;
+}
+
+.crt-about-more {
+  margin: 0 0 8px;
+  font-size: 0.68rem;
+}
+
+.crt-about-more a {
+  color: #9effc8;
+  letter-spacing: 0.06em;
+}
+
 .crt-about-bio {
   position: absolute;
   right: 12px;

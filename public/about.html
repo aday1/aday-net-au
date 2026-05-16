@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>aday.net.au // about</title>
+  <meta name="description" content="About Aday (Adrian Richardson) - chiptune, breakcore, live visuals, Clan Analogue, MacroVerse">
+  <meta name="theme-color" content="#100005">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="apple-touch-icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./crt-cuton.css">
+  <link rel="stylesheet" href="./about-page.css">
+  <link rel="stylesheet" href="./friend-exit-transition.css">
+  <script src="./cuton-preflight.js"></script>
+</head>
+<body class="scanlines-on boot-seq microbee-off">
+  <div id="pageTransition" class="page-transition" aria-hidden="true">
+    <div class="page-transition-inner"></div>
+  </div>
+  <main class="shell">
+    <header class="masthead">
+      <p class="sysline">aday.net.au // about</p>
+      <div class="masthead-brand">
+        <img class="masthead-avatar" src="https://avatars.githubusercontent.com/u/1834001?v=4" alt="Aday avatar">
+        <h1 class="logo glitch decrypt" data-text="about.artist.file">about.artist.file</h1>
+      </div>
+      <p class="tagline decrypt-line">clan analogue profile, macroverse fringe context, live AV practice</p>
+    </header>
+
+    <nav aria-label="primary" class="quicklinks">
+      <a class="quicklink-local" href="./index.html">Portal // crt landing page</a>
+      <a class="quicklink-local" href="./about.html">About // artist file</a>
+      <a class="quicklink-local" href="./projects.html">Projects // stacks and colabs</a>
+      <a class="quicklink-local" href="./friends.html">Friends // scene links and allies</a>
+      <a class="quicklink-local" href="./media.html">Media // channels and archives</a>
+      <a class="quicklink-headliner" href="https://macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">Macroverse // live shader engine</a>
+      <a class="quicklink-satellite" href="https://blog.aday.net.au">Blog // dev notes archive</a>
+    </nav>
+
+    <section class="panel" id="aboutPageBody" aria-label="About Aday">
+      <p>Loading artist file...</p>
+    </section>
+
+    <footer class="footer signal-footer">
+      <a href="./index.html">return to portal</a>
+      <a href="https://www.clananalogue.org/artists/aday/" target="_blank" rel="noopener noreferrer">Clan Analogue profile</a>
+      <a href="https://macroverse.aday.net.au/about.html" target="_blank" rel="noopener noreferrer">MacroVerse about</a>
+    </footer>
+  </main>
+  <script defer src="./friend-exit-transition.js"></script>
+  <script defer src="./about-page.js"></script>
+  <script>
+    (function () {
+      var skip = document.documentElement.classList.contains("cuton-skip");
+      var done = function () {
+        document.body.classList.remove("boot-seq");
+        document.body.classList.add("cuton-settled");
+        var pt = document.getElementById("pageTransition");
+        if (pt) pt.classList.add("hidden");
+      };
+      if (skip) {
+        done();
+        return;
+      }
+      setTimeout(function () {
+        done();
+        try { sessionStorage.setItem("aday-cuton-done-v1", "1"); } catch (e) {}
+        document.documentElement.classList.add("cuton-skip");
+      }, 900);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+.about-hero {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.about-portrait {
+  width: 100%;
+  border: 1px solid #6f2032;
+  border-radius: 4px;
+  display: block;
+  box-shadow: 0 0 0 1px rgba(255, 156, 178, 0.18);
+}
+
+.about-credit {
+  margin: 0.45rem 0 0;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.about-lede {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #c8f5d4;
+}
+
+.about-section {
+  margin: 0 0 1.1rem;
+}
+
+.about-section h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: #ff9fc8;
+  text-transform: uppercase;
+}
+
+.about-section p {
+  margin: 0;
+  line-height: 1.55;
+  color: #bce9ea;
+}
+
+.about-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+
+.about-tag {
+  border: 1px solid #3ea962;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d7ffe1;
+}
+
+.about-links {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+}
+
+.about-links a {
+  margin-right: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .about-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .about-portrait {
+    max-width: 280px;
+  }
+}

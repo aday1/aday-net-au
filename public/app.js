@@ -67,6 +67,8 @@
 
   const aboutBioFallback = {
     name: "Aday (Adrian Richardson)",
+    teaser:
+      "Chiptune, breakcore, and live visuals from Melbourne. Clan Analogue artist; MacroVerse Fringe alum. Trackers, VJ nights, and browser shader rigs.",
     imageCredit: "Clan Analogue // 8bit domination AU geoshed",
     clanBio: "Old-school machines (Amiga 1200, Atari 1040 STE, LSDJ Gameboy, MidiNES) meet trackers, grooveboxes, and VSTs. Hack/DIY wiring via MIDI and OSC. I VJ at breakcore and chiptune nights, build audio-reactive installs, and ran WeeklyBeats from 2012-2018. Clan Analogue releases: CA055M, CA053.",
     macroverseBio: "MacroVerse was a live sonic/visual work with Reductionist (Nick Wilson) for Melbourne Fringe at Abbotsford Convent: universe-scale energy, micro-instrument performance, and projected video that bent time. macroverse.aday.net.au extends that live-visual practice as a browser shader/VJ instrument.",
@@ -81,7 +83,7 @@
       title: "about // artist identity",
       menuLabel: "About",
       osdTitle: "Profile + bios",
-      href: "https://www.clananalogue.org/artists/aday/",
+      href: "./about.html",
       fallbacks: [
         "https://www.clananalogue.org/wp-content/uploads/2019/10/aday-8bit-domination-AU-geoshed-768x512.jpg",
         "https://content.pouet.net/logos/neuroxfra.gif"
@@ -338,9 +340,15 @@
     if (!osdOpenLink) return;
     const href = getOsdItemHref(item);
     if (href) {
+      const localLink = /^\.{0,2}\//.test(href) || (href.startsWith("/") && !href.startsWith("//"));
       osdOpenLink.href = href;
-      osdOpenLink.target = "_blank";
-      osdOpenLink.rel = "noopener noreferrer";
+      if (localLink) {
+        osdOpenLink.removeAttribute("target");
+        osdOpenLink.removeAttribute("rel");
+      } else {
+        osdOpenLink.target = "_blank";
+        osdOpenLink.rel = "noopener noreferrer";
+      }
       const label = (item?.menuLabel || "channel").toUpperCase();
       osdOpenLink.textContent = `LINK // ${label}`;
       osdOpenLink.classList.remove("is-disabled");
@@ -1630,15 +1638,15 @@
   const renderAboutBioPanel = () => {
     if (!crtAboutBioScroll) return;
     const bio = aboutBioData;
+    const teaser = bio.teaser || aboutBioFallback.teaser;
     const tagHtml = (bio.tags || [])
+      .slice(0, 4)
       .map((tag) => `<span class="crt-about-tag">${tag}</span>`)
       .join("");
     crtAboutBioScroll.innerHTML = [
       `<p class="crt-about-name">${bio.name}</p>`,
-      `<p class="crt-about-credit">${bio.imageCredit || ""}</p>`,
-      `<p class="crt-about-block"><span class="crt-about-src">CLAN //</span> ${bio.clanBio}</p>`,
-      `<p class="crt-about-block"><span class="crt-about-src">MACROVERSE //</span> ${bio.macroverseBio}</p>`,
-      `<p class="crt-about-links"><a href="https://www.clananalogue.org/artists/aday/" target="_blank" rel="noopener noreferrer">clan analogue</a> · <a href="https://macroverse.aday.net.au/about.html" target="_blank" rel="noopener noreferrer">macroverse about</a></p>`,
+      `<p class="crt-about-teaser">${teaser}</p>`,
+      `<p class="crt-about-more"><a href="./about.html">read full artist file //</a></p>`,
       `<div class="crt-about-tags">${tagHtml}</div>`
     ].join("");
   };
@@ -1653,20 +1661,18 @@
   const setCrtAboutMode = (active) => {
     if (!screen) return;
     screen.classList.toggle("crt-about-active", active);
+    screen.classList.toggle("crt-about-compact", active);
     if (crtAboutBio) crtAboutBio.hidden = !active;
-    if (crtAboutPortraitFx) crtAboutPortraitFx.hidden = !active;
-    if (crtAboutRadar) crtAboutRadar.hidden = !active;
-    if (canvas) canvas.style.opacity = active ? "0.18" : "";
+    if (crtAboutPortraitFx) crtAboutPortraitFx.hidden = true;
+    if (crtAboutRadar) crtAboutRadar.hidden = true;
+    if (canvas) canvas.style.opacity = active ? "0.28" : "";
     if (crtMedia) {
       crtMedia.classList.toggle("crt-about-portrait", active);
     }
     if (active) {
       renderAboutBioPanel();
-      syncAboutPortraitFx();
-      if (!prefersReducedMotion && window.crtAboutRadar) {
-        window.crtAboutRadar.start(crtAboutRadar);
-      }
-    } else if (window.crtAboutRadar) {
+    }
+    if (window.crtAboutRadar) {
       window.crtAboutRadar.stop();
     }
   };
