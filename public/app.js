@@ -837,6 +837,7 @@
         || node.classList.contains("headliner-badge")
         || node.classList.contains("masthead-avatar");
       wrap.className = inlineMedia ? "crt-media-wrap crt-media-wrap-inline" : "crt-media-wrap";
+      if (node.classList.contains("loop-ease-soft")) wrap.classList.add("crt-media-ease-soft");
       parent.insertBefore(wrap, node);
       wrap.appendChild(node);
     });
@@ -921,7 +922,7 @@
     const menu = document.createElement("div");
     menu.className = "ui-toggle-menu";
     menu.innerHTML = [
-      "<button type=\"button\" data-pref=\"retroCursor\">Toggle retro cursor</button>",
+      "<button type=\"button\" data-pref=\"retroCursor\">Toggle VGA pointer (Win 3.x vibe)</button>",
       "<button type=\"button\" data-pref=\"scanlines\">Toggle scanlines</button>",
       "<button type=\"button\" data-pref=\"animations\">Toggle animations</button>",
       "<button type=\"button\" data-pref=\"bgShader\">Toggle shader background</button>",
@@ -1191,25 +1192,77 @@
     let hoverNodeId = "";
     const liveNodes = new Map();
 
+    const NODE_PAD_X = 52;
+    const NODE_PAD_Y = 40;
+    const MAX_LAYER = 4;
     const nodes = [
-      { id: "aday", x: 0.50, y: 0.25, r: 7, c: "#9eff89", label: "aday.net.au", url: "https://aday.net.au" },
-      { id: "macroverse", x: 0.27, y: 0.50, r: 6, c: "#9fd4ff", label: "macroverse", url: "https://macroverse.aday.net.au" },
-      { id: "artbastard", x: 0.73, y: 0.50, r: 6, c: "#9fd4ff", label: "artbastard", url: "https://artbastard.aday.net.au" },
-      { id: "acid", x: 0.20, y: 0.74, r: 6, c: "#d697ff", label: "acid-banger", url: "https://aday1.github.io/acid-banger/" },
-      { id: "blog", x: 0.50, y: 0.74, r: 6, c: "#9eff89", label: "blog", url: "https://blog.aday.net.au" },
-      { id: "codepen", x: 0.80, y: 0.74, r: 6, c: "#88f7ff", label: "codepen", url: "https://codepen.io/aday_net_au/" },
-      { id: "clan", x: 0.12, y: 0.33, r: 5, c: "#b2ffa8", label: "clan", url: "https://www.clananalogue.org/artists/aday/" },
-      { id: "demozoo", x: 0.88, y: 0.33, r: 5, c: "#b2ffa8", label: "demozoo", url: "https://demozoo.org/sceners/28006/" }
+      { id: "aday", layer: 0, slot: 0, r: 8, c: "#9eff89", label: "aday.net.au", url: "https://aday.net.au" },
+      { id: "macroverse", layer: 1, slot: 0, r: 6, c: "#9fd4ff", label: "macroverse", url: "https://macroverse.aday.net.au" },
+      { id: "artbastard", layer: 1, slot: 1, r: 6, c: "#9fd4ff", label: "artbastard", url: "https://artbastard.aday.net.au" },
+      { id: "keys", layer: 1, slot: 2, r: 5.5, c: "#7ecfff", label: "keys", url: "https://keys.aday.net.au" },
+      { id: "blog", layer: 1, slot: 3, r: 5.5, c: "#9eff89", label: "blog", url: "https://blog.aday.net.au" },
+      { id: "qrzip", layer: 1, slot: 4, r: 5.5, c: "#8af0ff", label: "qr-zipper", url: "https://qr-zipper.aday.net.au" },
+      { id: "gh_mv", layer: 2, slot: 0, r: 5, c: "#6bb8ff", label: "gh macroverse", url: "https://aday1.github.io/macroverse.aday.net.au/" },
+      { id: "gh_ab", layer: 2, slot: 1, r: 5, c: "#6bb8ff", label: "gh artbastard", url: "https://aday1.github.io/artbastard.aday.net.au/" },
+      { id: "gh_blog", layer: 2, slot: 2, r: 5, c: "#6bb8ff", label: "gh blog", url: "https://aday1.github.io/blog-aday-net-au/" },
+      { id: "gh_qr", layer: 2, slot: 3, r: 5, c: "#6bb8ff", label: "gh qr-zip", url: "https://aday1.github.io/qr-zipper/qr-zipper.html" },
+      { id: "acid", layer: 3, slot: 0, r: 5.5, c: "#d697ff", label: "acid-banger", url: "https://aday1.github.io/acid-banger/" },
+      { id: "zeal", layer: 3, slot: 1, r: 5.5, c: "#c9a6ff", label: "ZealPalace", url: "https://aday1.github.io/ZealPalace/" },
+      { id: "errdiff", layer: 3, slot: 2, r: 5.5, c: "#e0a8ff", label: "error-diffusion", url: "https://aday1.github.io/error-diffusion/" },
+      { id: "codepen", layer: 4, slot: 0, r: 5, c: "#88f7ff", label: "codepen", url: "https://codepen.io/aday_net_au/" },
+      { id: "github", layer: 4, slot: 1, r: 5, c: "#9ecbff", label: "GitHub", url: "https://github.com/aday1" },
+      { id: "clan", layer: 4, slot: 2, r: 5, c: "#b2ffa8", label: "Clan Analogue", url: "https://www.clananalogue.org/artists/aday/" },
+      { id: "demozoo", layer: 4, slot: 3, r: 5, c: "#b2ffa8", label: "demozoo", url: "https://demozoo.org/sceners/28006/" }
     ];
     const edges = [
-      ["aday", "macroverse"], ["aday", "artbastard"], ["aday", "blog"], ["aday", "codepen"],
-      ["aday", "acid"], ["aday", "clan"], ["aday", "demozoo"], ["macroverse", "artbastard"],
-      ["blog", "acid"], ["codepen", "artbastard"]
+      { a: "aday", b: "macroverse", w: 1 },
+      { a: "aday", b: "artbastard", w: 1 },
+      { a: "aday", b: "keys", w: 1 },
+      { a: "aday", b: "blog", w: 1 },
+      { a: "aday", b: "qrzip", w: 1 },
+      { a: "aday", b: "codepen", w: 0.75 },
+      { a: "aday", b: "github", w: 0.75 },
+      { a: "aday", b: "clan", w: 0.65 },
+      { a: "aday", b: "demozoo", w: 0.65 },
+      { a: "macroverse", b: "artbastard", w: 0.72 },
+      { a: "macroverse", b: "gh_mv", w: 0.82 },
+      { a: "artbastard", b: "gh_ab", w: 0.82 },
+      { a: "blog", b: "gh_blog", w: 0.82 },
+      { a: "qrzip", b: "gh_qr", w: 0.82 },
+      { a: "blog", b: "acid", w: 0.45 },
+      { a: "blog", b: "errdiff", w: 0.45 },
+      { a: "github", b: "gh_mv", w: 0.35 },
+      { a: "github", b: "gh_ab", w: 0.35 },
+      { a: "codepen", b: "artbastard", w: 0.4 },
+      { a: "codepen", b: "macroverse", w: 0.38 },
+      { a: "keys", b: "gh_blog", w: 0.28 }
     ];
-    const particles = Array.from({ length: 22 }, (_, i) => ({
-      seed: i * 0.71 + 1,
-      speed: 0.11 + Math.random() * 0.24
-    }));
+    const layerSlotCounts = () => {
+      const m = new Map();
+      nodes.forEach((n) => {
+        m.set(n.layer, Math.max(m.get(n.layer) || 0, n.slot + 1));
+      });
+      return m;
+    };
+    const synapseControl = (ax, ay, bx, by, edgeIdx) => {
+      const mx = (ax + bx) * 0.5;
+      const my = (ay + by) * 0.5;
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+      const dir = edgeIdx % 2 === 0 ? 1 : -1;
+      const bend = 14 + (edgeIdx % 5) * 2.4;
+      return { cx: mx + nx * bend * dir, cy: my + ny * bend * dir };
+    };
+    const quadPoint = (ax, ay, cx, cy, bx, by, u) => {
+      const om = 1 - u;
+      return {
+        x: om * om * ax + 2 * om * u * cx + u * u * bx,
+        y: om * om * ay + 2 * om * u * cy + u * u * by
+      };
+    };
     let isVisible = true;
     if ("IntersectionObserver" in window) {
       const observer = new IntersectionObserver((entries) => {
@@ -1290,37 +1343,49 @@
       const h = rect.height;
       ctx.clearRect(0, 0, w, h);
       const t = time * 0.001;
-
+      const jit = prefersReducedMotion ? 0 : 1;
+      const slotCounts = layerSlotCounts();
       const map = new Map();
       nodes.forEach((n, i) => {
-        const nx = n.x * w + Math.sin(t * 0.7 + i) * 6;
-        const ny = n.y * h + Math.cos(t * 0.9 + i * 0.5) * 5;
+        const slotsInLayer = slotCounts.get(n.layer) || 1;
+        const colX = NODE_PAD_X + (n.layer / MAX_LAYER) * (w - NODE_PAD_X * 2);
+        let rowY;
+        if (slotsInLayer <= 1) {
+          rowY = h * 0.5;
+        } else {
+          rowY = NODE_PAD_Y + (n.slot / (slotsInLayer - 1)) * (h - NODE_PAD_Y * 2);
+        }
+        const nx = colX + jit * Math.sin(t * 0.62 + i * 0.37) * 1.1;
+        const ny = rowY + jit * Math.cos(t * 0.58 + i * 0.31) * 0.9;
         map.set(n.id, { ...n, px: nx, py: ny });
       });
       liveNodes.clear();
       map.forEach((n) => liveNodes.set(n.id, n));
 
-      edges.forEach(([a, b], idx) => {
-        const na = map.get(a);
-        const nb = map.get(b);
+      edges.forEach((edge, idx) => {
+        const na = map.get(edge.a);
+        const nb = map.get(edge.b);
         if (!na || !nb) return;
-        const pulse = 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.2 + idx));
-        ctx.strokeStyle = `rgba(130, 210, 255, ${pulse})`;
-        ctx.lineWidth = 1.2;
+        const wgt = Math.min(1, Math.max(0.12, edge.w));
+        const { cx, cy } = synapseControl(na.px, na.py, nb.px, nb.py, idx);
+        const baseA = 0.18 + 0.52 * wgt;
+        const lineW = 0.85 + 1.15 * wgt;
+        ctx.strokeStyle = `rgba(120, 200, 255, ${baseA})`;
+        ctx.lineWidth = lineW;
         ctx.beginPath();
         ctx.moveTo(na.px, na.py);
-        ctx.lineTo(nb.px, nb.py);
+        ctx.quadraticCurveTo(cx, cy, nb.px, nb.py);
         ctx.stroke();
-      });
-
-      particles.forEach((particle) => {
-        const t2 = t * particle.speed + particle.seed;
-        const px = (0.5 + 0.45 * Math.sin(t2 * 1.3)) * w;
-        const py = (0.5 + 0.45 * Math.cos(t2 * 0.9)) * h;
-        const size = 1 + 1.6 * (0.5 + 0.5 * Math.sin(t2 * 2.6));
-        ctx.fillStyle = "rgba(150, 255, 190, 0.42)";
+        const u = (t * 0.14 + idx * 0.041) % 1;
+        const pulse = quadPoint(na.px, na.py, cx, cy, nb.px, nb.py, u);
+        const glow = 2 + 2.2 * wgt;
+        ctx.fillStyle = `rgba(200, 255, 230, ${0.35 + 0.5 * wgt})`;
         ctx.beginPath();
-        ctx.arc(px, py, size, 0, Math.PI * 2);
+        ctx.arc(pulse.x, pulse.y, glow + 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = `rgba(235, 255, 248, ${0.55 + 0.4 * wgt})`;
+        ctx.beginPath();
+        ctx.arc(pulse.x, pulse.y, glow * 0.45, 0, Math.PI * 2);
         ctx.fill();
       });
 

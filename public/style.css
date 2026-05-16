@@ -14,6 +14,11 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; min-height: 100%; }
 
+html {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 body {
   font-family: "Consolas", "Lucida Console", "Courier New", monospace;
   background: radial-gradient(circle at 50% -20%, #22040d 0%, #15030a 48%, #0c0105 100%);
@@ -199,21 +204,35 @@ body.boot-seq .shell {
   animation: tvOn 600ms cubic-bezier(0.2, 0.7, 0.1, 1), bootFlicker 860ms steps(1, end);
 }
 
-.masthead { padding-bottom: 14px; border-bottom: 1px dashed #405577; }
-.sysline { color: #9bb0ce; margin: 0 0 6px; letter-spacing: 0.08em; }
+.masthead { padding-bottom: 14px; border-bottom: 1px dashed #405577; overflow-x: clip; max-width: 100%; }
+.sysline { color: #9bb0ce; margin: 0 0 6px; letter-spacing: 0.08em; word-break: break-word; overflow-wrap: anywhere; }
 .logo {
   margin: 0;
   font-size: clamp(2.8rem, 12vw, 7.6rem);
   line-height: 0.9;
   color: #d4ecff;
   text-shadow: -2px 0 rgba(255, 38, 110, 0.45), 2px 0 rgba(0, 217, 255, 0.42), 0 0 18px rgba(116, 225, 255, 0.35);
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  hyphens: auto;
 }
-.glitch { position: relative; display: inline-block; animation: none; }
+.glitch {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  vertical-align: top;
+  animation: none;
+}
 .glitch::before, .glitch::after { content: attr(data-text); position: absolute; inset: 0; pointer-events: none; }
 .glitch::before { transform: translateX(2px); color: rgba(255, 100, 180, 0.4); clip-path: polygon(0 0, 100% 0, 100% 48%, 0 48%); animation: none; }
 .glitch::after { transform: translateX(-2px); color: rgba(85, 245, 255, 0.42); clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%); animation: none; }
-.tagline { margin: 8px 0 0; color: var(--muted); }
-.tagline { letter-spacing: 0.03em; }
+.tagline { margin: 8px 0 0; color: var(--muted); letter-spacing: 0.03em; word-break: break-word; overflow-wrap: anywhere; max-width: 100%; }
 
 .crt-rig {
   margin: 18px 0 18px;
@@ -1099,6 +1118,22 @@ body.boot-seq .shell {
   animation: crtMediaStaticFlicker 0.95s steps(2, end) infinite;
 }
 
+/* Headliner Macroverse / ArtBastard grok GIFs: CRT overlays were ~1s stepped (strobe).
+   Slower ease-based drift reads as a gentle CRT hum, not a flash sequence. */
+.crt-media-ease-soft::before {
+  opacity: 0.5;
+  animation: crtMediaScanSlow 5.8s ease-in-out infinite;
+}
+
+.crt-media-ease-soft::after {
+  animation: crtMediaGlowSoft 7s ease-in-out infinite;
+  opacity: 0.38;
+}
+
+.crt-media-ease-soft > img.signal-animated {
+  filter: saturate(1.1) contrast(1.06);
+}
+
 .mosh-wrap {
   position: relative;
 }
@@ -1638,41 +1673,21 @@ a { cursor: pointer; }
 
 .retro-cursor {
   position: fixed;
-  width: 20px;
-  height: 28px;
+  inset: -100px auto auto -100px;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-2px, -2px);
-  mix-blend-mode: normal;
-  animation: cursorPulse 0.9s steps(1, end) infinite;
-  opacity: 1;
-  display: none;
-}
-
-.retro-cursor::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #ff2137;
-  clip-path: polygon(0 0, 0 100%, 24% 79%, 40% 100%, 52% 92%, 36% 72%, 70% 72%);
-  box-shadow: 0 0 6px rgba(255, 28, 55, 0.45);
-}
-
-.retro-cursor::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 235, 238, 0.9);
-  clip-path: polygon(6% 8%, 6% 82%, 22% 69%, 36% 87%, 43% 82%, 28% 64%, 57% 64%, 57% 56%, 22% 56%, 22% 24%);
-  opacity: 0.75;
-  mix-blend-mode: screen;
+  visibility: hidden;
 }
 
 body.retro-cursor-on,
 body.retro-cursor-on a,
 body.retro-cursor-on button,
 body.retro-cursor-on [role="button"] {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='30' viewBox='0 0 22 30'%3E%3Cpath d='M2 2V27L8 21L11 29L14 27L11 19H20V2Z' fill='%23ffffff' stroke='%23000000' stroke-width='1.2'/%3E%3Cpath d='M4 4V22L8 18L10.4 25L11.7 24.2L9.6 17H17V4Z' fill='%23cfd6db'/%3E%3Cpath d='M6 24L8 22L11 29L14 27L11 19H13' fill='none' stroke='%23000000' stroke-width='1' opacity='0.58'/%3E%3C/svg%3E") 2 2, auto !important;
+  cursor: url("/assets/cursors/win31-pointer.svg") 1 1, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath fill='%23fff' stroke='%23000' stroke-width='1' d='M1 1 L1 22 L11 13 L17 26 L21 23 L13 11 L26 11 L26 6 L13 6 L13 1 Z'/%3E%3C/svg%3E") 1 1, auto !important;
 }
 
 body.hide-crt-static .crt-static-overlay {
@@ -1747,6 +1762,13 @@ body.animations-off *::after {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.masthead-brand .logo {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .masthead-avatar {
@@ -1791,6 +1813,11 @@ body.animations-off *::after {
   .masthead-avatar {
     width: 46px;
     height: 46px;
+  }
+
+  .logo {
+    font-size: clamp(1.55rem, 7vw, 3.4rem);
+    line-height: 1.08;
   }
 
   .panel {
@@ -1991,6 +2018,17 @@ body.animations-off *::after {
   60% { transform: translate(1px, 1px); opacity: 0.36; }
 }
 
+/* Smooth scanline drift for loop-ease-soft cards (replaces stepped crtMediaScanTwitch). */
+@keyframes crtMediaScanSlow {
+  0%, 100% { background-position: 0 0, 0 0; opacity: 0.48; }
+  50% { background-position: 0 2px, 2px -1px; opacity: 0.55; }
+}
+
+@keyframes crtMediaGlowSoft {
+  0%, 100% { transform: translate(0, 0); opacity: 0.34; }
+  50% { transform: translate(0.5px, -0.5px); opacity: 0.44; }
+}
+
 @keyframes cutOnNoise {
   0% { transform: translate(0, 0); opacity: 0.32; }
   50% { transform: translate(-2%, 1%); opacity: 0.62; }
@@ -2165,11 +2203,6 @@ body.animations-off *::after {
   0%, 100% { transform: translate(0, 0); opacity: 0.22; }
   35% { transform: translate(-1.1%, 0.6%); opacity: 0.32; }
   70% { transform: translate(0.8%, -0.7%); opacity: 0.26; }
-}
-
-@keyframes cursorPulse {
-  0%, 100% { transform: translate(-2px, -2px) scale(1); opacity: 1; }
-  50% { transform: translate(-2px, -2px) scale(1.06); opacity: 0.84; }
 }
 
 @keyframes iconPulseSoft {

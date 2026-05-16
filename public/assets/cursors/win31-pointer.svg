@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <title>chunky monochrome pointer</title>
+  <!-- CC0 1.0: original vector for aday.net.au (retro homage, not traced from proprietary cursors). -->
+  <path fill="#ffffff" stroke="#000000" stroke-width="1"
+    d="M1 1 L1 22 L11 13 L17 26 L21 23 L13 11 L26 11 L26 6 L13 6 L13 1 Z"/>
+</svg>
