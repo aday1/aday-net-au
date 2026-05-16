@@ -82,8 +82,9 @@
           <button id="scRandom" type="button">Random SoundCloud mode</button>
         </article>
         <article class="card">
-          <h3>WeeklyBeats track browser</h3>
-          <div class="wb-controls">
+          <h3>WeeklyBeats + DJ</h3>
+          <p class="repo-meta">Full archive section below. Mix on <a href="./dj.html">DJ Console</a>.</p>
+          <div class="wb-controls" hidden>
             <label for="wbSortSelector">Sort</label>
             <select id="wbSortSelector">
               <option value="year-desc">year desc</option>
@@ -117,8 +118,40 @@
       </div>
     </section>
 
+    <section id="mediaWbSection" class="panel blog-wb-section media-wb-section">
+      <h2 class="decrypt">WeeklyBeats archive</h2>
+      <p class="repo-meta"><a href="https://weeklybeats.com/music/aday" target="_blank" rel="noopener noreferrer">weeklybeats.com/music/aday</a></p>
+      <div class="wb-archive-controls">
+        <label for="mediaWbSectionSearch">Search</label>
+        <input class="wb-search" id="mediaWbSectionSearch" type="search" />
+        <label for="mediaWbSectionYear">Year</label>
+        <select class="wb-year-filter" id="mediaWbSectionYear"><option value="all">all years</option></select>
+        <label for="mediaWbSectionWeek">Week</label>
+        <select class="wb-week-filter" id="mediaWbSectionWeek"><option value="all">all weeks</option></select>
+        <label for="mediaWbSectionSort">Sort</label>
+        <select class="wb-sort" id="mediaWbSectionSort">
+          <option value="year-desc">year desc</option>
+          <option value="year-asc">year asc</option>
+          <option value="week-desc">week desc</option>
+          <option value="week-asc">week asc</option>
+          <option value="title-asc">title asc</option>
+        </select>
+        <span class="wb-track-count"></span>
+      </div>
+      <div class="wb-archive-stage">
+        <ul class="wb-track-list"></ul>
+        <div class="wb-player-pane">
+          <audio class="wb-audio-player" controls preload="metadata"></audio>
+          <iframe class="wb-embed-frame" title="WeeklyBeats track" loading="lazy" hidden></iframe>
+          <p class="wb-track-meta">Loading catalog...</p>
+        </div>
+      </div>
+    </section>
+
+    <div id="mediaYtMount"></div>
+
     <section class="panel">
-      <h2 class="decrypt">Video Index + Channels</h2>
+      <h2 class="decrypt">Video links</h2>
       <div class="grid three">
         <article class="card">
           <h3>Onlinedoof archive clip</h3>
@@ -129,7 +162,8 @@
           <a href="https://vimeo.com/84038041" target="_blank" rel="noopener noreferrer">vimeo.com/84038041</a>
         </article>
         <article class="card">
-          <h3>YouTube Channel</h3>
+          <h3>Channels</h3>
+          <a href="https://www.youtube.com/@aday_net_au" target="_blank" rel="noopener noreferrer">youtube.com/@aday_net_au</a>
           <a href="https://www.youtube.com/@aday1" target="_blank" rel="noopener noreferrer">youtube.com/@aday1</a>
           <a href="https://soundcloud.com/adaynetau" target="_blank" rel="noopener noreferrer">soundcloud.com/adaynetau</a>
         </article>
@@ -201,6 +235,7 @@
   <div id="retroCursor" class="retro-cursor" aria-hidden="true"></div>
   <script defer src="./crt-microbee.js"></script>
   <script defer src="./friend-exit-transition.js"></script>
+  <script src="./media-archive.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

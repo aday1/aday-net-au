@@ -3,6 +3,7 @@
   const canvas = document.getElementById("crtCanvas");
   const atzCanvas = document.getElementById("atzCanvas");
   const crtMedia = document.getElementById("crtMedia");
+  const crtAcidPan = document.getElementById("crtAcidPan");
   const crtCaption = document.getElementById("crtCaption");
   const crtAboutRadar = document.getElementById("crtAboutRadar");
   const crtAboutBio = document.getElementById("crtAboutBio");
@@ -114,12 +115,16 @@
       fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
     },
     {
-      src: "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif",
-      title: "acid-banger animated preview",
+      src: "/assets/repo-cards/acid-banger-strip-2.png",
+      title: "acid-banger visual",
       menuLabel: "Acid Banger",
-      osdTitle: "Original visual loop",
+      osdTitle: "Slow pan reel",
       href: "https://aday1.github.io/acid-banger/",
-      fallbacks: ["https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"]
+      acidPanStrip: "/assets/repo-cards/acid-banger-strip-1.png",
+      fallbacks: [
+        "/assets/repo-cards/acid-banger-strip-1.png",
+        "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png"
+      ]
     },
     {
       src: "/assets/repo-cards/macroverse-loop-pingpong.gif",
@@ -629,37 +634,19 @@
   ];
 
   let djDeckSources = [
-    // Stable uploads playlists (avoid deprecated listType=user_uploads/search embeds).
-    // Aday: UCIAFCgAIIABAjGuoBogfmAQ -> uploads playlist UUIAFCgAIIABAjGuoBogfmAQ
-    // Clan Analogue: UC7t6b5NpEJGq71jPu8DqBVW -> uploads playlist UU7t6b5NpEJGq71jPu8DqBVW
-    // Aisjam: UC1_w2-bcOXGXzxS79c2qnqA -> uploads playlist UU1_w2-bcOXGXzxS79c2qnqA
     {
-      id: "aday-yt-uploads",
-      label: "Aday YouTube uploads",
+      id: "aday-yt-net-au",
+      label: "YouTube @aday_net_au uploads",
       type: "music",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUdKgN2c92DhDON71FBwGq4g&enablejsapi=1&playsinline=1&rel=0"
     },
     {
-      id: "aday-yt-legacy",
-      label: "Aday YouTube archive uploads",
+      id: "aday-yt-aday1",
+      label: "YouTube @aday1 uploads",
       type: "music",
       kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
-    },
-    {
-      id: "aday-yt-live",
-      label: "Aday YouTube live visual stream",
-      type: "live",
-      kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
-    },
-    {
-      id: "aday-yt-weeklybeats",
-      label: "Aday YouTube WeeklyBeats clips",
-      type: "weeklybeats",
-      kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
+      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUv2idZd22rCQsmcBMh0AAeg&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aisjam-yt",
@@ -674,13 +661,6 @@
       type: "live",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UU7t6b5NpEJGq71jPu8DqBVW&enablejsapi=1&playsinline=1&rel=0"
-    },
-    {
-      id: "hungee-funk-yt",
-      label: "Aday + friends YouTube mix",
-      type: "friends",
-      kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "friend-breakcore-yt",
@@ -725,15 +705,8 @@
       embed: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/clan-analogue&color=%2300b4ff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
     },
     {
-      id: "yt-livecoding",
-      label: "YouTube / Live coding visual picks",
-      type: "coding",
-      kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUIAFCgAIIABAjGuoBogfmAQ&enablejsapi=1&playsinline=1&rel=0"
-    },
-    {
-      id: "yt-drone-flight",
-      label: "YouTube / Drone flight reels (curated)",
+      id: "yt-drone-aisjam",
+      label: "YouTube / Aisjam drone reels",
       type: "drone",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UU1_w2-bcOXGXzxS79c2qnqA&enablejsapi=1&playsinline=1&rel=0"
@@ -775,11 +748,21 @@
       if (!response.ok) return;
       const payload = await response.json();
       const tracks = Array.isArray(payload?.tracks) ? payload.tracks : [];
-      const extraSources = tracks.slice(0, 40).map((track, index) => {
+      const extraSources = tracks.map((track, index) => {
         const year = Number.isFinite(track?.year) ? track.year : "----";
         const week = Number.isFinite(track?.week) ? `W${track.week}` : "W?";
         const title = String(track?.title || `track-${index + 1}`).trim();
         const slug = sanitizeDjSourceId(track?.slug || `${year}-${week}-${title}`);
+        const audioUrl = String(track?.audio_url || "").trim();
+        if (audioUrl) {
+          return {
+            id: `wb-track-${slug || index + 1}`,
+            label: `WeeklyBeats / ${year} ${week} / ${title}`,
+            type: "weeklybeats",
+            kind: "audio",
+            embed: audioUrl
+          };
+        }
         return {
           id: `wb-track-${slug || index + 1}`,
           label: `WeeklyBeats / ${year} ${week} / ${title}`,
@@ -826,8 +809,8 @@
   };
 
   const djDeckState = {
-    a: { frame: deckAFrame, status: deckAState, kind: "", widget: null, sourceId: "" },
-    b: { frame: deckBFrame, status: deckBState, kind: "", widget: null, sourceId: "" }
+    a: { frame: deckAFrame, status: deckAState, kind: "", widget: null, audio: null, sourceId: "" },
+    b: { frame: deckBFrame, status: deckBState, kind: "", widget: null, audio: null, sourceId: "" }
   };
 
   const livePageOverrides = {
@@ -842,7 +825,7 @@
     "macroverse.aday.net.au": "/assets/repo-cards/macroverse-loop-pingpong.gif",
     "artbastard.aday.net.au": "/assets/repo-cards/artbastard-loop-pingpong.gif",
     "error-diffusion": "/assets/repo-cards/card-security-lock.jpg",
-    "acid-banger": "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif",
+    "acid-banger": "/assets/repo-cards/acid-banger-strip-2.png",
     "blog.aday.net.au": "/assets/repo-cards/card-forum-map.jpg",
     "aday-net-au": "/assets/repo-cards/card-synth-rack.jpg",
     "keys-aday-net-au": "/assets/repo-cards/card-security-lock.jpg",
@@ -874,7 +857,7 @@
     if (lower.includes("sound") || lower.includes("audio") || lower.includes("music") || lower.includes("daw")) return "/assets/repo-cards/card-audio-rack.jpg";
     if (lower.includes("blog") || lower.includes("forum")) return "/assets/repo-cards/card-forum-map.jpg";
     if (lower.includes("breakcore")) return "/assets/repo-cards/card-social-map-crt.jpg";
-    if (lower.includes("acid")) return "https://raw.githubusercontent.com/aday1/acid-banger/main/acid-banger-visual.gif";
+    if (lower.includes("acid")) return "/assets/repo-cards/acid-banger-strip-2.png";
     if (lower.includes("move") && lower.includes("music")) return "/assets/repo-cards/movemusicsaveeditor-loop-pingpong.gif";
     if (!localRepoCardPool.length) return "";
     return localRepoCardPool[seed % localRepoCardPool.length];
@@ -955,7 +938,12 @@
     randomizeFrameGeneration();
     initRandomImageDeck();
     initSoundcloudDeck();
-    initWeeklyBeatsNode();
+    if (document.getElementById("mediaWbSection") && window.AdayMediaArchive) {
+      void window.AdayMediaArchive.initWeeklybeatsArchive({ rootId: "mediaWbSection" });
+      void window.AdayMediaArchive.hydrateYoutubeSection("mediaYtMount", "mediaYtSection");
+    } else {
+      initWeeklyBeatsNode();
+    }
     initGalleryFilters();
     void initDjCrossfader();
     if ("requestIdleCallback" in window) {
@@ -1662,6 +1650,23 @@
     crtAboutPortraitFx.style.backgroundImage = `url("${src}")`;
   };
 
+  const setAcidPanMode = (active, stripSrc = "") => {
+    if (!screen) return;
+    screen.classList.toggle("crt-acid-pan-on", active);
+    if (crtAcidPan) {
+      if (active && stripSrc) {
+        crtAcidPan.src = stripSrc;
+        crtAcidPan.hidden = false;
+      } else {
+        crtAcidPan.hidden = true;
+        crtAcidPan.removeAttribute("src");
+      }
+    }
+    if (crtMedia) {
+      crtMedia.classList.toggle("crt-acid-pan-backing", active);
+    }
+  };
+
   const setCrtAboutMode = (active) => {
     if (!screen) return;
     screen.classList.toggle("crt-about-active", active);
@@ -1687,7 +1692,9 @@
     mediaIndex = normalized;
     const item = mediaFeed[mediaIndex];
     const isAbout = item?.mode === "about";
+    const isAcidPan = !!item?.acidPanStrip;
     setCrtAboutMode(isAbout);
+    setAcidPanMode(isAcidPan && !isAbout, item?.acidPanStrip || "");
     const menuLabel = getMenuLabel(item);
     const queue = [item.src, ...(item.fallbacks || []), svgPreviewFallback(item.title)]
       .map((candidate) => normalizeKnownGifSource(candidate));
@@ -1713,6 +1720,7 @@
     }
     if (isAbout && crtMedia.complete) moshImage(crtMedia);
     else if (isAbout) crtMedia.addEventListener("load", () => moshImage(crtMedia), { once: true });
+    else if (isAcidPan) crtMedia.classList.remove("mosh-image");
 
     if (window.anime) {
       window.anime({
@@ -1851,6 +1859,10 @@
       deck.widget.setVolume(vol);
       return;
     }
+    if (deck.kind === "audio" && deck.audio) {
+      deck.audio.volume = vol / 100;
+      return;
+    }
   };
 
   const applyCrossfader = () => {
@@ -1871,9 +1883,29 @@
     deck.kind = source.kind;
     deck.sourceId = source.id;
     deck.widget = null;
+    if (deck.audio) {
+      deck.audio.pause();
+      deck.audio.remove();
+      deck.audio = null;
+    }
     if (deck.status) {
       deck.status.textContent = `${deckKey === "a" ? "deck a" : "deck b"}: ${source.label}`;
     }
+    if (source.kind === "audio") {
+      deck.frame.src = "about:blank";
+      deck.frame.hidden = true;
+      const audio = document.createElement("audio");
+      audio.className = "dj-audio-deck";
+      audio.controls = true;
+      audio.src = source.embed;
+      audio.preload = "metadata";
+      deck.frame.parentElement?.appendChild(audio);
+      deck.audio = audio;
+      audio.addEventListener("canplay", () => applyCrossfader(), { once: true });
+      audio.play().catch(() => {});
+      return;
+    }
+    deck.frame.hidden = false;
     deck.frame.src = source.embed;
     deck.frame.addEventListener("load", () => {
       if (source.kind === "soundcloud" && window.SC && typeof window.SC.Widget === "function") {

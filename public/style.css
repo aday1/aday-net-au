@@ -317,6 +317,55 @@ body.cuton-settled .shell {
   filter: saturate(1.22) contrast(1.1);
 }
 
+.crt-acid-pan-layer {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 0;
+  width: 250%;
+  max-width: none;
+  height: 135%;
+  object-fit: cover;
+  opacity: 0.9;
+  filter: saturate(1.12) contrast(1.06);
+  transform: translateY(-50%) translateX(0);
+  animation: acidStripPan 44s linear infinite;
+  pointer-events: none;
+}
+
+.screen.crt-acid-pan-on .crt-media.crt-acid-pan-backing {
+  opacity: 0.22;
+  animation: none;
+  filter: saturate(1.05) contrast(1.04) blur(1px);
+}
+
+.screen.crt-acid-pan-on .crt-static-overlay {
+  opacity: 0.38;
+  animation: none;
+}
+
+.screen.crt-acid-pan-on .crt-caption {
+  z-index: 4;
+}
+
+@keyframes acidStripPan {
+  from {
+    transform: translateY(-50%) translateX(0);
+  }
+  to {
+    transform: translateY(-50%) translateX(calc(-100% + 42vw));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-acid-pan-layer {
+    animation: none;
+    width: 100%;
+    transform: translateY(-50%);
+    object-position: 28% 50%;
+  }
+}
+
 .crt-caption {
   position: absolute;
   left: 12px;
@@ -483,7 +532,7 @@ body.cuton-settled .shell {
 }
 
 .screen.crt-about-compact .crt-static-overlay {
-  opacity: 0.28;
+  opacity: 0.22;
   animation: none;
 }
 
@@ -493,9 +542,43 @@ body.cuton-settled .shell {
 }
 
 .screen.crt-about-compact .crt-about-bio {
-  max-height: 32%;
-  left: auto;
-  width: min(340px, 52%);
+  max-height: 30%;
+  left: 10px;
+  right: auto;
+  bottom: 10px;
+  width: min(300px, 46%);
+}
+
+.screen.crt-about-active .overlay {
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.screen.crt-about-compact .channel {
+  max-width: 42%;
+}
+
+.screen.crt-about-compact .osd-menu {
+  align-self: flex-end;
+  margin-left: auto;
+  max-height: min(48vh, 300px);
+  overflow: hidden;
+}
+
+.screen.crt-about-compact .osd-menu ul {
+  max-height: min(34vh, 210px);
+  overflow-y: auto;
+}
+
+.screen.crt-about-active .osd-menu header,
+.screen.crt-about-active .osd-menu ul,
+.screen.crt-about-active .osd-menu footer {
+  animation: none;
+}
+
+.screen.crt-about-active .osd-menu li.active {
+  animation: none;
 }
 
 .crt-about-teaser {
@@ -607,7 +690,7 @@ body.cuton-settled .shell {
 
 .screen.crt-about-active .osd-menu {
   align-self: flex-end;
-  max-height: calc(100% - 46%);
+  max-height: min(52vh, 340px);
 }
 
 @keyframes crtAboutPortraitGlitch {
@@ -634,8 +717,17 @@ body.cuton-settled .shell {
   }
 
   .screen.crt-about-active .osd-menu {
-    width: min(190px, 44vw);
-    max-height: calc(100% - 52%);
+    width: min(248px, 72vw);
+    max-height: min(46vh, 280px);
+  }
+
+  .screen.crt-about-compact .crt-about-bio {
+    width: min(280px, 88%);
+    max-height: 34%;
+  }
+
+  .osd-menu {
+    width: min(260px, 92vw);
   }
 }
 
@@ -662,7 +754,7 @@ body.cuton-settled .shell {
 
 .osd-menu {
   pointer-events: auto;
-  width: min(208px, 35vw);
+  width: min(280px, 44vw);
   border: 0;
   background: var(--osd-blue);
   color: var(--osd-text);
@@ -751,11 +843,14 @@ body.cuton-settled .shell {
   animation: osdItemGlitch 1.1s steps(2, end) infinite;
 }
 
-.osd-menu footer {
+.osd-menu footer,
+.osd-menu .osd-footer-row {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  flex-wrap: nowrap;
   border-top: 0;
   margin-top: 4px;
   padding: 5px 10px;
@@ -765,7 +860,8 @@ body.cuton-settled .shell {
   animation: osdMenuGlitch 5s ease 2s infinite;
 }
 
-.osd-menu footer span {
+.osd-menu footer .osd-hint-v,
+.osd-menu footer span.osd-hint-v {
   color: var(--osd-text);
   background: var(--osd-blue);
   border: 2px solid var(--osd-yellow);
@@ -775,10 +871,25 @@ body.cuton-settled .shell {
   text-shadow: var(--osd-outline);
 }
 
+.osd-menu .osd-footer-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.osd-menu .osd-hint-k {
+  letter-spacing: 0.05em;
+}
+
 .osd-menu .osd-open-link {
   color: var(--osd-text);
   text-decoration: none;
-  max-width: 58%;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -828,7 +939,7 @@ body.cuton-settled .shell {
 .quicklinks a {
   text-decoration: none;
   border: 1px solid #46618a;
-  padding: 11px 12px 11px 44px;
+  padding: 11px 12px 11px 46px;
   min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
@@ -839,8 +950,9 @@ body.cuton-settled .shell {
 
 /* Default tier: static pages on this origin (aday.net.au HTML shell) */
 .quicklinks a.quicklink-local {
-  --link-icon-border: rgba(255, 130, 170, 0.58);
-  --link-icon-bg: rgba(48, 14, 28, 0.92);
+  --link-icon-glyph: #d8a0b4;
+  --link-icon-border: rgba(200, 120, 150, 0.42);
+  --link-icon-bg: #12080c;
   color: #ffc8e0;
   border-color: #b84f78;
   background:
@@ -857,8 +969,9 @@ body.cuton-settled .shell {
 
 /* Subdomains that are services but not the live VJ/DMX pair */
 .quicklinks a.quicklink-satellite {
-  --link-icon-border: rgba(255, 190, 110, 0.58);
-  --link-icon-bg: rgba(44, 30, 8, 0.92);
+  --link-icon-glyph: #d4b878;
+  --link-icon-border: rgba(190, 150, 80, 0.42);
+  --link-icon-bg: #100c06;
   color: #ffe4b0;
   border-color: #b88a3a;
   background:
@@ -875,8 +988,9 @@ body.cuton-settled .shell {
 
 /* Third-party or off-portal hubs */
 .quicklinks a.quicklink-network {
-  --link-icon-border: rgba(180, 155, 255, 0.58);
-  --link-icon-bg: rgba(22, 16, 40, 0.92);
+  --link-icon-glyph: #b8a8d8;
+  --link-icon-border: rgba(150, 130, 200, 0.42);
+  --link-icon-bg: #0c0a14;
   color: #d8ccff;
   border-color: #6c5a9c;
   background:
@@ -893,8 +1007,9 @@ body.cuton-settled .shell {
 
 /* Full hosted live apps (Macroverse, ArtBastard) - only these get the cyan spotlight */
 .quicklinks a.quicklink-headliner {
-  --link-icon-border: rgba(120, 200, 255, 0.65);
-  --link-icon-bg: rgba(10, 24, 48, 0.92);
+  --link-icon-glyph: #8ec0d8;
+  --link-icon-border: rgba(110, 170, 205, 0.45);
+  --link-icon-bg: #0a1218;
   border-color: #82d4ff;
   color: #d2f2ff;
   background:
@@ -951,7 +1066,7 @@ body.cuton-settled .shell {
 
 .card .friend-brand-link[href*="youtube"]::before,
 .card a[href*="youtube.com"]::before {
-  filter: invert(90%) sepia(20%) saturate(265%) hue-rotate(162deg) brightness(1.02) contrast(1.02);
+  filter: opacity(0.88) brightness(0.78) saturate(0.65);
 }
 
 .friend-brand-link span {
@@ -962,8 +1077,9 @@ body.cuton-settled .shell {
 /* Public SVG icon badges for links (free icon sources). */
 :is(.quicklinks a, .card a, .footer a) {
   --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/link-2.svg");
-  --link-icon-border: rgba(129, 198, 255, 0.52);
-  --link-icon-bg: rgba(12, 24, 43, 0.86);
+  --link-icon-glyph: #9ab4c4;
+  --link-icon-border: rgba(118, 158, 188, 0.38);
+  --link-icon-bg: #0a1016;
   position: relative;
 }
 
@@ -978,27 +1094,79 @@ body.cuton-settled .shell {
   left: 9px;
   top: 50%;
   transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border: 1px solid var(--link-icon-border);
-  background:
-    var(--link-icon-url) center / 11px 11px no-repeat,
-    var(--link-icon-bg);
-  box-shadow: 0 0 8px rgba(101, 191, 255, 0.16), inset 0 0 5px rgba(137, 212, 255, 0.14);
-  filter: invert(90%) sepia(20%) saturate(265%) hue-rotate(162deg) brightness(1.02) contrast(1.02);
+  border-radius: 3px;
+  background-color: var(--link-icon-bg);
+  box-shadow: none;
+  filter: none;
   pointer-events: none;
 }
 
+:is(.quicklinks a, .card a, .footer a)::after {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  background-color: var(--link-icon-glyph);
+  -webkit-mask-image: var(--link-icon-url);
+  mask-image: var(--link-icon-url);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 11px 11px;
+  mask-size: 11px 11px;
+}
+
+.quicklinks a::before,
+.quicklinks a::after {
+  left: 9px;
+  width: 26px;
+  height: 26px;
+}
+
 .quicklinks a::before {
-  left: 10px;
-  width: 22px;
-  height: 22px;
-  border-width: 1px;
   border-radius: 4px;
-  background:
-    var(--link-icon-url) center / 17px 17px no-repeat,
-    var(--link-icon-bg);
-  box-shadow: 0 0 12px rgba(101, 191, 255, 0.22), inset 0 0 6px rgba(137, 212, 255, 0.18);
+}
+
+.quicklinks a::after {
+  -webkit-mask-size: 15px 15px;
+  mask-size: 15px 15px;
+}
+
+/* Brand marks: logo on matte tile, no invert bloom */
+:is(.quicklinks a, .card a, .footer a)[href*="github.com"]::after,
+:is(.quicklinks a, .card a, .footer a)[href*="youtube.com"]::after,
+:is(.quicklinks a, .card a, .footer a)[href*="mastodon"]::after,
+:is(.quicklinks a, .card a, .footer a)[href*="twitch.tv"]::after,
+:is(.quicklinks a, .card a, .footer a)[href*="soundcloud.com"]::after,
+:is(.quicklinks a, .card a, .footer a)[href*="codepen.io"]::after {
+  display: none;
+}
+
+:is(.quicklinks a, .card a, .footer a)[href*="github.com"]::before,
+:is(.quicklinks a, .card a, .footer a)[href*="youtube.com"]::before,
+:is(.quicklinks a, .card a, .footer a)[href*="mastodon"]::before,
+:is(.quicklinks a, .card a, .footer a)[href*="twitch.tv"]::before,
+:is(.quicklinks a, .card a, .footer a)[href*="soundcloud.com"]::before,
+:is(.quicklinks a, .card a, .footer a)[href*="codepen.io"]::before {
+  background-image: var(--link-icon-url);
+  background-size: 12px 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.92;
+  filter: opacity(0.88) brightness(0.78) saturate(0.65);
+}
+
+.quicklinks a[href*="github.com"]::before,
+.quicklinks a[href*="youtube.com"]::before {
+  background-size: 14px 14px;
 }
 
 /* Local static routes (icon per page; hosted-projects after projects to avoid substring clash) */
@@ -1020,27 +1188,27 @@ body.cuton-settled .shell {
 
 .quicklinks a[href*="github.com"],
 .card a[href*="github.com"],
-.footer a[href*="github.com"] { --link-icon-url: url("https://cdn.simpleicons.org/github/9cd9ff"); }
+.footer a[href*="github.com"] { --link-icon-url: url("https://cdn.simpleicons.org/github/7a98a8"); }
 
 .quicklinks a[href*="youtube.com"],
 .card a[href*="youtube.com"],
-.footer a[href*="youtube.com"] { --link-icon-url: url("https://cdn.simpleicons.org/youtube/9cd9ff"); }
+.footer a[href*="youtube.com"] { --link-icon-url: url("https://cdn.simpleicons.org/youtube/7a98a8"); }
 
 .quicklinks a[href*="mastodon"],
 .card a[href*="mastodon"],
-.footer a[href*="mastodon"] { --link-icon-url: url("https://cdn.simpleicons.org/mastodon/9cd9ff"); }
+.footer a[href*="mastodon"] { --link-icon-url: url("https://cdn.simpleicons.org/mastodon/7a98a8"); }
 
 .quicklinks a[href*="twitch.tv"],
 .card a[href*="twitch.tv"],
-.footer a[href*="twitch.tv"] { --link-icon-url: url("https://cdn.simpleicons.org/twitch/9cd9ff"); }
+.footer a[href*="twitch.tv"] { --link-icon-url: url("https://cdn.simpleicons.org/twitch/7a98a8"); }
 
 .quicklinks a[href*="soundcloud.com"],
 .card a[href*="soundcloud.com"],
-.footer a[href*="soundcloud.com"] { --link-icon-url: url("https://cdn.simpleicons.org/soundcloud/9cd9ff"); }
+.footer a[href*="soundcloud.com"] { --link-icon-url: url("https://cdn.simpleicons.org/soundcloud/7a98a8"); }
 
 .quicklinks a[href*="codepen.io"],
 .card a[href*="codepen.io"],
-.footer a[href*="codepen.io"] { --link-icon-url: url("https://cdn.simpleicons.org/codepen/9cd9ff"); }
+.footer a[href*="codepen.io"] { --link-icon-url: url("https://cdn.simpleicons.org/codepen/7a98a8"); }
 
 .quicklinks a[href*="blog.aday.net.au"],
 .card a[href*="blog.aday.net.au"],
@@ -1196,7 +1364,7 @@ body.cuton-settled .shell {
 }
 
 .service-icon-lite[src$=".svg"] {
-  filter: invert(86%) sepia(5%) saturate(95%) hue-rotate(55deg) brightness(0.9) contrast(1.08);
+  filter: opacity(0.9) brightness(0.82) saturate(0.55);
 }
 
 .icon-badge {
@@ -1211,7 +1379,7 @@ body.cuton-settled .shell {
 }
 
 .icon-macroverse[src$=".svg"] {
-  filter: invert(84%) sepia(8%) saturate(120%) hue-rotate(170deg) brightness(0.9) contrast(1.08);
+  filter: opacity(0.9) brightness(0.82) saturate(0.55);
 }
 
 .icon-artbastard {
@@ -1221,7 +1389,7 @@ body.cuton-settled .shell {
 }
 
 .icon-artbastard[src$=".svg"] {
-  filter: invert(86%) sepia(8%) saturate(130%) hue-rotate(359deg) brightness(0.9) contrast(1.08);
+  filter: opacity(0.9) brightness(0.82) saturate(0.55);
 }
 
 .headliner-card > * {
@@ -2695,5 +2863,92 @@ body.animations-off *::after {
   50% {
     box-shadow: 0 0 4px rgba(128, 182, 138, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.16);
     border-color: #5e8664;
+  }
+}
+
+.media-yt-section .yt-archive-controls,
+.media-wb-section .wb-archive-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: end;
+  margin: 10px 0;
+}
+
+.yt-pick-channel {
+  display: block;
+  font-size: 0.72rem;
+  color: #7eb8e8;
+}
+
+.yt-pick-hidden {
+  display: none;
+}
+
+.wb-archive-stage {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.2fr);
+  gap: 12px;
+}
+
+.wb-track-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid #2a4a68;
+}
+
+.wb-track-pick {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 8px;
+  border: 0;
+  border-bottom: 1px solid #1c3348;
+  background: rgba(4, 12, 22, 0.85);
+  color: #d8f4ff;
+  cursor: pointer;
+}
+
+.wb-track-pick.is-active {
+  background: rgba(64, 140, 200, 0.22);
+}
+
+.wb-track-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #3a607f;
+}
+
+.wb-track-thumb--empty {
+  display: inline-block;
+  background: #142636;
+}
+
+.wb-player-pane .wb-audio-player,
+.wb-player-pane .wb-embed-frame {
+  width: 100%;
+  min-height: 120px;
+}
+
+.wb-track-meta {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #9ad3ff;
+}
+
+.dj-audio-deck {
+  width: 100%;
+  margin-top: 8px;
+}
+
+@media (max-width: 800px) {
+  .wb-archive-stage {
+    grid-template-columns: 1fr;
   }
 }

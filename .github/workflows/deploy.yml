@@ -19,6 +19,14 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install yt-dlp
+        run: sudo apt-get update && sudo apt-get install -y yt-dlp
+
+      - name: Build media catalogs
+        env:
+          WB_SKIP_ENRICH: "1"
+        run: node ./scripts/build-media-data.mjs
+
       - name: Write deploy metadata
         run: |
           SHORT_SHA="$(echo "$GITHUB_SHA" | cut -c1-12)"

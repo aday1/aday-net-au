@@ -1,5 +1,10 @@
 /* microbee CRT monitor cues (codepen.io/microbee/pen/xxjLqVK) */
 
+.microbee-matrix,
+.microbee-glitch-band {
+  display: none !important;
+}
+
 body.microbee-crt-on::before {
   background: linear-gradient(
     to bottom,
