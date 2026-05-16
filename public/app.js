@@ -855,24 +855,95 @@
     "The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack": "High-speed MCP macro pack for repetitive DAW editing and envelope batching."
   };
 
+  const CUTON_SESSION_KEY = "aday-cuton-done-v1";
+  const hasSeenCutOn = (() => {
+    try {
+      return sessionStorage.getItem(CUTON_SESSION_KEY) === "1";
+    } catch {
+      return false;
+    }
+  })();
+  const markCutOnSeen = () => {
+    try {
+      sessionStorage.setItem(CUTON_SESSION_KEY, "1");
+      document.documentElement.classList.add("cuton-skip");
+    } catch {
+      // ignore storage errors
+    }
+  };
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
-  /* Overlap shell reveal with the tail of the CRT wash so load does not feel stuck behind a dead-air overlay */
-  const CUTON_BOOT_MS = 2550;
-  const CUTON_HIDE_MS = 3150;
+  const CUTON_BOOT_MS = prefersReducedMotion ? 0 : 1500;
+  const CUTON_HIDE_MS = prefersReducedMotion ? 0 : 1950;
   let cutOnScheduled = false;
+  let heavyAppStarted = false;
+  const startHeavyApp = () => {
+    if (heavyAppStarted) return;
+    heavyAppStarted = true;
+    window.addEventListener("resize", fit);
+    fit();
+    initAtzedentBackdrop();
+    if (canvas) requestAnimationFrame(render);
+    runNodeMap();
+    initAcidVisualCrossfade();
+    if (crtMedia) {
+      crtMedia.src = normalizeKnownGifSource(crtMedia.getAttribute("src") || crtMedia.src);
+      classifySignalImage(crtMedia, crtMedia.src);
+    }
+    cycleMenu();
+    if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 12500 : 10000);
+    setInterval(pulseCrtBurst, performanceMode ? 9800 : 7800);
+    initHeaderLoops();
+    randomizeFrameGeneration();
+    initRandomImageDeck();
+    initSoundcloudDeck();
+    initWeeklyBeatsNode();
+    initGalleryFilters();
+    void initDjCrossfader();
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(() => hydrateRepoGrid(), { timeout: 3000 });
+    } else {
+      setTimeout(() => hydrateRepoGrid(), 1400);
+    }
+    document.querySelectorAll("img.mosh-image").forEach((img) => {
+      img.src = normalizeKnownGifSource(img.getAttribute("src") || img.src);
+      classifySignalImage(img, img.src);
+      armGenericImageFallback(img);
+      if (img.complete) moshImage(img);
+      else img.addEventListener("load", () => moshImage(img), { once: true });
+    });
+    document.querySelectorAll("img:not(.mosh-image)").forEach((img) => {
+      img.src = normalizeKnownGifSource(img.getAttribute("src") || img.src);
+      classifySignalImage(img, img.src);
+      armGenericImageFallback(img);
+    });
+    wrapMediaWithCrtEffect();
+  };
+  const skipCutOnNow = () => {
+    bootDone();
+    hideTransition();
+    startHeavyApp();
+  };
   const runCutOnSequence = (forceImmediate = false) => {
-    if (forceImmediate) {
-      bootDone();
-      hideTransition();
+    if (forceImmediate || hasSeenCutOn || prefersReducedMotion) {
+      if (!hasSeenCutOn && !prefersReducedMotion) markCutOnSeen();
+      skipCutOnNow();
       cutOnScheduled = true;
       return;
     }
     if (cutOnScheduled) return;
     cutOnScheduled = true;
-    setTimeout(bootDone, CUTON_BOOT_MS);
+    markCutOnSeen();
+    setTimeout(() => {
+      bootDone();
+      startHeavyApp();
+    }, CUTON_BOOT_MS);
     setTimeout(hideTransition, CUTON_HIDE_MS);
   };
+  if (hasSeenCutOn) {
+    bootDone();
+    hideTransition();
+  }
   const loadUiPrefs = () => {
     const defaults = {
       retroCursor: canUseRetroCursor,
@@ -977,12 +1048,11 @@
     });
     window.addEventListener("resize", closeMenu);
   };
-  document.addEventListener("DOMContentLoaded", () => {
-    runCutOnSequence(prefersReducedMotion);
-  });
-  window.addEventListener("load", () => {
-    runCutOnSequence(prefersReducedMotion);
-  });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => runCutOnSequence(false), { once: true });
+  } else {
+    runCutOnSequence(false);
+  }
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) runCutOnSequence(true);
   });
@@ -2319,45 +2389,6 @@ void main() {
     }
   };
 
-  window.addEventListener("resize", fit);
-  fit();
-  initAtzedentBackdrop();
-  if (canvas) requestAnimationFrame(render);
-  runNodeMap();
-  initAcidVisualCrossfade();
-  if (crtMedia) {
-    crtMedia.src = normalizeKnownGifSource(crtMedia.getAttribute("src") || crtMedia.src);
-    classifySignalImage(crtMedia, crtMedia.src);
-  }
-  cycleMenu();
-  if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 12500 : 10000);
-  setInterval(pulseCrtBurst, performanceMode ? 9800 : 7800);
-  initHeaderLoops();
-  randomizeFrameGeneration();
-  initRandomImageDeck();
-  initSoundcloudDeck();
-  initWeeklyBeatsNode();
-  initGalleryFilters();
-  void initDjCrossfader();
-  if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(() => hydrateRepoGrid(), { timeout: 3000 });
-  } else {
-    setTimeout(() => hydrateRepoGrid(), 1400);
-  }
-
-  document.querySelectorAll("img.mosh-image").forEach((img) => {
-    img.src = normalizeKnownGifSource(img.getAttribute("src") || img.src);
-    classifySignalImage(img, img.src);
-    armGenericImageFallback(img);
-    if (img.complete) moshImage(img);
-    else img.addEventListener("load", () => moshImage(img), { once: true });
-  });
-  document.querySelectorAll("img:not(.mosh-image)").forEach((img) => {
-    img.src = normalizeKnownGifSource(img.getAttribute("src") || img.src);
-    classifySignalImage(img, img.src);
-    armGenericImageFallback(img);
-  });
-  wrapMediaWithCrtEffect();
   document.addEventListener("visibilitychange", () => {
     const repoVideos = document.querySelectorAll("video.repo-shot-video");
     repoVideos.forEach((video) => {

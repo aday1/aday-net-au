@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>404 // aday.net.au</title>
   <link rel="stylesheet" href="./style.css">
+  <script src="./cuton-preflight.js"></script>
 </head>
 <body class="scanlines-on boot-seq">
   <main class="shell">
@@ -22,5 +23,19 @@
       </ul>
     </section>
   </main>
+  <script>
+    (function () {
+      var skip = document.documentElement.classList.contains("cuton-skip");
+      if (skip) {
+        document.body.classList.remove("boot-seq");
+        return;
+      }
+      setTimeout(function () {
+        document.body.classList.remove("boot-seq");
+        try { sessionStorage.setItem("aday-cuton-done-v1", "1"); } catch (e) {}
+        document.documentElement.classList.add("cuton-skip");
+      }, 1500);
+    })();
+  </script>
 </body>
 </html>
