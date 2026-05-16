@@ -590,6 +590,34 @@ body:not(.boot-seq) .shell {
   transform: translateY(-1px);
 }
 
+.friend-brand-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  padding-left: 0;
+  text-decoration: none;
+}
+
+.friend-brand-link::before {
+  display: none;
+}
+
+.friend-brand-logo {
+  display: block;
+  max-width: min(100%, 280px);
+  height: auto;
+  image-rendering: pixelated;
+  border: 1px solid rgba(129, 198, 255, 0.35);
+  background: #000;
+}
+
+.friend-brand-link span {
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
 /* Public SVG icon badges for links (free icon sources). */
 :is(.quicklinks a, .card a, .footer a) {
   --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/link-2.svg");
