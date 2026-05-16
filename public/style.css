@@ -178,7 +178,8 @@ body::after {
 .shell {
   position: relative;
   z-index: 3;
-  width: min(1080px, 95vw);
+  width: min(1080px, 100%);
+  max-width: 100%;
   margin: 34px auto 46px;
   padding: 22px;
   border: 1px solid #6f2032;
@@ -186,6 +187,8 @@ body::after {
   box-shadow: 0 0 0 1px rgba(255, 156, 178, 0.22), 0 22px 90px rgba(0, 0, 0, 0.56), inset 0 0 50px rgba(110, 0, 30, 0.24);
   transform-origin: center;
   animation: none;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .shell::before {
@@ -204,14 +207,14 @@ body.boot-seq .shell {
   animation: tvOn 600ms cubic-bezier(0.2, 0.7, 0.1, 1), bootFlicker 860ms steps(1, end);
 }
 
-.masthead { padding-bottom: 14px; border-bottom: 1px dashed #405577; overflow-x: clip; max-width: 100%; }
+.masthead { padding-bottom: 14px; border-bottom: 1px dashed #405577; overflow: hidden; max-width: 100%; }
 .sysline { color: #9bb0ce; margin: 0 0 6px; letter-spacing: 0.08em; word-break: break-word; overflow-wrap: anywhere; }
 .logo {
   margin: 0;
-  font-size: clamp(2.8rem, 12vw, 7.6rem);
-  line-height: 0.9;
+  font-size: clamp(1.85rem, 4.2vw + 0.65rem, 3.85rem);
+  line-height: 1.02;
   color: #d4ecff;
-  text-shadow: -2px 0 rgba(255, 38, 110, 0.45), 2px 0 rgba(0, 217, 255, 0.42), 0 0 18px rgba(116, 225, 255, 0.35);
+  text-shadow: -1px 0 rgba(255, 38, 110, 0.4), 1px 0 rgba(0, 217, 255, 0.38), 0 0 14px rgba(116, 225, 255, 0.32);
   max-width: 100%;
   min-width: 0;
   overflow-wrap: anywhere;
@@ -223,6 +226,7 @@ body.boot-seq .shell {
   position: relative;
   display: inline-block;
   max-width: 100%;
+  overflow: hidden;
   overflow-wrap: anywhere;
   word-break: break-word;
   white-space: normal;
@@ -230,8 +234,8 @@ body.boot-seq .shell {
   animation: none;
 }
 .glitch::before, .glitch::after { content: attr(data-text); position: absolute; inset: 0; pointer-events: none; }
-.glitch::before { transform: translateX(2px); color: rgba(255, 100, 180, 0.4); clip-path: polygon(0 0, 100% 0, 100% 48%, 0 48%); animation: none; }
-.glitch::after { transform: translateX(-2px); color: rgba(85, 245, 255, 0.42); clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%); animation: none; }
+.glitch::before { transform: translateX(1px); color: rgba(255, 100, 180, 0.4); clip-path: polygon(0 0, 100% 0, 100% 48%, 0 48%); animation: none; }
+.glitch::after { transform: translateX(-1px); color: rgba(85, 245, 255, 0.42); clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%); animation: none; }
 .tagline { margin: 8px 0 0; color: var(--muted); letter-spacing: 0.03em; word-break: break-word; overflow-wrap: anywhere; max-width: 100%; }
 
 .crt-rig {
@@ -480,35 +484,90 @@ body.boot-seq .shell {
   grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
   gap: 9px;
   margin-bottom: 14px;
+  min-width: 0;
 }
 
 .quicklinks a {
   text-decoration: none;
-  color: #9eff89;
   border: 1px solid #46618a;
-  padding: 10px 11px 10px 34px;
-  background:
-    linear-gradient(180deg, rgba(13, 24, 42, 0.92), rgba(8, 16, 29, 0.9));
-  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+  padding: 11px 12px 11px 44px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-weight: 600;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, color 200ms ease;
 }
-.quicklinks a:hover {
-  border-color: #8ad4ff;
-  box-shadow: 0 0 16px rgba(101, 191, 255, 0.3);
+
+/* Default tier: static pages on this origin (aday.net.au HTML shell) */
+.quicklinks a.quicklink-local {
+  --link-icon-border: rgba(255, 130, 170, 0.58);
+  --link-icon-bg: rgba(48, 14, 28, 0.92);
+  color: #ffc8e0;
+  border-color: #b84f78;
+  background:
+    linear-gradient(180deg, rgba(42, 14, 28, 0.95), rgba(22, 8, 16, 0.94));
+  box-shadow: 0 0 10px rgba(255, 90, 140, 0.12), inset 0 0 20px rgba(200, 60, 110, 0.08);
+}
+
+.quicklinks a.quicklink-local:hover {
+  border-color: #ff7eb0;
+  color: #ffe8f4;
+  box-shadow: 0 0 18px rgba(255, 120, 170, 0.35), inset 0 0 24px rgba(255, 100, 150, 0.12);
   transform: translateY(-1px);
 }
 
+/* Subdomains that are services but not the live VJ/DMX pair */
+.quicklinks a.quicklink-satellite {
+  --link-icon-border: rgba(255, 190, 110, 0.58);
+  --link-icon-bg: rgba(44, 30, 8, 0.92);
+  color: #ffe4b0;
+  border-color: #b88a3a;
+  background:
+    linear-gradient(180deg, rgba(38, 28, 10, 0.95), rgba(18, 14, 6, 0.94));
+  box-shadow: 0 0 12px rgba(255, 200, 90, 0.14), inset 0 0 18px rgba(180, 120, 40, 0.1);
+}
+
+.quicklinks a.quicklink-satellite:hover {
+  border-color: #ffd078;
+  color: #fff6e4;
+  box-shadow: 0 0 20px rgba(255, 190, 80, 0.32), inset 0 0 22px rgba(220, 160, 60, 0.14);
+  transform: translateY(-1px);
+}
+
+/* Third-party or off-portal hubs */
+.quicklinks a.quicklink-network {
+  --link-icon-border: rgba(180, 155, 255, 0.58);
+  --link-icon-bg: rgba(22, 16, 40, 0.92);
+  color: #d8ccff;
+  border-color: #6c5a9c;
+  background:
+    linear-gradient(180deg, rgba(24, 18, 38, 0.95), rgba(12, 10, 22, 0.94));
+  box-shadow: 0 0 12px rgba(140, 120, 220, 0.16), inset 0 0 18px rgba(90, 70, 160, 0.1);
+}
+
+.quicklinks a.quicklink-network:hover {
+  border-color: #b8a0e8;
+  color: #f4f0ff;
+  box-shadow: 0 0 20px rgba(160, 140, 255, 0.32), inset 0 0 22px rgba(130, 110, 210, 0.14);
+  transform: translateY(-1px);
+}
+
+/* Full hosted live apps (Macroverse, ArtBastard) - only these get the cyan spotlight */
 .quicklinks a.quicklink-headliner {
+  --link-icon-border: rgba(120, 200, 255, 0.65);
+  --link-icon-bg: rgba(10, 24, 48, 0.92);
   border-color: #82d4ff;
   color: #d2f2ff;
   background:
     linear-gradient(180deg, rgba(22, 50, 84, 0.92), rgba(10, 23, 43, 0.92));
   box-shadow: 0 0 18px rgba(93, 178, 255, 0.24), inset 0 0 14px rgba(99, 180, 255, 0.16);
-  font-weight: bold;
 }
 
 .quicklinks a.quicklink-headliner:hover {
   border-color: #9ce0ff;
   box-shadow: 0 0 24px rgba(128, 201, 255, 0.4), inset 0 0 16px rgba(133, 203, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Public SVG icon badges for links (free icon sources). */
@@ -539,6 +598,35 @@ body.boot-seq .shell {
   box-shadow: 0 0 8px rgba(101, 191, 255, 0.16), inset 0 0 5px rgba(137, 212, 255, 0.14);
   filter: invert(90%) sepia(20%) saturate(265%) hue-rotate(162deg) brightness(1.02) contrast(1.02);
   pointer-events: none;
+}
+
+.quicklinks a::before {
+  left: 10px;
+  width: 22px;
+  height: 22px;
+  border-width: 1px;
+  border-radius: 4px;
+  background:
+    var(--link-icon-url) center / 17px 17px no-repeat,
+    var(--link-icon-bg);
+  box-shadow: 0 0 12px rgba(101, 191, 255, 0.22), inset 0 0 6px rgba(137, 212, 255, 0.18);
+}
+
+/* Local static routes (icon per page; hosted-projects after projects to avoid substring clash) */
+.quicklinks a[href*="index.html"] {
+  --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/home.svg");
+}
+
+.quicklinks a[href*="projects.html"] {
+  --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/layers.svg");
+}
+
+.quicklinks a[href*="hosted-projects.html"] {
+  --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/package.svg");
+}
+
+.quicklinks a[href*="media.html"] {
+  --link-icon-url: url("https://raw.githubusercontent.com/feathericons/feather/master/icons/video.svg");
 }
 
 .quicklinks a[href*="github.com"],
@@ -643,6 +731,7 @@ body.boot-seq .shell {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  min-width: 0;
 }
 
 .headliner-card {
@@ -651,6 +740,12 @@ body.boot-seq .shell {
     linear-gradient(180deg, rgba(14, 28, 51, 0.95), rgba(7, 16, 30, 0.95));
   box-shadow: inset 0 0 30px rgba(70, 142, 210, 0.16), 0 0 20px rgba(80, 164, 255, 0.12);
   overflow: hidden;
+  min-width: 0;
+}
+
+.headliner-card p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .headliner-card h3 {
@@ -660,8 +755,13 @@ body.boot-seq .shell {
 }
 
 .headliner-card a {
+  display: inline-block;
   color: #8ef6ff;
   font-weight: bold;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
 }
 
 .headliner-head {
@@ -1760,15 +1860,17 @@ body.animations-off *::after {
 
 .masthead-brand {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   min-width: 0;
   max-width: 100%;
+  overflow: hidden;
 }
 
 .masthead-brand .logo {
   flex: 1 1 0;
   min-width: 0;
+  align-self: center;
 }
 
 .masthead-avatar {
@@ -1806,8 +1908,11 @@ body.animations-off *::after {
   }
 
   .shell {
-    width: 96vw;
+    width: 100%;
+    max-width: 100%;
     padding: 14px;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .masthead-avatar {
@@ -1816,7 +1921,7 @@ body.animations-off *::after {
   }
 
   .logo {
-    font-size: clamp(1.55rem, 7vw, 3.4rem);
+    font-size: clamp(1.45rem, 5.5vw + 0.35rem, 2.65rem);
     line-height: 1.08;
   }
 
