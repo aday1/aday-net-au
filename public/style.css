@@ -459,28 +459,41 @@ body:not(.boot-seq) .shell {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
+  cursor: pointer;
 }
 
-.osd-menu a {
+.osd-menu li:hover {
+  background: rgba(146, 255, 142, 0.1);
+}
+
+.osd-menu .osd-tune-btn {
   color: #92ff84;
   text-decoration: none;
   display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
+  cursor: pointer;
 }
 
-.osd-menu a:hover {
-  text-decoration: underline;
+.osd-menu .osd-tune-btn:hover {
+  text-decoration: none;
 }
 
-.osd-menu a .osd-link-text {
+.osd-menu .osd-tune-btn .osd-link-text {
   display: inline-block;
   white-space: nowrap;
   will-change: transform;
 }
 
-.osd-menu li.active a.is-scrolling .osd-link-text {
+.osd-menu li.active .osd-tune-btn.is-scrolling .osd-link-text {
   text-overflow: clip;
   animation: osdMarquee var(--osd-scroll-duration, 7s) linear infinite;
 }
@@ -498,6 +511,29 @@ body:not(.boot-seq) .shell {
 }
 
 .osd-menu footer span { color: #e8f77f; }
+
+.osd-menu .osd-open-link {
+  color: #e8f77f;
+  text-decoration: none;
+  max-width: 58%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.osd-menu .osd-open-link:hover {
+  text-decoration: underline;
+}
+
+.osd-menu .osd-open-link.is-disabled {
+  pointer-events: none;
+  opacity: 0.45;
+  text-decoration: none;
+}
+
+.osd-menu .osd-footer-hint {
+  text-align: right;
+}
 
 .osd-menu::before {
   content: "";
@@ -1915,7 +1951,7 @@ body.hide-atz-bg .atz-canvas {
   display: none !important;
 }
 
-body.disable-osd-marquee .osd-menu li.active a.is-scrolling .osd-link-text {
+body.disable-osd-marquee .osd-menu li.active .osd-tune-btn.is-scrolling .osd-link-text {
   animation: none !important;
   transform: translateX(0) !important;
 }

@@ -7,6 +7,8 @@
   const screen = document.querySelector(".screen");
   const crtChannelLabel = document.querySelector(".channel");
   const osdMenuHeader = document.querySelector(".osd-menu header");
+  const osdMenuList = document.querySelector(".osd-menu ul");
+  const osdOpenLink = document.getElementById("osdOpenLink");
   const nodeMapCanvas = document.getElementById("nodeMapCanvas");
   const cursor = document.getElementById("retroCursor");
   const menuItems = [...document.querySelectorAll(".osd-menu li")];
@@ -293,6 +295,40 @@
   const getOsdItemHref = (item) => {
     return item?.href || "";
   };
+  const ensureOsdTuneButton = (row) => {
+    let btn = row.querySelector(".osd-tune-btn");
+    if (!btn) {
+      row.textContent = "";
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "osd-tune-btn";
+      const textSpan = document.createElement("span");
+      textSpan.className = "osd-link-text";
+      btn.appendChild(textSpan);
+      row.appendChild(btn);
+    }
+    return btn;
+  };
+  const updateOsdOpenLink = (item) => {
+    if (!osdOpenLink) return;
+    const href = getOsdItemHref(item);
+    if (href) {
+      osdOpenLink.href = href;
+      osdOpenLink.target = "_blank";
+      osdOpenLink.rel = "noopener noreferrer";
+      const label = (item?.menuLabel || "channel").toUpperCase();
+      osdOpenLink.textContent = `LINK // ${label}`;
+      osdOpenLink.classList.remove("is-disabled");
+      osdOpenLink.removeAttribute("aria-disabled");
+    } else {
+      osdOpenLink.removeAttribute("href");
+      osdOpenLink.removeAttribute("target");
+      osdOpenLink.removeAttribute("rel");
+      osdOpenLink.textContent = "LINK // n/a";
+      osdOpenLink.classList.add("is-disabled");
+      osdOpenLink.setAttribute("aria-disabled", "true");
+    }
+  };
   const renderOsdPreviewList = (currentItem) => {
     if (!menuItems.length || !mediaFeed.length) return;
     const visibleCount = menuItems.length;
@@ -301,44 +337,24 @@
       const feedIndex = (mediaIndex - activeSlot + slot + mediaFeed.length) % mediaFeed.length;
       const item = mediaFeed[feedIndex];
       const row = menuItems[slot];
-      const href = getOsdItemHref(item);
-      let link = row.querySelector("a");
-      if (!link) {
-        link = document.createElement("a");
-        row.textContent = "";
-        row.appendChild(link);
-      }
-      let textSpan = link.querySelector(".osd-link-text");
-      if (!textSpan) {
-        textSpan = document.createElement("span");
-        textSpan.className = "osd-link-text";
-        link.textContent = "";
-        link.appendChild(textSpan);
-      }
+      row.dataset.feedIndex = String(feedIndex);
+      const btn = ensureOsdTuneButton(row);
+      const textSpan = btn.querySelector(".osd-link-text");
       const rowText = formatOsdEntry(item);
-      textSpan.textContent = rowText;
-      link.classList.remove("is-scrolling");
-      link.style.removeProperty("--osd-scroll-distance");
-      link.style.removeProperty("--osd-scroll-duration");
-      if (href) {
-        link.setAttribute("href", href);
-        link.setAttribute("target", "_blank");
-        link.setAttribute("rel", "noopener noreferrer");
-      } else {
-        link.removeAttribute("href");
-        link.removeAttribute("target");
-        link.removeAttribute("rel");
-      }
+      if (textSpan) textSpan.textContent = rowText;
+      btn.classList.remove("is-scrolling");
+      btn.style.removeProperty("--osd-scroll-distance");
+      btn.style.removeProperty("--osd-scroll-duration");
       row.classList.toggle("active", slot === activeSlot);
       if (slot === activeSlot && uiPrefs.osdMarquee) {
         requestAnimationFrame(() => {
-          const overflowPx = textSpan.scrollWidth - link.clientWidth;
+          const overflowPx = textSpan.scrollWidth - btn.clientWidth;
           if (overflowPx > 6) {
             const distance = Math.ceil(overflowPx + 24);
             const duration = Math.min(16, Math.max(7, distance / 20));
-            link.style.setProperty("--osd-scroll-distance", `${distance}px`);
-            link.style.setProperty("--osd-scroll-duration", `${duration}s`);
-            link.classList.add("is-scrolling");
+            btn.style.setProperty("--osd-scroll-distance", `${distance}px`);
+            btn.style.setProperty("--osd-scroll-duration", `${duration}s`);
+            btn.classList.add("is-scrolling");
           }
         });
       }
@@ -347,6 +363,7 @@
     const menuText = (currentItem?.menuLabel || getMenuLabel(currentItem)).trim();
     if (crtChannelLabel) crtChannelLabel.textContent = `CH-${String(mediaIndex + 1).padStart(2, "0")} ${menuText.toUpperCase()}`;
     if (osdMenuHeader) osdMenuHeader.textContent = `Surf // ${menuText}`;
+    updateOsdOpenLink(currentItem);
   };
   const syncCrtMenuState = (item) => {
     if (!menuItems.length) return;
@@ -890,6 +907,7 @@
       crtMedia.src = normalizeKnownGifSource(crtMedia.getAttribute("src") || crtMedia.src);
       classifySignalImage(crtMedia, crtMedia.src);
     }
+    initOsdChannelSurf();
     cycleMenu();
     if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 12500 : 10000);
     setInterval(pulseCrtBurst, performanceMode ? 9800 : 7800);
@@ -1553,9 +1571,10 @@
     syncCrtMenuState(mediaFeed[mediaIndex]);
   };
 
-  const cycleCrtMedia = () => {
-    if (!crtMedia) return;
-    mediaIndex = (mediaIndex + 1) % mediaFeed.length;
+  const tuneCrtMediaToIndex = (nextIndex) => {
+    if (!crtMedia || !mediaFeed.length) return;
+    const normalized = ((nextIndex % mediaFeed.length) + mediaFeed.length) % mediaFeed.length;
+    mediaIndex = normalized;
     const item = mediaFeed[mediaIndex];
     const menuLabel = getMenuLabel(item);
     const queue = [item.src, ...(item.fallbacks || []), svgPreviewFallback(item.title)]
@@ -1569,7 +1588,7 @@
     };
     crtMedia.onerror = () => applyCandidate();
     applyCandidate();
-    crtCaption.textContent = `${menuLabel.toLowerCase()} // ${item.title}`;
+    if (crtCaption) crtCaption.textContent = `${menuLabel.toLowerCase()} // ${item.title}`;
     syncCrtMenuState(item);
     if (screen) {
       screen.classList.add("crt-switching");
@@ -1591,6 +1610,22 @@
         easing: "easeOutExpo"
       });
     }
+  };
+
+  const cycleCrtMedia = () => {
+    tuneCrtMediaToIndex(mediaIndex + 1);
+  };
+
+  const initOsdChannelSurf = () => {
+    if (!osdMenuList) return;
+    osdMenuList.addEventListener("click", (event) => {
+      const row = event.target.closest(".osd-menu li");
+      if (!row || !osdMenuList.contains(row)) return;
+      event.preventDefault();
+      const idx = Number(row.dataset.feedIndex);
+      if (!Number.isFinite(idx)) return;
+      tuneCrtMediaToIndex(idx);
+    });
   };
 
   const pulseCrtBurst = () => {
