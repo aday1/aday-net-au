@@ -4,22 +4,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  sync-dns-and-nginx:
+  sync-dns:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout macroverse stack (nginx + DNS script)
+      - name: Checkout macroverse stack (DNS script)
         uses: actions/checkout@v4
         with:
           repository: aday1/macroverse.aday.net.au
           ref: main
           path: macroverse-stack
 
-      - name: Upsert Cloudflare A records for Linode stack
+      - name: Upsert dev lane DNS (required)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ZONE_NAME: aday.net.au
+          SYNC_MODE: dev-only
         run: bash macroverse-stack/ops/sync-cloudflare-dns.sh
 
+      - name: Upsert remaining Linode DNS (best effort)
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_NAME: aday.net.au
+          SYNC_MODE: all
+        run: bash macroverse-stack/ops/sync-cloudflare-dns.sh
+
+  deploy-nginx:
+    needs: sync-dns
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy nginx config on Linode
         uses: appleboy/ssh-action@v1.0.3
         with:
