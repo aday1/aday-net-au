@@ -1607,20 +1607,24 @@ body.cuton-settled .shell {
   animation: crtMediaStaticFlicker 0.95s steps(2, end) infinite;
 }
 
-/* Headliner Macroverse / ArtBastard grok GIFs: CRT overlays were ~1s stepped (strobe).
-   Slower ease-based drift reads as a gentle CRT hum, not a flash sequence. */
+/* Headliner project loops: slow scan drift only (no stepped flicker overlay). */
 .crt-media-ease-soft::before {
-  opacity: 0.5;
-  animation: crtMediaScanSlow 5.8s ease-in-out infinite;
+  opacity: 0.28;
+  animation: crtMediaScanSlow 11s ease-in-out infinite;
 }
 
 .crt-media-ease-soft::after {
-  animation: crtMediaGlowSoft 7s ease-in-out infinite;
-  opacity: 0.38;
+  animation: none;
+  opacity: 0.18;
 }
 
-.crt-media-ease-soft > img.signal-animated {
-  filter: saturate(1.1) contrast(1.06);
+.crt-media-ease-soft > img.signal-animated,
+.crt-media-ease-soft > img.signal-static {
+  filter: saturate(1.05) contrast(1.03);
+}
+
+.crt-media-ease-soft > img.project-loop {
+  image-rendering: auto;
 }
 
 .mosh-wrap {

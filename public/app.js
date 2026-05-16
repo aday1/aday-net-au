@@ -295,7 +295,11 @@
   ];
   const gifPingPongSourceMap = {
     "/assets/repo-cards/macroverse-loop.gif": "/assets/repo-cards/macroverse-loop-pingpong.gif",
+    "/assets/repo-cards/macroverse-grok-loop.gif": "/assets/repo-cards/macroverse-loop-pingpong.gif",
     "/assets/repo-cards/artbastard-loop.gif": "/assets/repo-cards/artbastard-loop-pingpong.gif",
+    "/assets/repo-cards/artbastard-grok-loop.gif": "/assets/repo-cards/artbastard-loop-pingpong.gif",
+    "/assets/repo-cards/projects-grok-loop.gif": "/assets/repo-cards/macroverse-loop-pingpong.gif",
+    "/assets/repo-cards/qr-zipper-grok-loop.gif": "/assets/repo-cards/card-neon-code.jpg",
     "https://raw.githubusercontent.com/aday1/MoveMusicSaveEditor/main/test.gif": "/assets/repo-cards/movemusicsaveeditor-loop-pingpong.gif"
   };
   const normalizeKnownGifSource = (value) => {
