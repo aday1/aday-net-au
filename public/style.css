@@ -608,9 +608,32 @@ body:not(.boot-seq) .shell {
   display: block;
   max-width: min(100%, 280px);
   height: auto;
-  image-rendering: pixelated;
+  image-rendering: auto;
   border: 1px solid rgba(129, 198, 255, 0.35);
   background: #000;
+}
+
+.friend-brand-logo-wide {
+  max-width: min(100%, 240px);
+}
+
+.friend-brand-logo-square {
+  max-width: 96px;
+  border-radius: 4px;
+}
+
+.friend-brand-logo-pixel {
+  image-rendering: pixelated;
+}
+
+.card .friend-brand-link + a {
+  margin-top: 0.45rem;
+  display: inline-block;
+}
+
+.card .friend-brand-link[href*="youtube"]::before,
+.card a[href*="youtube.com"]::before {
+  filter: invert(90%) sepia(20%) saturate(265%) hue-rotate(162deg) brightness(1.02) contrast(1.02);
 }
 
 .friend-brand-link span {
