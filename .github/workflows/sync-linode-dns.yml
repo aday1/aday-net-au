@@ -1,5 +1,9 @@
 name: sync-linode-dns
 
+# Requires CLOUDFLARE_DNS_API_TOKEN (Zone DNS Edit on aday.net.au).
+# Pages-only CLOUDFLARE_API_TOKEN cannot create dns_records (HTTP 403).
+# After DNS sync, run deploy-linode on macroverse.aday.net.au to reload nginx.
+
 on:
   workflow_dispatch:
 
@@ -16,7 +20,7 @@ jobs:
 
       - name: Upsert dev lane DNS (required)
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DNS_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ZONE_NAME: aday.net.au
           SYNC_MODE: dev-only
         run: bash macroverse-stack/ops/sync-cloudflare-dns.sh
@@ -24,35 +28,7 @@ jobs:
       - name: Upsert remaining Linode DNS (best effort)
         continue-on-error: true
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DNS_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ZONE_NAME: aday.net.au
           SYNC_MODE: all
         run: bash macroverse-stack/ops/sync-cloudflare-dns.sh
-
-  deploy-nginx:
-    needs: sync-dns
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy nginx config on Linode
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.LINODE_HOST }}
-          username: ${{ secrets.LINODE_USER }}
-          key: ${{ secrets.LINODE_SSH_KEY }}
-          script: |
-            flock /tmp/macroverse-deploy.lock bash -lc '
-              set -e
-              cd ~/compose/macroverse.aday.net.au
-              if [ -f nginx/auth/aday.htpasswd ] && ! git ls-files --error-unmatch nginx/auth/aday.htpasswd >/dev/null 2>&1; then
-                mv nginx/auth/aday.htpasswd "nginx/auth/aday.htpasswd.bak.$(date +%s)"
-              fi
-              git pull --ff-only origin main
-              if [ -f nginx/auth/aday.htpasswd ]; then
-                sed -i "s/\r$//" nginx/auth/aday.htpasswd
-              fi
-              docker compose pull
-              docker compose up -d --remove-orphans
-              docker compose exec -T nginx nginx -t
-              docker restart edge_nginx
-            '
