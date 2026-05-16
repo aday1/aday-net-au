@@ -13,6 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: aday-net-au
+
+      - uses: actions/checkout@v4
+        with:
+          repository: aday1/blog.aday.net.au
+          path: blog.aday.net.au
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -25,9 +32,11 @@ jobs:
       - name: Build media catalogs
         env:
           WB_SKIP_ENRICH: "1"
+        working-directory: aday-net-au
         run: node ./scripts/build-media-data.mjs
 
       - name: Write deploy metadata
+        working-directory: aday-net-au
         run: |
           SHORT_SHA="$(echo "$GITHUB_SHA" | cut -c1-12)"
           BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -58,3 +67,4 @@ jobs:
         with:
           wranglerVersion: '4'
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: aday-net-au
