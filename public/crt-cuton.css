@@ -118,6 +118,7 @@
   }
 
   body:not(.boot-seq) .shell,
+  body.cuton-settled .shell,
   body:not(.boot-seq) main,
   body:not(.boot-seq) .container {
     animation: none !important;

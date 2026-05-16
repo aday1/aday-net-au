@@ -41,7 +41,8 @@ html.cuton-skip .page-transition {
   display: none !important;
 }
 
-html.cuton-skip body.boot-seq .shell {
+html.cuton-skip body.boot-seq .shell,
+html.cuton-skip body.cuton-settled .shell {
   opacity: 1;
   visibility: visible;
   animation: none !important;
@@ -118,6 +119,13 @@ html.cuton-skip body.boot-seq .shell {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+.page-transition.hidden::before,
+.page-transition.hidden::after,
+.page-transition.hidden .page-transition-inner::before {
+  animation: none !important;
+  opacity: 0 !important;
 }
 
 
@@ -219,11 +227,19 @@ body.boot-seq .shell {
   animation: none !important;
 }
 
-body:not(.boot-seq) .shell {
+body:not(.boot-seq):not(.cuton-settled) .shell {
   opacity: 1;
   visibility: visible;
-  animation: crtTvTurnOn 900ms linear both;
+  animation: crtTvTurnOn 900ms linear forwards;
   transform-origin: center center;
+}
+
+body.cuton-settled .shell {
+  opacity: 1;
+  visibility: visible;
+  animation: none !important;
+  transform: none;
+  filter: none;
 }
 
 .masthead { padding-bottom: 14px; border-bottom: 1px dashed #405577; overflow: hidden; max-width: 100%; }
@@ -2381,7 +2397,8 @@ body.animations-off *::after {
     animation: none !important;
   }
 
-  body:not(.boot-seq) .shell {
+  body:not(.boot-seq) .shell,
+  body.cuton-settled .shell {
     animation: none !important;
   }
 }

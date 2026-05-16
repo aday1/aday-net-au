@@ -94,8 +94,7 @@ body.scanlines-off .microbee-matrix {
   animation: microbeeBandFlicker 0.1s steps(2, end) 3;
 }
 
-body.microbee-glitch-slice .screen,
-body.microbee-glitch-slice .shell {
+body.microbee-glitch-slice .screen {
   animation: microbeeSliceJolt 0.14s steps(2, end) 1;
 }
 

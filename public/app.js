@@ -913,7 +913,10 @@
       // ignore storage errors
     }
   };
-  const bootDone = () => body.classList.remove("boot-seq");
+  const bootDone = () => {
+    body.classList.remove("boot-seq");
+    body.classList.add("cuton-settled");
+  };
   const hideTransition = () => pageTransition?.classList.add("hidden");
   const CUTON_BOOT_MS = prefersReducedMotion ? 0 : 100;
   const CUTON_HIDE_MS = prefersReducedMotion ? 0 : 920;

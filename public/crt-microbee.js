@@ -33,9 +33,11 @@
   let height = 0;
   let dpr = 1;
   let glitchY = 0.8;
+  let lastGlitchAt = 0;
   let lastT = performance.now();
   let rafId = 0;
   let running = true;
+  const GLITCH_COOLDOWN_MS = 3200;
 
   const isEnabled = () => {
     const body = document.body;
@@ -99,6 +101,9 @@
   };
 
   const triggerGlitch = () => {
+    const now = performance.now();
+    if (now - lastGlitchAt < GLITCH_COOLDOWN_MS) return;
+    lastGlitchAt = now;
     glitchY = (glitchY + 0.11 + Math.random() * 0.08) % 1;
     glitchBand.style.top = `${glitchY * height - 3}px`;
     glitchBand.classList.add("is-hot");
@@ -122,7 +127,7 @@
 
     drawMatrix(delta);
 
-    if (Math.random() < delta * 1.8) triggerGlitch();
+    if (Math.random() < delta * 0.22) triggerGlitch();
   };
 
   document.body.classList.add("microbee-crt-on");
