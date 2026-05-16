@@ -1,0 +1,11 @@
+{
+  "name": "Aday (Adrian Richardson)",
+  "imageCredit": "Clan Analogue artist profile // 8bit domination AU geoshed",
+  "sources": [
+    { "label": "Clan Analogue", "url": "https://www.clananalogue.org/artists/aday/" },
+    { "label": "MacroVerse", "url": "https://macroverse.aday.net.au/about.html" }
+  ],
+  "clanBio": "Old-school machines (Amiga 1200, Atari 1040 STE, LSDJ Gameboy, MidiNES) meet trackers, grooveboxes, and VSTs. The hack/DIY side of making music matters: MIDI, OSC, and getting gear to talk. I VJ at breakcore and chiptune nights, build audio-reactive installs, and ran WeeklyBeats from 2012-2018. Releases on Clan Analogue: CA055M (Ming One | Addiction), CA053 (Mobile Strategies).",
+  "macroverseBio": "MacroVerse began as a live sonic and visual work with Reductionist (Nick Wilson): universe evolution from energy stasis toward heat-death, at Abbotsford Convent during Melbourne Fringe. Reductionist performed on battery-powered micro-instruments; I projected live video that bent time and scale. Longtime Clan Analogue members. macroverse.aday.net.au carries that practice forward as a browser shader/VJ instrument.",
+  "tags": ["chiptune", "breakcore", "VJ", "trackers", "Clan Analogue", "Melbourne Fringe", "GLSL", "live visuals"]
+}

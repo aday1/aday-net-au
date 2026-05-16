@@ -4,6 +4,10 @@
   const atzCanvas = document.getElementById("atzCanvas");
   const crtMedia = document.getElementById("crtMedia");
   const crtCaption = document.getElementById("crtCaption");
+  const crtAboutRadar = document.getElementById("crtAboutRadar");
+  const crtAboutBio = document.getElementById("crtAboutBio");
+  const crtAboutBioScroll = document.getElementById("crtAboutBioScroll");
+  const crtAboutPortraitFx = document.getElementById("crtAboutPortraitFx");
   const screen = document.querySelector(".screen");
   const crtChannelLabel = document.querySelector(".channel");
   const osdMenuHeader = document.querySelector(".osd-menu header");
@@ -61,7 +65,28 @@
   let mediaIndex = 0;
   const sessionEdgeSeed = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 
+  const aboutBioFallback = {
+    name: "Aday (Adrian Richardson)",
+    imageCredit: "Clan Analogue // 8bit domination AU geoshed",
+    clanBio: "Old-school machines (Amiga 1200, Atari 1040 STE, LSDJ Gameboy, MidiNES) meet trackers, grooveboxes, and VSTs. Hack/DIY wiring via MIDI and OSC. I VJ at breakcore and chiptune nights, build audio-reactive installs, and ran WeeklyBeats from 2012-2018. Clan Analogue releases: CA055M, CA053.",
+    macroverseBio: "MacroVerse was a live sonic/visual work with Reductionist (Nick Wilson) for Melbourne Fringe at Abbotsford Convent: universe-scale energy, micro-instrument performance, and projected video that bent time. macroverse.aday.net.au extends that live-visual practice as a browser shader/VJ instrument.",
+    tags: ["chiptune", "breakcore", "VJ", "trackers", "Clan Analogue", "Melbourne Fringe", "GLSL"]
+  };
+  let aboutBioData = { ...aboutBioFallback };
+
   const mediaFeed = [
+    {
+      mode: "about",
+      src: "/assets/about/aday-profile-geoshed.jpg",
+      title: "about // artist identity",
+      menuLabel: "About",
+      osdTitle: "Profile + bios",
+      href: "https://www.clananalogue.org/artists/aday/",
+      fallbacks: [
+        "https://www.clananalogue.org/wp-content/uploads/2019/10/aday-8bit-domination-AU-geoshed-768x512.jpg",
+        "https://content.pouet.net/logos/neuroxfra.gif"
+      ]
+    },
     {
       src: "https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png",
       title: "error-diffusion / visual patch output",
@@ -890,8 +915,8 @@
   };
   const bootDone = () => body.classList.remove("boot-seq");
   const hideTransition = () => pageTransition?.classList.add("hidden");
-  const CUTON_BOOT_MS = prefersReducedMotion ? 0 : 1500;
-  const CUTON_HIDE_MS = prefersReducedMotion ? 0 : 1950;
+  const CUTON_BOOT_MS = prefersReducedMotion ? 0 : 100;
+  const CUTON_HIDE_MS = prefersReducedMotion ? 0 : 920;
   let cutOnScheduled = false;
   let heavyAppStarted = false;
   const startHeavyApp = () => {
@@ -908,7 +933,7 @@
       classifySignalImage(crtMedia, crtMedia.src);
     }
     initOsdChannelSurf();
-    cycleMenu();
+    tuneCrtMediaToIndex(mediaIndex);
     if (crtMedia) setInterval(cycleCrtMedia, performanceMode ? 12500 : 10000);
     setInterval(pulseCrtBurst, performanceMode ? 9800 : 7800);
     initHeaderLoops();
@@ -970,7 +995,8 @@
       scanlines: true,
       animations: true,
       bgShader: true,
-      osdMarquee: true
+      osdMarquee: true,
+      friendExitTransition: true
     };
     try {
       const raw = localStorage.getItem(UI_PREF_KEY);
@@ -983,7 +1009,8 @@
         scanlines: parsed.scanlines !== false,
         animations: parsed.animations !== false,
         bgShader: parsed.bgShader !== false,
-        osdMarquee: parsed.osdMarquee !== false
+        osdMarquee: parsed.osdMarquee !== false,
+        friendExitTransition: parsed.friendExitTransition !== false
       };
     } catch {
       return defaults;
@@ -1003,6 +1030,7 @@
     body.classList.toggle("hide-osd-menu", !uiPrefs.osdMenu);
     body.classList.toggle("scanlines-off", !uiPrefs.scanlines);
     body.classList.toggle("animations-off", !uiPrefs.animations);
+    body.classList.toggle("microbee-off", !uiPrefs.animations || !uiPrefs.scanlines);
     body.classList.toggle("hide-atz-bg", !uiPrefs.bgShader);
     body.classList.toggle("disable-osd-marquee", !uiPrefs.osdMarquee);
     if (cursor) cursor.style.display = "none";
@@ -1017,7 +1045,8 @@
       "<button type=\"button\" data-pref=\"bgShader\">Toggle shader background</button>",
       "<button type=\"button\" data-pref=\"osdMarquee\">Toggle OSD marquee</button>",
       "<button type=\"button\" data-pref=\"crtStatic\">Toggle CRT static overlay</button>",
-      "<button type=\"button\" data-pref=\"osdMenu\">Toggle TV OSD menu</button>"
+      "<button type=\"button\" data-pref=\"osdMenu\">Toggle TV OSD menu</button>",
+      "<button type=\"button\" data-pref=\"friendExitTransition\">Toggle friend exit globe</button>"
     ].join("");
     const updateMenuState = () => {
       menu.querySelectorAll("button[data-pref]").forEach((btn) => {
@@ -1066,6 +1095,16 @@
     });
     window.addEventListener("resize", closeMenu);
   };
+  fetch("./data/aday-about-bio.json")
+    .then((res) => (res.ok ? res.json() : Promise.reject(new Error("bio missing"))))
+    .then((data) => {
+      aboutBioData = { ...aboutBioFallback, ...data };
+      if (screen?.classList.contains("crt-about-active")) renderAboutBioPanel();
+    })
+    .catch(() => {
+      aboutBioData = { ...aboutBioFallback };
+    });
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => runCutOnSequence(false), { once: true });
   } else {
@@ -1140,10 +1179,15 @@
 
       void main() {
         vec2 uv = gl_FragCoord.xy / uRes.xy;
+        vec2 center = uv - 0.5;
+        float barrel = dot(center, center) * 0.22;
+        uv += center * (1.0 - barrel) * barrel;
         vec2 p = uv * 2.0 - 1.0;
         p.x *= uRes.x / uRes.y;
 
         float t = uTime * 0.32;
+        float phosphor = fract(uv.y * uRes.y * 0.5);
+        float scanAmp = phosphor * phosphor / 0.25;
         float wave = sin((uv.y + t * 0.9) * 92.0) * 0.06;
         float scan = sin((uv.y + t) * 1520.0) * 0.11;
         float n = noise(uv * 450.0 + t * 40.0) * 0.18;
@@ -1166,6 +1210,8 @@
 
         float vignette = smoothstep(1.15, 0.38, length(p));
         col *= vignette;
+        col *= 1.0 - scanAmp * 0.11;
+        col += vec3(0.04, 0.12, 0.07) * (1.0 - scanAmp) * 0.35;
 
         gl_FragColor = vec4(col, 1.0);
       }
@@ -1233,11 +1279,18 @@
       ctx.fillRect(x, yy, 92, 3);
     }
 
-    if (Math.random() < 0.12) {
+    const microbeeOn = document.body.classList.contains("microbee-crt-on")
+      && !document.body.classList.contains("microbee-off");
+    if (Math.random() < (microbeeOn ? 0.22 : 0.12)) {
       const gy = Math.random() * h;
       const gh = 8 + Math.random() * 20;
-      const sx = (Math.random() - 0.5) * 18;
+      const sx = (Math.random() - 0.5) * (microbeeOn ? 28 : 18);
       ctx.drawImage(canvas, 0, gy, w, gh, sx, gy + (Math.random() - 0.5) * 6, w, gh);
+    }
+    if (microbeeOn && Math.random() < 0.08) {
+      const bandY = ((performance.now() * 0.00007) % 1) * h;
+      ctx.fillStyle = "rgba(0, 255, 130, 0.06)";
+      ctx.fillRect(0, bandY, w, 3);
     }
   };
 
@@ -1571,11 +1624,57 @@
     syncCrtMenuState(mediaFeed[mediaIndex]);
   };
 
+  const renderAboutBioPanel = () => {
+    if (!crtAboutBioScroll) return;
+    const bio = aboutBioData;
+    const tagHtml = (bio.tags || [])
+      .map((tag) => `<span class="crt-about-tag">${tag}</span>`)
+      .join("");
+    crtAboutBioScroll.innerHTML = [
+      `<p class="crt-about-name">${bio.name}</p>`,
+      `<p class="crt-about-credit">${bio.imageCredit || ""}</p>`,
+      `<p class="crt-about-block"><span class="crt-about-src">CLAN //</span> ${bio.clanBio}</p>`,
+      `<p class="crt-about-block"><span class="crt-about-src">MACROVERSE //</span> ${bio.macroverseBio}</p>`,
+      `<p class="crt-about-links"><a href="https://www.clananalogue.org/artists/aday/" target="_blank" rel="noopener noreferrer">clan analogue</a> · <a href="https://macroverse.aday.net.au/about.html" target="_blank" rel="noopener noreferrer">macroverse about</a></p>`,
+      `<div class="crt-about-tags">${tagHtml}</div>`
+    ].join("");
+  };
+
+  const syncAboutPortraitFx = () => {
+    if (!crtAboutPortraitFx || !crtMedia) return;
+    const src = crtMedia.currentSrc || crtMedia.src;
+    if (!src) return;
+    crtAboutPortraitFx.style.backgroundImage = `url("${src}")`;
+  };
+
+  const setCrtAboutMode = (active) => {
+    if (!screen) return;
+    screen.classList.toggle("crt-about-active", active);
+    if (crtAboutBio) crtAboutBio.hidden = !active;
+    if (crtAboutPortraitFx) crtAboutPortraitFx.hidden = !active;
+    if (crtAboutRadar) crtAboutRadar.hidden = !active;
+    if (canvas) canvas.style.opacity = active ? "0.18" : "";
+    if (crtMedia) {
+      crtMedia.classList.toggle("crt-about-portrait", active);
+    }
+    if (active) {
+      renderAboutBioPanel();
+      syncAboutPortraitFx();
+      if (!prefersReducedMotion && window.crtAboutRadar) {
+        window.crtAboutRadar.start(crtAboutRadar);
+      }
+    } else if (window.crtAboutRadar) {
+      window.crtAboutRadar.stop();
+    }
+  };
+
   const tuneCrtMediaToIndex = (nextIndex) => {
     if (!crtMedia || !mediaFeed.length) return;
     const normalized = ((nextIndex % mediaFeed.length) + mediaFeed.length) % mediaFeed.length;
     mediaIndex = normalized;
     const item = mediaFeed[mediaIndex];
+    const isAbout = item?.mode === "about";
+    setCrtAboutMode(isAbout);
     const menuLabel = getMenuLabel(item);
     const queue = [item.src, ...(item.fallbacks || []), svgPreviewFallback(item.title)]
       .map((candidate) => normalizeKnownGifSource(candidate));
@@ -1584,20 +1683,28 @@
       if (idx >= queue.length) return;
       crtMedia.src = queue[idx];
       classifySignalImage(crtMedia, queue[idx]);
+      if (isAbout) syncAboutPortraitFx();
       idx += 1;
     };
     crtMedia.onerror = () => applyCandidate();
     applyCandidate();
-    if (crtCaption) crtCaption.textContent = `${menuLabel.toLowerCase()} // ${item.title}`;
+    if (crtCaption) {
+      crtCaption.textContent = isAbout
+        ? `${menuLabel.toLowerCase()} // ${aboutBioData.name}`
+        : `${menuLabel.toLowerCase()} // ${item.title}`;
+    }
     syncCrtMenuState(item);
     if (screen) {
       screen.classList.add("crt-switching");
       setTimeout(() => screen.classList.remove("crt-switching"), 700);
     }
+    if (isAbout && crtMedia.complete) moshImage(crtMedia);
+    else if (isAbout) crtMedia.addEventListener("load", () => moshImage(crtMedia), { once: true });
+
     if (window.anime) {
       window.anime({
         targets: crtMedia,
-        opacity: [0.12, 0.86],
+        opacity: [0.12, isAbout ? 0.96 : 0.86],
         scale: [1.02, 1],
         duration: 1050,
         easing: "easeOutCubic"

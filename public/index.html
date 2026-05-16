@@ -11,6 +11,9 @@
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
   <script defer src="https://w.soundcloud.com/player/api.js"></script>
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./crt-cuton.css">
+  <link rel="stylesheet" href="./crt-microbee.css">
+  <link rel="stylesheet" href="./friend-exit-transition.css">
   <script src="./cuton-preflight.js"></script>
 </head>
 <body class="scanlines-on boot-seq">
@@ -31,8 +34,14 @@
     <section class="crt-rig scanlines" aria-label="crt-hero">
       <div class="screen">
         <canvas id="crtCanvas" class="picture" width="960" height="540"></canvas>
+        <canvas id="crtAboutRadar" class="crt-about-radar" aria-hidden="true"></canvas>
+        <div id="crtAboutPortraitFx" class="crt-about-portrait-fx" aria-hidden="true"></div>
         <img id="crtMedia" class="crt-media mosh-image" src="https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png" alt="Aday media feed">
         <div class="crt-static-overlay" aria-hidden="true"></div>
+        <div id="crtAboutBio" class="crt-about-bio" hidden>
+          <p class="crt-about-kicker">SYS // ARTIST ID</p>
+          <div id="crtAboutBioScroll" class="crt-about-bio-scroll"></div>
+        </div>
         <div id="crtCaption" class="crt-caption">error-diffusion visual stream</div>
         <div class="overlay">
           <div class="channel">AV-1</div>
@@ -98,6 +107,9 @@
     </footer>
   </main>
   <div id="retroCursor" class="retro-cursor" aria-hidden="true"></div>
+  <script defer src="./crt-about-radar.js"></script>
+  <script defer src="./crt-microbee.js"></script>
+  <script defer src="./friend-exit-transition.js"></script>
   <script src="./app.js"></script>
   <div id="deployMetaDock" style="position:fixed;right:10px;bottom:10px;z-index:9999;max-width:min(420px,calc(100vw - 20px));font:11px/1.45 ui-monospace,Consolas,monospace;">
     <div id="deployMetaRestore" hidden style="margin-bottom:6px;text-align:right;">
