@@ -31,6 +31,7 @@ jobs:
 
   deploy-nginx:
     needs: sync-dns
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy nginx config on Linode
@@ -52,6 +53,6 @@ jobs:
               fi
               docker compose pull
               docker compose up -d --remove-orphans
-              docker compose exec -T edge_nginx nginx -t
+              docker compose exec -T nginx nginx -t
               docker restart edge_nginx
             '
