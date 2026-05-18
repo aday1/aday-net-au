@@ -18,6 +18,12 @@ jobs:
           ref: main
           path: macroverse-stack
 
+      - name: Probe Cloudflare DNS token
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DNS_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_NAME: aday.net.au
+        run: bash macroverse-stack/ops/check-cloudflare-dns-token.sh
+
       - name: Upsert dev lane DNS (required)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DNS_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
