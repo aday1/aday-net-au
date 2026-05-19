@@ -257,7 +257,7 @@
       .join("");
     return `<section id="${sectionId}" class="blog-yt-section media-yt-section panel">
       <h2 class="decrypt">YouTube archive</h2>
-      <p class="repo-meta">${escapeHtml(String(catalog.video_count || 0))} uploads — @aday_net_au + @aday1</p>
+      <p class="repo-meta">${escapeHtml(String(catalog.video_count || 0))} uploads — @aday_net_au</p>
       <div class="yt-archive-controls">
         <label for="${sectionId}Search">Search</label>
         <input id="${sectionId}Search" type="search" placeholder="filter titles..." />

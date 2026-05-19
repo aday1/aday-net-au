@@ -245,8 +245,8 @@
       src: "/assets/repo-cards/card-circuit-blue.jpg",
       title: "youtube / channel feed",
       menuLabel: "YouTube",
-      osdTitle: "@aday1 channel",
-      href: "https://www.youtube.com/@aday1",
+      osdTitle: "@aday_net_au",
+      href: "https://www.youtube.com/@aday_net_au",
       fallbacks: ["https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png"]
     },
     {
@@ -640,13 +640,6 @@
       type: "music",
       kind: "youtube",
       embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUdKgN2c92DhDON71FBwGq4g&enablejsapi=1&playsinline=1&rel=0"
-    },
-    {
-      id: "aday-yt-aday1",
-      label: "YouTube @aday1 uploads",
-      type: "music",
-      kind: "youtube",
-      embed: "https://www.youtube-nocookie.com/embed/videoseries?list=UUv2idZd22rCQsmcBMh0AAeg&enablejsapi=1&playsinline=1&rel=0"
     },
     {
       id: "aisjam-yt",
