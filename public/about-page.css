@@ -7,6 +7,8 @@
 
 .about-portrait {
   width: 100%;
+  height: auto;
+  aspect-ratio: 768 / 512;
   border: 1px solid #6f2032;
   border-radius: 4px;
   display: block;
