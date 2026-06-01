@@ -131,7 +131,7 @@
       title: "macroverse visual relay card",
       menuLabel: "Macroverse",
       osdTitle: "Live visual relay card",
-      href: "https://macroverse.aday.net.au",
+      href: "https://aday1.github.io/macroverse.aday.net.au/",
       fallbacks: [
         "/assets/repo-cards/card-radar-core.jpg",
         "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png",
@@ -810,7 +810,8 @@
     ZealPalace: "https://aday1.github.io/ZealPalace/",
     "acid-banger": "https://aday1.github.io/acid-banger/",
     "error-diffusion": "https://errordiffusion.net",
-    MoveMusicSaveEditor: "https://movemusic.com/"
+    MoveMusicSaveEditor: "https://movemusic.com/",
+    "macroverse.aday.net.au": "https://aday1.github.io/macroverse.aday.net.au/"
   };
 
   const repoImageOverrides = {
@@ -1334,7 +1335,7 @@
     const MAX_LAYER = 4;
     const nodes = [
       { id: "aday", layer: 0, slot: 0, r: 8, c: "#9eff89", label: "aday.net.au", url: "https://aday.net.au" },
-      { id: "macroverse", layer: 1, slot: 0, r: 6, c: "#9fd4ff", label: "macroverse", url: "https://macroverse.aday.net.au" },
+      { id: "macroverse", layer: 1, slot: 0, r: 6, c: "#9fd4ff", label: "macroverse", url: "https://aday1.github.io/macroverse.aday.net.au/" },
       { id: "artbastard", layer: 1, slot: 1, r: 6, c: "#9fd4ff", label: "artbastard", url: "https://artbastard.aday.net.au" },
       { id: "keys", layer: 1, slot: 2, r: 5.5, c: "#7ecfff", label: "keys", url: "https://keys.aday.net.au" },
       { id: "blog", layer: 1, slot: 3, r: 5.5, c: "#9eff89", label: "blog", url: "https://blog.aday.net.au" },
