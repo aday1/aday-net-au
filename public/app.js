@@ -810,6 +810,7 @@
     ZealPalace: "https://aday1.github.io/ZealPalace/",
     "acid-banger": "https://aday1.github.io/acid-banger/",
     "error-diffusion": "https://errordiffusion.net",
+    "qr-zipper": "https://qr-zipper.aday.net.au",
     MoveMusicSaveEditor: "https://movemusic.com/",
     "macroverse.aday.net.au": "https://aday1.github.io/macroverse.aday.net.au/"
   };
