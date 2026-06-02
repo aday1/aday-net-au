@@ -143,7 +143,7 @@
       title: "artbastard live control card",
       menuLabel: "ArtBastard",
       osdTitle: "Live control card",
-      href: "https://artbastard.aday.net.au",
+      href: "https://aday1.github.io/artbastard.aday.net.au/",
       fallbacks: [
         "/assets/repo-cards/card-dmx-console.jpg",
         "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png",
