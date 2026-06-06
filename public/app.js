@@ -53,7 +53,7 @@
   const galleryCards = [...document.querySelectorAll(".gallery-card")];
   const ENABLE_RETRO_CURSOR = true;
   const UI_PREF_KEY = "aday-ui-prefs-v1";
-  const UI_PREF_VERSION = 2;
+  const UI_PREF_VERSION = 3;
   const prefersReducedMotion = !!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   const coarsePointer = !!window.matchMedia?.("(pointer: coarse)")?.matches;
   const smallViewport = window.innerWidth <= 820;
@@ -63,7 +63,6 @@
   const queryParams = new URLSearchParams(window.location.search);
   const shaderQuery = queryParams.get("shader");
   const shaderAllowed = !!atzCanvas && !performanceMode && !ultraLiteMode && shaderQuery !== "off";
-  const shaderForcedOn = shaderQuery === "on" && shaderAllowed;
   const ATZ_RENDER_SCALE = 0.55;
   const ATZ_FRAME_BUDGET_MS = 1000 / 12;
   const crtFrameBudgetMs = ultraLiteMode ? 50 : (performanceMode ? 34 : 16);
@@ -1001,7 +1000,7 @@
       osdMenu: true,
       scanlines: true,
       animations: true,
-      bgShader: shaderForcedOn,
+      bgShader: shaderAllowed,
       osdMarquee: true,
       friendExitTransition: true,
       prefVersion: UI_PREF_VERSION
@@ -1010,16 +1009,16 @@
       const raw = localStorage.getItem(UI_PREF_KEY);
       if (!raw) return defaults;
       const parsed = JSON.parse(raw);
-      const migratedShaderDefault = parsed.prefVersion === UI_PREF_VERSION
-        ? parsed.bgShader === true
-        : false;
+      const shaderPref = parsed.prefVersion === UI_PREF_VERSION
+        ? parsed.bgShader !== false
+        : true;
       return {
         retroCursor: canUseRetroCursor && parsed.retroCursor !== false,
         crtStatic: parsed.crtStatic !== false,
         osdMenu: parsed.osdMenu !== false,
         scanlines: parsed.scanlines !== false,
         animations: parsed.animations !== false,
-        bgShader: shaderForcedOn || (shaderAllowed && !prefersReducedMotion && shaderQuery !== "off" && migratedShaderDefault),
+        bgShader: shaderAllowed && shaderPref,
         osdMarquee: parsed.osdMarquee !== false,
         friendExitTransition: parsed.friendExitTransition !== false,
         prefVersion: UI_PREF_VERSION
