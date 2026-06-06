@@ -134,8 +134,8 @@
       href: "https://aday1.github.io/macroverse.aday.net.au/",
       fallbacks: [
         "/assets/repo-cards/card-radar-core.jpg",
-        "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png",
-        "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/screenshot.png"
+        "https://aday1.github.io/macroverse.aday.net.au/screenshots/full-ui-layout.webp",
+        "https://aday1.github.io/macroverse.aday.net.au/videos/hero-loop-poster.webp"
       ]
     },
     {
@@ -146,8 +146,8 @@
       href: "https://aday1.github.io/artbastard.aday.net.au/",
       fallbacks: [
         "/assets/repo-cards/card-dmx-console.jpg",
-        "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png",
-        "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/screenshot.png"
+        "/assets/repo-cards/card-system-tree.jpg",
+        "/assets/repo-cards/card-neon-code.jpg"
       ]
     },
     {
@@ -619,8 +619,8 @@
   const randomImageSources = [
     "https://raw.githubusercontent.com/aday1/error-diffusion/master/public/assets/max-patch-1.png",
     "https://raw.githubusercontent.com/aday1/acid-banger/main/preview.png",
-    "https://raw.githubusercontent.com/aday1/macroverse.aday.net.au/main/preview.png",
-    "https://raw.githubusercontent.com/aday1/artbastard.aday.net.au/main/preview.png",
+    "https://aday1.github.io/macroverse.aday.net.au/screenshots/full-ui-layout.webp",
+    "/assets/repo-cards/card-dmx-console.jpg",
     "https://media.demozoo.org/screens/t/dc/3c/d2ca.pl765305.jpg",
     "https://media.demozoo.org/screens/t/0d/47/2883.187843.jpg",
     "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1400&q=80",
