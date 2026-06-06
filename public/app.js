@@ -77,7 +77,7 @@
     teaser:
       "Chiptune, breakcore, and live visuals from Melbourne. Clan Analogue artist; MacroVerse Fringe alum. Trackers, VJ nights, and browser shader rigs.",
     imageCredit: "Clan Analogue // 8bit domination AU geoshed",
-    clanBio: "Old-school machines (Amiga 1200, Atari 1040 STE, LSDJ Gameboy, MidiNES) meet trackers, grooveboxes, and VSTs. Hack/DIY wiring via MIDI and OSC. I VJ at breakcore and chiptune nights, build audio-reactive installs, and ran WeeklyBeats from 2012-2018. Clan Analogue releases: CA055M, CA053.",
+    clanBio: "Old-school machines (Amiga 1200, Atari 1040 STE, LSDJ Gameboy, MidiNES) meet trackers, grooveboxes, and VSTs. Hack/DIY wiring via MIDI and OSC. I VJ at breakcore and chiptune nights, build audio-reactive installs, and submitted to WeeklyBeats across multiple years. Clan Analogue releases: CA055M, CA053.",
     macroverseBio: "MacroVerse was a live sonic/visual work with Reductionist (Nick Wilson) for Melbourne Fringe at Abbotsford Convent: universe-scale energy, micro-instrument performance, and projected video that bent time. macroverse.aday.net.au extends that live-visual practice as a browser shader/VJ instrument.",
     tags: ["chiptune", "breakcore", "VJ", "trackers", "Clan Analogue", "Melbourne Fringe", "GLSL"]
   };
